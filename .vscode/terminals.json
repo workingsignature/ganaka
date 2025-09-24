@@ -1,0 +1,20 @@
+{
+  "autorun": false,
+  "terminals": [
+    {
+      "name": "Client:dev",
+      "focus": true,
+      "command": "pnpm run dev:client"
+    },
+    {
+      "name": "Server:dev",
+      "focus": true,
+      "command": "pnpm run dev:server"
+    },
+    {
+      "name": "Bot:dev",
+      "focus": true,
+      "command": "pnpm run dev:bot"
+    }
+  ]
+}
