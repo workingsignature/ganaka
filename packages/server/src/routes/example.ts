@@ -6,8 +6,6 @@ const exampleRoutes: FastifyPluginAsync = async (fastify, opts) => {
     return {
       message: "Hello from example route!",
       timestamp: new Date().toISOString(),
-      pluginData: fastify.example,
-      pluginMethod: fastify.getExampleMessage(),
     };
   });
 
