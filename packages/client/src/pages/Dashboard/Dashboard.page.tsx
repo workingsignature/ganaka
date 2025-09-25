@@ -1,4 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  MiniCalendar,
+  MiniCalendarDay,
+  MiniCalendarDays,
+  MiniCalendarNavigation,
+} from "@/components/ui/shadcn-io/mini-calendar";
 
 export const DashboardPage = () => {
   // DRAW
@@ -9,11 +15,19 @@ export const DashboardPage = () => {
           <CardHeader>
             <CardTitle>Shortlist</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p>
-              Here are your top recommendations for the week. These are based on
-              your preferences and the weather.
-            </p>
+          <CardContent className="w-full h-full grid grid-rows-[auto_1fr] gap-2">
+            <div className="w-full h-full">
+              <MiniCalendar>
+                <MiniCalendarNavigation direction="prev" />
+                <MiniCalendarDays>
+                  {(date) => (
+                    <MiniCalendarDay date={date} key={date.toISOString()} />
+                  )}
+                </MiniCalendarDays>
+                <MiniCalendarNavigation direction="next" />
+              </MiniCalendar>
+            </div>
+            <div>Shortlist</div>
           </CardContent>
         </Card>
         <Card className="w-full h-full">
