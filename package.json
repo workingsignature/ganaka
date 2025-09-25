@@ -11,6 +11,11 @@
     "name": "Rohit Raj",
     "email": "rohitrajnovember@gmail.com"
   },
+  "pnpm": {
+    "overrides": {
+      "@types/node": "^24.5.2"
+    }
+  },
   "license": "MIT",
   "packageManager": "pnpm@10.8.0"
 }

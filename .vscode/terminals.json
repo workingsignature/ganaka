@@ -15,6 +15,13 @@
       "name": "Bot:dev",
       "focus": true,
       "command": "pnpm run dev:bot"
+    },
+    {
+      "name": "Add Shaadcn component",
+      "focus": true,
+      "cwd": "[workspaceFolder]/packages/client",
+      "command": "npx shadcn@latest add ",
+      "execute": false
     }
   ]
 }
