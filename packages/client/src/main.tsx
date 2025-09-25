@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
-import { Dashboard } from "./layouts/Dashboard/Dashboard.tsx";
+import { Dashboard } from "./layouts/Dashboard/Dashboard.layout.tsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
