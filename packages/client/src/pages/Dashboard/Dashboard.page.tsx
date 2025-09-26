@@ -17,9 +17,9 @@ export const DashboardPage = () => {
           </CardHeader>
           <CardContent className="w-full h-full grid grid-rows-[auto_1fr] gap-2">
             <div className="w-full h-full">
-              <MiniCalendar>
+              <MiniCalendar className="w-full" days={7}>
                 <MiniCalendarNavigation direction="prev" />
-                <MiniCalendarDays>
+                <MiniCalendarDays className="w-full">
                   {(date) => (
                     <MiniCalendarDay date={date} key={date.toISOString()} />
                   )}
