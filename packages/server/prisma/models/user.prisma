@@ -3,9 +3,22 @@ model User {
     bots   Bot[]
     orders Order[]
 
-    email    String @unique
+    email    String         @unique
     password String
+    security UserSecurity[]
 
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model UserSecurity {
+    id   String @id @default(uuid())
+    user User   @relation(fields: [userId], references: [id])
+
+    apiKey    String
+    apiSecret String
+
+    userId    String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
