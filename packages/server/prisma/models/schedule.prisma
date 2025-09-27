@@ -1,15 +1,13 @@
 model Schedule {
     id String @id @default(uuid())
 
-    shortlist   Shortlist         @relation(fields: [shortlistId], references: [id])
-    tradeBegin  DateTime
-    tradeEnd    DateTime
-    creator     ScheduleCreatedBy
-    usedByBots  BotSchedule[]
-    cron        String? // if recurring
-    processed   Boolean           @default(false) // item has been added to queue
-    processedAt DateTime
-    status      ScheduleStatus
+    shortlist  Shortlist         @relation(fields: [shortlistId], references: [id])
+    tradeBegin DateTime
+    tradeEnd   DateTime
+    creator    ScheduleCreatedBy
+    usedByBots BotSchedule[]
+    cron       String? // if recurring
+    status     ScheduleStatus
 
     shortlistId String   @unique
     createdAt   DateTime @default(now())

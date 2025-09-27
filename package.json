@@ -5,7 +5,8 @@
   "scripts": {
     "dev:bot": "pnpm --filter @forecast/bot dev",
     "dev:client": "pnpm --filter @forecast/client dev",
-    "dev:server": "pnpm --filter @forecast/server dev"
+    "dev:server": "pnpm --filter @forecast/server dev",
+    "prisma:migrate:dev": "pnpm --filter @forecast/server prisma:migrate:dev"
   },
   "author": {
     "name": "Rohit Raj",
