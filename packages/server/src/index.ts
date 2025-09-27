@@ -1,5 +1,10 @@
 import Fastify from "fastify";
-import { join } from "path";
+import sensible from "@fastify/sensible";
+import cors from "@fastify/cors";
+import autoLoad from "@fastify/autoload";
+import websocket from "@fastify/websocket";
+import socket from "./socket/socket";
+import path from "path";
 
 const fastify = Fastify({
   logger: {
@@ -8,22 +13,20 @@ const fastify = Fastify({
 });
 
 // Register plugins
-fastify.register(require("@fastify/sensible"));
-fastify.register(require("@fastify/cors"), {
+fastify.register(websocket);
+fastify.register(sensible);
+fastify.register(cors, {
   origin: true,
 });
 
-// Auto-load plugins
-fastify.register(require("@fastify/autoload"), {
-  dir: join(__dirname, "plugins"),
+// Register routes
+fastify.register(autoLoad, {
+  dir: path.join(__dirname, "routes"),
   options: { prefix: "/api" },
 });
 
-// Auto-load routes
-fastify.register(require("@fastify/autoload"), {
-  dir: join(__dirname, "routes"),
-  options: { prefix: "/api" },
-});
+// Register websocket
+fastify.register(socket);
 
 // Health check route
 fastify.get("/health", async (request, reply) => {
@@ -37,6 +40,9 @@ const start = async () => {
     const host = process.env.HOST || "0.0.0.0";
 
     await fastify.listen({ port, host });
+    fastify.log.info(
+      `WebSocket server running on ws://${host}:${port}/connect`
+    );
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
