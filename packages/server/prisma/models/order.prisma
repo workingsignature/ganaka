@@ -1,0 +1,39 @@
+model Order {
+    id   String @id @default(uuid())
+    user User   @relation(fields: [userId], references: [id])
+
+    company   Company        @relation(fields: [companyId], references: [id])
+    type      OrderType
+    status    OrderStatus
+    createdBy OrderCreatedBy
+    qty       Int
+    price     Float
+
+    userId    String
+    companyId String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum OrderType {
+    BUY
+    SELL
+    BUY_STOP
+    SELL_STOP
+    BUY_LIMIT
+    SELL_LIMIT
+}
+
+enum OrderCreatedBy {
+    BOT_OPPORTUNITY // buying cause the bot sees an opportunity
+    BOT_STOP_LOSS // buy/sell cause the stock hit stop loss
+    BOT_TAKE_PROFIT // buy/sell cause the stock hit take profit
+    USER_OVERRIDE // buy/sell cause the user manually executed the order
+}
+
+enum OrderStatus {
+    PENDING
+    FILLED
+    CANCELLED
+    FAILED
+}

@@ -22,6 +22,12 @@
       "cwd": "[workspaceFolder]/packages/client",
       "command": "npx shadcn@latest add ",
       "execute": false
+    },
+    {
+      "name": "Server: Migrate-Dev",
+      "focus": true,
+      "cwd": "[workspaceFolder]/packages/server",
+      "command": "pnpm run prisma:migrate:dev"
     }
   ]
 }
