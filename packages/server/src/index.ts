@@ -21,8 +21,8 @@ fastify.register(cors, {
 
 // Register routes
 fastify.register(autoLoad, {
-  dir: path.join(__dirname, "routes"),
-  options: { prefix: "/api" },
+  dir: path.join(__dirname, "routes/v1"),
+  options: { prefix: "/v1/" },
 });
 
 // Register websocket
