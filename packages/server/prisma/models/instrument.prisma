@@ -1,0 +1,13 @@
+model Instrument {
+    id String @id @default(uuid())
+
+    exchange                String
+    exchange_token          String
+    trading_symbol          String
+    groww_symbol            String
+    name                    String
+    internal_trading_symbol String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

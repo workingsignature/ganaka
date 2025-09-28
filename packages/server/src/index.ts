@@ -5,6 +5,11 @@ import autoLoad from "@fastify/autoload";
 import websocket from "@fastify/websocket";
 import socket from "./socket/socket";
 import path from "path";
+import dotenv from "dotenv";
+import { prisma } from "./helpers/prisma";
+import { groww } from "./helpers/groww";
+
+dotenv.config();
 
 const fastify = Fastify({
   logger: {
@@ -24,6 +29,9 @@ fastify.register(autoLoad, {
   dir: path.join(__dirname, "routes/v1"),
   options: { prefix: "/v1/" },
 });
+fastify.register(autoLoad, {
+  dir: path.join(__dirname, "routes/general"),
+});
 
 // Register websocket
 fastify.register(socket);
@@ -38,6 +46,9 @@ const start = async () => {
     fastify.log.info(
       `WebSocket server running on ws://${host}:${port}/connect`
     );
+
+    await prisma.$connect();
+    fastify.log.info("Database connection established successfully");
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
