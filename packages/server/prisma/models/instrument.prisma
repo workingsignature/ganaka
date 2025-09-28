@@ -13,4 +13,6 @@ model Instrument {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    @@index([trading_symbol, groww_symbol, name])
 }
