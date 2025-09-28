@@ -1,0 +1,13 @@
+[project]
+name = "groww_access_token_generator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.117.1",
+    "growwapi>=0.0.9",
+    "pyotp>=2.9.0",
+    "python-dotenv>=1.1.1",
+    "uvicorn>=0.37.0",
+]

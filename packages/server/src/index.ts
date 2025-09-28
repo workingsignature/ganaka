@@ -28,11 +28,6 @@ fastify.register(autoLoad, {
 // Register websocket
 fastify.register(socket);
 
-// Health check route
-fastify.get("/health", async (request, reply) => {
-  return { status: "ok", timestamp: new Date().toISOString() };
-});
-
 // Start server
 const start = async () => {
   try {
