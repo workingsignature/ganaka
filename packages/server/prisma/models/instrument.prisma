@@ -1,10 +1,13 @@
 model Instrument {
-    id String @id @default(uuid())
+    id           String              @id @default(uuid())
+    includedIn   Shortlist[]
+    partOfOrders Order[]
+    predictions  PredictionHistory[]
 
     exchange                String
     exchange_token          String
     trading_symbol          String
-    groww_symbol            String
+    groww_symbol            String @unique
     name                    String
     internal_trading_symbol String
 

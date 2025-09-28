@@ -66,10 +66,17 @@ const updateInstrumentsRoutes: FastifyPluginAsync = async (fastify, opts) => {
         });
       });
 
-      await prisma.instrument.deleteMany();
-      await prisma.instrument.createMany({
-        data: instrumentsArray,
-      });
+      await prisma.$transaction(
+        instrumentsArray.map((instrument) => {
+          return prisma.instrument.upsert({
+            where: {
+              groww_symbol: instrument.groww_symbol,
+            },
+            create: instrument,
+            update: instrument,
+          });
+        })
+      );
 
       return {
         message: `${instrumentsArray.length} instruments inserted successfully.`,

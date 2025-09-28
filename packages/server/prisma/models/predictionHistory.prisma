@@ -1,12 +1,12 @@
 model PredictionHistory {
     id          String      @id @default(uuid())
-    company     Company     @relation(fields: [companyId], references: [id])
+    instrument  Instrument  @relation(fields: [instrumentId], references: [id])
     botSchedule BotSchedule @relation(fields: [botScheduleId], references: [id])
 
     score  Float
     reason String
 
-    companyId     String
+    instrumentId  String
     botScheduleId String
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt

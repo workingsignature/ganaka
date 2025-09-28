@@ -1,28 +1,9 @@
 model Shortlist {
     id String @id @default(uuid())
 
-    companies      Company[]
+    instruments    Instrument[]
     partOfSchedule Schedule?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-}
-
-model Company {
-    id           String              @id @default(uuid())
-    includedIn   Shortlist[]
-    partOfOrders Order[]
-    predictions  PredictionHistory[]
-
-    name   String
-    symbol String
-    market Market @default(NSE)
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
-enum Market {
-    NSE
-    BSE
 }

@@ -37,9 +37,9 @@ const candleRoutes: FastifyPluginAsync = async (fastify) => {
           },
           schedule: {
             shortlist: {
-              companies: {
+              instruments: {
                 some: {
-                  symbol: validatedParams.symbol,
+                  groww_symbol: validatedParams.symbol,
                 },
               },
             },
@@ -50,7 +50,7 @@ const candleRoutes: FastifyPluginAsync = async (fastify) => {
             include: {
               shortlist: {
                 include: {
-                  companies: true,
+                  instruments: true,
                 },
               },
             },
