@@ -17,7 +17,7 @@ class TOTPRequestBody(BaseModel):
     api_secret: str
 
 
-@app.post("/generate-groww-token")
+@app.post("/")
 async def generate_groww_token(body: TOTPRequestBody):
     try:
         print(body)
