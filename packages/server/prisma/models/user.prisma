@@ -1,7 +1,8 @@
 model User {
-    id     String  @id @default(uuid())
-    bots   Bot[]
-    orders Order[]
+    id         String      @id @default(uuid())
+    bots       Bot[]
+    shortlists Shortlist[]
+    schedules  Schedule[]
 
     clerkId  String         @unique
     security UserSecurity[]

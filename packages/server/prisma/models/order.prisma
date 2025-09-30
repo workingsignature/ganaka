@@ -1,6 +1,5 @@
 model Order {
-    id   String @id @default(uuid())
-    user User   @relation(fields: [userId], references: [id])
+    id String @id @default(uuid())
 
     instrument Instrument     @relation(fields: [instrumentId], references: [id])
     type       OrderType

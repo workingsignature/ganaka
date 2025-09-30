@@ -1,9 +1,13 @@
 model Shortlist {
     id String @id @default(uuid())
 
-    instruments    Instrument[]
-    partOfSchedule Schedule?
+    instruments Instrument[]
+    forDate     DateTime
+    createdBy   User         @relation(fields: [createdById], references: [id])
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdById String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@index([createdById, forDate])
 }

@@ -2,8 +2,7 @@ model Bot {
     id    String @id @default(uuid())
     owner User   @relation(fields: [userId], references: [id])
 
-    name      String
-    schedules BotSchedule[]
+    name String
 
     userId    String
     createdAt DateTime @default(now())

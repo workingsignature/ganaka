@@ -1,38 +1,24 @@
 model Schedule {
     id String @id @default(uuid())
 
-    shortlist  Shortlist         @relation(fields: [shortlistId], references: [id])
-    tradeBegin DateTime
-    tradeEnd   DateTime
-    creator    ScheduleCreatedBy
-    usedByBots BotSchedule[]
-    cron       String? // if recurring
-    status     ScheduleStatus
+    startDate DateTime
+    endDate   DateTime
+    type      ScheduleType
+    status    ScheduleStatus
+    createdBy User?          @relation(fields: [userId], references: [id])
 
-    shortlistId String   @unique
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    userId    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
-model BotSchedule {
-    id          String              @id @default(uuid())
-    predictions PredictionHistory[]
-
-    schedule Schedule @relation(fields: [scheduleId], references: [id])
-    bot      Bot      @relation(fields: [botId], references: [id])
-
-    botId      String
-    scheduleId String
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-}
-
-enum ScheduleCreatedBy {
+enum ScheduleType {
     USER
     SYSTEM
 }
 
 enum ScheduleStatus {
+    PENDING
     ACTIVE
     INACTIVE
     COMPLETED
