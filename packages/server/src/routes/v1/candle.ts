@@ -3,10 +3,17 @@ import { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { prisma } from "../../helpers/prisma";
 import { validateRequest } from "../../helpers/validator";
+import { requireAuth } from "../../helpers/auth";
 
 const candleRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/candle/:symbol", async (request, reply) => {
     try {
+      // authenticate user
+      const authenticatedRequest = await requireAuth(request, reply);
+      if (!authenticatedRequest) {
+        return;
+      }
+
       // validate request
       const validatedParams = validateRequest(
         request.params,

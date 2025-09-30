@@ -3,14 +3,13 @@ model User {
     bots   Bot[]
     orders Order[]
 
-    email    String         @unique
-    password String
+    clerkId  String         @unique
     security UserSecurity[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([email])
+    @@index([clerkId])
 }
 
 model UserSecurity {
