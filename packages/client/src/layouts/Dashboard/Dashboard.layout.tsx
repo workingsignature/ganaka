@@ -24,7 +24,6 @@ export const Dashboard = () => {
   if (!isSignedIn) {
     return <Navigate to="/auth" replace />;
   }
-  console.log({ window });
 
   // DRAW
   return (

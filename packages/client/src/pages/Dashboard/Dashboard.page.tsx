@@ -1,9 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BotInfoCard } from "./components/BotInfoCard/BotInfoCard";
-import { ShortlistCard } from "./components/ShortlistCard/ShortlistCard";
 import { DateSelector } from "./components/DateSelector";
+import { ShortlistCard } from "./components/ShortlistCard/ShortlistCard";
+import { useQueryParams } from "@/utils/hooks/useQueryParams";
 
 export const DashboardPage = () => {
+  // HOOKS
+  const { botId } = useQueryParams();
+
+  console.log({ botId });
+
   // DRAW
   return (
     <div className="w-full h-full grid grid-cols-[350px_1fr_300px] gap-2">
