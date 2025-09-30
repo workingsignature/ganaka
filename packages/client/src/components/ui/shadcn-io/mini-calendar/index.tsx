@@ -1,7 +1,14 @@
 "use client";
 
 import { useControllableState } from "@radix-ui/react-use-controllable-state";
-import { addDays, format, isSameDay, isToday, subDays } from "date-fns";
+import {
+  addDays,
+  format,
+  isSameDay,
+  isToday,
+  subDays,
+  isWeekend,
+} from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Slot } from "radix-ui";
 import {
@@ -50,13 +57,13 @@ const getDays = (startDate: Date, count: number): Date[] => {
 const formatDate = (date: Date) => {
   const month = format(date, "MMM");
   const day = format(date, "d");
+  const dayOfWeek = format(date, "EEE");
 
-  return { month, day };
+  return { month, day, dayOfWeek };
 };
 
 export type MiniCalendarProps = HTMLAttributes<HTMLDivElement> & {
   value?: Date;
-  defaultValue?: Date;
   onValueChange?: (date: Date | undefined) => void;
   startDate?: Date;
   defaultStartDate?: Date;
@@ -66,7 +73,6 @@ export type MiniCalendarProps = HTMLAttributes<HTMLDivElement> & {
 
 export const MiniCalendar = ({
   value,
-  defaultValue,
   onValueChange,
   startDate,
   defaultStartDate = new Date(),
@@ -80,7 +86,7 @@ export const MiniCalendar = ({
     Date | undefined
   >({
     prop: value,
-    defaultProp: defaultValue,
+    defaultProp: new Date(),
     onChange: onValueChange,
   });
 
@@ -114,7 +120,7 @@ export const MiniCalendar = ({
     <MiniCalendarContext.Provider value={contextValue}>
       <div
         className={cn(
-          "flex items-center gap-2 rounded-lg border bg-background p-2",
+          "flex items-center rounded-lg border bg-background p-2",
           className
         )}
         {...props}
@@ -191,7 +197,10 @@ export const MiniCalendarDays = ({
   const days = getDays(startDate, dayCount);
 
   return (
-    <div className={cn("flex items-center gap-1", className)} {...props}>
+    <div
+      className={cn("flex items-center gap-1 overflow-auto", className)}
+      {...props}
+    >
       {days.map((date) => children(date))}
     </div>
   );
@@ -207,14 +216,16 @@ export const MiniCalendarDay = ({
   ...props
 }: MiniCalendarDayProps) => {
   const { selectedDate, onDateSelect } = useMiniCalendar();
-  const { month, day } = formatDate(date);
+  const { day, dayOfWeek } = formatDate(date);
   const isSelected = selectedDate && isSameDay(date, selectedDate);
+  const isWeekendDate = isWeekend(date);
   const isTodayDate = isToday(date);
 
   return (
     <Button
       className={cn(
         "h-auto min-w-[3rem] flex-col gap-0 p-2 text-xs",
+        isWeekendDate && "text-gray-400",
         isTodayDate && !isSelected && "bg-accent",
         className
       )}
@@ -227,10 +238,11 @@ export const MiniCalendarDay = ({
       <span
         className={cn(
           "font-medium text-[10px] text-muted-foreground",
+          isWeekendDate && "text-gray-400",
           isSelected && "text-primary-foreground/70"
         )}
       >
-        {month}
+        {dayOfWeek}
       </span>
       <span className="font-semibold text-sm">{day}</span>
     </Button>

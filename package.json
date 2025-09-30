@@ -15,7 +15,13 @@
   "pnpm": {
     "overrides": {
       "@types/node": "^24.5.2"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "@tailwindcss/oxide",
+      "esbuild",
+      "unrs-resolver"
+    ]
   },
   "license": "MIT",
   "packageManager": "pnpm@10.8.0"
