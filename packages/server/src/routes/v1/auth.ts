@@ -1,8 +1,4 @@
-import { FastifyPluginAsync, FastifyRequest } from "fastify";
-import { validateRequest } from "../../helpers/validator";
-import { verifyToken } from "@clerk/backend";
-import z from "zod";
-import { prisma } from "../../helpers/prisma";
+import { FastifyPluginAsync } from "fastify";
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post("/auth", async (request, reply) => {});

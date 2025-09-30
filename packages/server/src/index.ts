@@ -7,9 +7,13 @@ import socket from "./socket/socket";
 import path from "path";
 import dotenv from "dotenv";
 import { prisma } from "./helpers/prisma";
+import swagger from "@fastify/swagger";
+import swaggerUi from "@fastify/swagger-ui";
 import { groww } from "./helpers/groww";
 
 dotenv.config();
+const port = process.env.PORT ? parseInt(process.env.PORT) : 4400;
+const host = process.env.HOST || "0.0.0.0";
 
 const fastify = Fastify({
   logger: {
@@ -22,6 +26,35 @@ fastify.register(websocket);
 fastify.register(sensible);
 fastify.register(cors, {
   origin: true,
+});
+fastify.register(swagger, {
+  openapi: {
+    info: {
+      title: "Forecast API",
+      description: "API documentation for Forecast service",
+      version: "0.0.1",
+    },
+    servers: [
+      {
+        url: `http://localhost:${port}`,
+        description: "Development server",
+      },
+      {
+        url: `https://staging.weatherman.rraj.dev`,
+        description: "Staging server",
+      },
+      {
+        url: `https://weatherman.rraj.dev`,
+        description: "Production server",
+      },
+    ],
+  },
+});
+fastify.register(swaggerUi, {
+  routePrefix: "/docs",
+  theme: {
+    title: "Forecast API",
+  },
 });
 
 // Register routes
@@ -39,14 +72,13 @@ fastify.register(socket);
 // Start server
 const start = async () => {
   try {
-    const port = process.env.PORT ? parseInt(process.env.PORT) : 4400;
-    const host = process.env.HOST || "0.0.0.0";
-
     await fastify.listen({ port, host });
     fastify.log.info(
       `WebSocket server running on ws://${host}:${port}/connect`
     );
-
+    fastify.log.info(
+      `Swagger documentation available at http://${host}:${port}/docs`
+    );
     await prisma.$connect();
     fastify.log.info("Database connection established successfully");
   } catch (err) {
