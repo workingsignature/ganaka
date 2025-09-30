@@ -1,4 +1,4 @@
-# Forecast Bot
+# Ganaka Bot
 
 A TypeScript Node.js bot application with nodemon for development.
 
@@ -75,7 +75,7 @@ nodemon.json          # Nodemon configuration
 
 ## Environment Variables
 
-- `BOT_NAME` - Name of the bot (default: ForecastBot)
+- `BOT_NAME` - Name of the bot (default: GanakaBot)
 - `BOT_VERSION` - Version of the bot (default: 1.0.0)
 - `PORT` - Port to run the bot on (default: 3000)
 - `NODE_ENV` - Environment (development/production)

@@ -4,7 +4,7 @@ export const Navbar = () => {
   // DRAW
   return (
     <div className="w-full h-full py-1 px-2 rounded-sm flex flex-row items-center justify-between">
-      <div className="text-lg font-semibold">Forecast</div>
+      <div className="text-lg font-semibold">Ganaka</div>
       <SignedIn>
         <UserButton />
       </SignedIn>

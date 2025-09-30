@@ -1,7 +1,7 @@
 {
-  "name": "@forecast/bot",
+  "name": "@ganaka/bot",
   "version": "0.0.1",
-  "description": "Forecast Bot - TypeScript Node.js application",
+  "description": "Ganaka Bot - TypeScript Node.js application",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

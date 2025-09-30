@@ -1,4 +1,4 @@
-# Forecast Server
+# Ganaka Server
 
 A TypeScript Node.js server built with Fastify, featuring:
 

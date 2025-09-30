@@ -30,8 +30,8 @@ fastify.register(cors, {
 fastify.register(swagger, {
   openapi: {
     info: {
-      title: "Forecast API",
-      description: "API documentation for Forecast service",
+      title: "Ganaka API",
+      description: "API documentation for Ganaka",
       version: "0.0.1",
     },
     servers: [
@@ -53,7 +53,7 @@ fastify.register(swagger, {
 fastify.register(swaggerUi, {
   routePrefix: "/docs",
   theme: {
-    title: "Forecast API",
+    title: "Ganaka API",
   },
 });
 

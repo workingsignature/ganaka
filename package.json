@@ -1,12 +1,12 @@
 {
-  "name": "forecast",
+  "name": "ganaka",
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "dev:bot": "pnpm --filter @forecast/bot dev",
-    "dev:client": "pnpm --filter @forecast/client dev",
-    "dev:server": "pnpm --filter @forecast/server dev",
-    "prisma:migrate:dev": "pnpm --filter @forecast/server prisma:migrate:dev"
+    "dev:bot": "pnpm --filter @ganaka/bot dev",
+    "dev:client": "pnpm --filter @ganaka/client dev",
+    "dev:server": "pnpm --filter @ganaka/server dev",
+    "prisma:migrate:dev": "pnpm --filter @ganaka/server prisma:migrate:dev"
   },
   "author": {
     "name": "Rohit Raj",

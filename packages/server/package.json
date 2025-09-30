@@ -1,7 +1,7 @@
 {
-  "name": "@forecast/server",
+  "name": "@ganaka/server",
   "version": "0.0.1",
-  "description": "Forecast server application",
+  "description": "Ganaka server application",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon",
