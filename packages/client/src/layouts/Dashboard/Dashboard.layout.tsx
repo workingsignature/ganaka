@@ -17,7 +17,7 @@ export const Dashboard = () => {
   if (!isLoaded) {
     return (
       <div className="w-full h-full flex items-center justify-center">
-        <Spinner variant="infinite" size={40} />
+        <Spinner variant="pinwheel" size={40} />
       </div>
     );
   }
