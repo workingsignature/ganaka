@@ -9,24 +9,28 @@
     {
       "name": "Server:dev",
       "focus": true,
+      "split": "Client:dev",
       "command": "pnpm run dev:server"
     },
     {
       "name": "Bot:dev",
       "focus": true,
-      "command": "pnpm run dev:bot"
+      "command": "pnpm run dev:bot",
+      "onlySingle": true
     },
     {
       "name": "Server: Migrate-Dev",
       "focus": true,
-      "command": "pnpm run prisma:migrate:dev"
+      "command": "pnpm run prisma:migrate:dev",
+      "onlySingle": true
     },
     {
       "name": "Add Shadcn component",
       "focus": true,
       "cwd": "[workspaceFolder]/packages/client",
       "command": "npx shadcn@latest add ",
-      "execute": false
+      "execute": false,
+      "onlySingle": true
     }
   ]
 }
