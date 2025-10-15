@@ -2,7 +2,7 @@ import { gFormatDate } from "@/utils/helpers";
 import { SignedIn, UserButton } from "@clerk/clerk-react";
 import { Skeleton } from "@mantine/core";
 import { MiniCalendar } from "@mantine/dates";
-import { subDays } from "date-fns";
+import { isWeekend, subDays } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -34,6 +34,9 @@ const MiniCalendarView = () => {
     }, 1000);
   };
   const handleMiniCalendarChange = (date: string) => {
+    if (isWeekend(new Date(date))) {
+      return;
+    }
     navigate(`/${date}`);
   };
 
@@ -73,6 +76,13 @@ const MiniCalendarView = () => {
         <MiniCalendar
           value={urlParams.date}
           maxDate={gFormatDate()}
+          getDayProps={(date) => ({
+            style: {
+              color: isWeekend(date) ? "var(--mantine-color-red-8)" : undefined,
+              opacity: isWeekend(date) ? 0.5 : 1,
+              cursor: isWeekend(date) ? "not-allowed" : "pointer",
+            },
+          })}
           defaultDate={gFormatDate(
             subDays(
               urlParams.date ? new Date(urlParams.date) : new Date(),
@@ -90,7 +100,7 @@ const MiniCalendarView = () => {
 export const Navbar = () => {
   // DRAW
   return (
-    <div className="w-full h-full px-2 rounded-sm flex flex-row items-center justify-between gap-8">
+    <div className="w-full h-full rounded-sm flex flex-row items-center justify-between gap-8">
       <MiniCalendarView />
       <SignedIn>
         <UserButton />

@@ -1,4 +1,5 @@
 import { MantineProvider } from "@mantine/core";
+import { Tabs } from "@mantine/core";
 import { format } from "date-fns";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Auth } from "./layouts/Auth/Auth.layout";
@@ -11,7 +12,22 @@ export const App = () => {
 
   // DRAW
   return (
-    <MantineProvider>
+    <MantineProvider
+      theme={{
+        primaryColor: "violet",
+        components: {
+          Tabs: Tabs.Tab.extend({
+            defaultProps: {
+              styles: {
+                tab: {
+                  border: "1px solid var(--mantine-color-gray-3)",
+                },
+              },
+            },
+          }),
+        },
+      }}
+    >
       <BrowserRouter>
         <Routes>
           <Route path="/auth/*" element={<Auth />} />
