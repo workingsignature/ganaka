@@ -9,4 +9,52 @@ Platform that helps build day-trading bots.
   - Register bots and sessions (used for tracking all actions for a bot during a day trading run).
   - LIVE market data for any instrument.
   - List of pre-defined (daily updated) instruments (eg. Volume Shockers, Top Gainers, etc) & user-defined shortlists of instruments.
-  -
+
+## Bot Template:
+
+```ts
+const bot = () => {
+  const listOfInstruments = [];
+  const date = new Date();
+
+  // precursor PLATFORM
+  const sessionId = registerSession({
+    userToken,
+    botName,
+    date,
+  });
+
+  // common data PLATFORM + OUTSIDE (sessionId)
+  const listOfInstruments = platform.getListOfInstruments("SmallCap1");
+  const listOfInstruments = platform.getListOfInstruments("volumeShockers");
+
+  while (true) {
+    // 10seconds interval
+    // get information for each instrument
+    listOfInstruments.forEach((instrument) => {
+      // get information
+      // PLATFORM + OUTSIDE + SESSION_ID
+      // ALSO -> Portfolio SESSION_ID
+    });
+
+    // process this information
+    listOfInstruments.forEach((instrument) => {
+      // process this information
+    });
+    const analysis = [
+      {
+        instrument,
+        score,
+        reasons,
+      },
+    ];
+
+    // trading
+    analysis.forEach((item) => {
+      // trading
+      // PLATFORM
+      // placeOrder, placeStopLoss, placeTakeProfit (papertrading) + SESSION_ID
+    });
+  }
+};
+```
