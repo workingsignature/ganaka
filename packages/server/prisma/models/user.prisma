@@ -1,11 +1,10 @@
 model User {
-    id         String      @id @default(uuid())
-    bots       Bot[]
-    shortlists Shortlist[]
-    schedules  Schedule[]
+    id      String @id @default(uuid())
+    clerkId String @unique
 
-    clerkId  String         @unique
-    security UserSecurity[]
+    bots          Bot[]
+    shortlists    Shortlist[]
+    developerKeys DeveloperKeys[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -13,16 +12,22 @@ model User {
     @@index([clerkId])
 }
 
-model UserSecurity {
+model DeveloperKeys {
     id   String @id @default(uuid())
     user User   @relation(fields: [userId], references: [id])
 
-    apiKey    String
-    apiSecret String
+    key    String             @unique
+    status DeveloperKeyStatus @default(ACTIVE)
 
     userId    String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     @@index([userId])
+}
+
+enum DeveloperKeyStatus {
+    ACTIVE
+    INACTIVE
+    EXPIRED
 }
