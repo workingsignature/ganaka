@@ -13,6 +13,12 @@
       "command": "pnpm run dev:server"
     },
     {
+      "name": "Server:build",
+      "focus": true,
+      "command": "pnpm run build:server",
+      "onlySingle": true
+    },
+    {
       "name": "Bot:dev",
       "focus": true,
       "command": "pnpm run dev:bot",
