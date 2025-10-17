@@ -89,32 +89,32 @@ const shortlistRoutes: FastifyPluginAsync = async (fastify) => {
           return;
         }
 
-        // get shortlist
-        const shortlist = await prisma.shortlist.findMany({
-          where: {
-            createdById: authenticatedRequest.user.clerkId,
-            forDate: new Date(validatedParams.date),
-          },
-          include: {
-            instruments: true,
-          },
-        });
-        if (!shortlist || shortlist.length === 0) {
-          return reply.notFound("No shortlist found for the given date.");
-        }
+        // // get shortlist
+        // const shortlist = await prisma.shortlist.findMany({
+        //   where: {
+        //     createdById: authenticatedRequest.user.clerkId,
+        //     forDate: new Date(validatedParams.date),
+        //   },
+        //   include: {
+        //     instruments: true,
+        //   },
+        // });
+        // if (!shortlist || shortlist.length === 0) {
+        //   return reply.notFound("No shortlist found for the given date.");
+        // }
 
-        return reply.send({
-          data: {
-            id: shortlist[0].id,
-            instruments: shortlist[0].instruments.map((instrument) => ({
-              id: instrument.id,
-              symbol: instrument.trading_symbol,
-              name: instrument.name,
-              groww_symbol: instrument.groww_symbol,
-              exchange: instrument.exchange,
-            })),
-          },
-        });
+        // return reply.send({
+        //   data: {
+        //     id: shortlist[0].id,
+        //     instruments: shortlist[0].instruments.map((instrument) => ({
+        //       id: instrument.id,
+        //       symbol: instrument.trading_symbol,
+        //       name: instrument.name,
+        //       groww_symbol: instrument.groww_symbol,
+        //       exchange: instrument.exchange,
+        //     })),
+        //   },
+        // });
       } catch (error) {
         fastify.log.error(error);
         return reply.internalServerError("An unexpected error occurred.");
@@ -228,41 +228,41 @@ const shortlistRoutes: FastifyPluginAsync = async (fastify) => {
           return;
         }
 
-        const shortlist = await prisma.shortlist.upsert({
-          where: {
-            id: validatedParams.shortlistId,
-            createdById: authenticatedRequest.user.clerkId,
-            forDate: new Date(validatedParams.date),
-          },
-          create: {
-            id: validatedParams.shortlistId,
-            createdById: authenticatedRequest.user.clerkId,
-            forDate: new Date(validatedParams.date),
-          },
-          update: {
-            instruments: {
-              connect: validatedBody.instruments.map((instrument) => ({
-                id: instrument.id,
-              })),
-            },
-          },
-          include: {
-            instruments: true,
-          },
-        });
+        // const shortlist = await prisma.shortlist.upsert({
+        //   where: {
+        //     id: validatedParams.shortlistId,
+        //     createdById: authenticatedRequest.user.clerkId,
+        //     forDate: new Date(validatedParams.date),
+        //   },
+        //   create: {
+        //     id: validatedParams.shortlistId,
+        //     createdById: authenticatedRequest.user.clerkId,
+        //     forDate: new Date(validatedParams.date),
+        //   },
+        //   update: {
+        //     instruments: {
+        //       connect: validatedBody.instruments.map((instrument) => ({
+        //         id: instrument.id,
+        //       })),
+        //     },
+        //   },
+        //   include: {
+        //     instruments: true,
+        //   },
+        // });
 
-        return reply.send({
-          data: {
-            id: shortlist.id,
-            instruments: shortlist.instruments.map((instrument) => ({
-              id: instrument.id,
-              symbol: instrument.trading_symbol,
-              name: instrument.name,
-              groww_symbol: instrument.groww_symbol,
-              exchange: instrument.exchange,
-            })),
-          },
-        });
+        // return reply.send({
+        //   data: {
+        //     id: shortlist.id,
+        //     instruments: shortlist.instruments.map((instrument) => ({
+        //       id: instrument.id,
+        //       symbol: instrument.trading_symbol,
+        //       name: instrument.name,
+        //       groww_symbol: instrument.groww_symbol,
+        //       exchange: instrument.exchange,
+        //     })),
+        //   },
+        // });
       } catch (error) {
         fastify.log.error(error);
         return reply.internalServerError("An unexpected error occurred.");

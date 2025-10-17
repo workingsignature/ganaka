@@ -1,18 +1,14 @@
 import { isAfter, isBefore } from "date-fns";
 import { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
-import { prisma } from "../../helpers/prisma";
-import { validateRequest } from "../../helpers/validator";
-import { requireAuth } from "../../helpers/auth";
+import { validateRequest } from "../../../helpers/validator";
 
 const candleRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/candle/:symbol", async (request, reply) => {
     try {
-      // authenticate user
-      const authenticatedRequest = await requireAuth(request, reply);
-      if (!authenticatedRequest) {
-        return;
-      }
+      // Authentication is handled by userAuthPlugin
+      // The request now has user information attached
+      const user = request.user;
 
       // validate request
       const validatedParams = validateRequest(
