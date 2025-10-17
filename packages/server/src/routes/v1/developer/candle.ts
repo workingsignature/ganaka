@@ -5,6 +5,9 @@ import { validateRequest } from "../../../helpers/validator";
 const candleRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/candle/:symbol", async (request, reply) => {
     try {
+      fastify.log.info(
+        `request.developer ${JSON.stringify(request.developer)}`
+      );
       const developerId = request.developer?.id;
       if (!developerId) {
         return;

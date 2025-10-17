@@ -28,6 +28,7 @@ const userAuthPlugin: FastifyPluginAsync = async (fastify) => {
       }
 
       if (validHeaders && !validHeaders.authorization.startsWith("Bearer ")) {
+        fastify.log.info("Invalid authorization header");
         return reply.badRequest(
           "Invalid authorization header. Please check your credentials and try again."
         );
@@ -39,22 +40,21 @@ const userAuthPlugin: FastifyPluginAsync = async (fastify) => {
         secretKey: process.env.CLERK_SECRET_KEY!,
       });
       if (!payload) {
+        fastify.log.info("Invalid token");
         return reply.badRequest(
           "Invalid token. Please check your credentials and try again."
         );
       }
 
       // Get or create user in your database
-      let user = await prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { clerkId: payload.sub },
       });
       if (!user) {
-        // Create user if they don't exist
-        user = await prisma.user.create({
-          data: {
-            clerkId: payload.sub,
-          },
-        });
+        fastify.log.info("User not found");
+        return reply.notFound(
+          "Authentication failed for this user request. User not found. Please contact support."
+        );
       }
 
       // Attach user to request

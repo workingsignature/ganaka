@@ -20,28 +20,32 @@ const developerAuthPlugin: FastifyPluginAsync = async (fastify) => {
         request.headers,
         reply,
         z.object({
-          developerKey: z.string().min(1),
-          developerId: z.string().min(1),
-        })
+          authorization: z.string(),
+        }),
+        "headers"
       );
       if (!validHeaders) {
         return;
       }
 
       // validate developer key
-      const developerKey = validHeaders.developerKey;
+      if (validHeaders && !validHeaders.authorization.startsWith("Bearer ")) {
+        fastify.log.info("Invalid authorization header");
+        return reply.badRequest(
+          "Invalid authorization header. Please check your credentials and try again."
+        );
+      }
+      const token = validHeaders.authorization.substring(7);
       const developer = await prisma.developerKeys.findUnique({
         where: {
-          key: developerKey,
-          user: {
-            id: validHeaders.developerId,
-          },
+          key: token,
         },
         include: {
           user: true,
         },
       });
       if (!developer || developer?.status !== DeveloperKeyStatus.ACTIVE) {
+        fastify.log.info("Developer not found or inactive");
         return reply.unauthorized(
           "Authorization failed for this developer request. Please check your credentials and try again."
         );

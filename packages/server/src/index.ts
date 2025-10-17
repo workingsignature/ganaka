@@ -59,11 +59,10 @@ fastify.register(swaggerUi, {
   },
 });
 
-// Register routes with authentication plugins
+// // Register routes with authentication plugins
 // User routes (/v1) - protected with Clerk authentication
-fastify.register(async function (fastify) {
-  // Register user authentication plugin for all routes in this scope
-  fastify.register(userAuthPlugin);
+fastify.register(async function (fastify, opts) {
+  await userAuthPlugin(fastify, opts);
 
   // Register user routes
   fastify.register(autoLoad, {
@@ -73,9 +72,8 @@ fastify.register(async function (fastify) {
 });
 
 // Developer routes (/v1/developer) - protected with developer key authentication
-fastify.register(async function (fastify) {
-  // Register developer authentication plugin for all routes in this scope
-  fastify.register(developerAuthPlugin);
+fastify.register(async function (fastify, opts) {
+  await developerAuthPlugin(fastify, opts);
 
   // Register developer routes
   fastify.register(autoLoad, {
@@ -86,7 +84,7 @@ fastify.register(async function (fastify) {
 
 // General routes (no authentication required)
 fastify.register(autoLoad, {
-  dir: path.join(__dirname, "routes/general"),
+  dir: path.join(__dirname, "routes/general/"),
 });
 
 // Register websocket
