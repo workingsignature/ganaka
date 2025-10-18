@@ -5,14 +5,6 @@ import { validateRequest } from "../../../helpers/validator";
 const candleRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/candle/:symbol", async (request, reply) => {
     try {
-      fastify.log.info(
-        `request.developer ${JSON.stringify(request.developer)}`
-      );
-      const developerId = request.developer?.id;
-      if (!developerId) {
-        return;
-      }
-
       // validate request
       const validatedParams = validateRequest(
         request.params,
@@ -25,9 +17,7 @@ const candleRoutes: FastifyPluginAsync = async (fastify) => {
         request.query,
         reply,
         z.object({
-          scheduleId: z.string(), // uses bot schedule id
           timestamp: z.string(),
-          botId: z.string(),
         })
       );
       if (!validatedParams || !validatedQuery) {
