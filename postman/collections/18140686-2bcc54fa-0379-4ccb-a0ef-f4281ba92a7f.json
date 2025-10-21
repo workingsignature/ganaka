@@ -250,6 +250,64 @@
 			"name": "General",
 			"item": [
 				{
+					"name": "Webhooks",
+					"item": [
+						{
+							"name": "User",
+							"id": "18140686-d8cc4b0e-5f2b-4137-94ef-2698fc705c7d",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/webhook/user",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"webhook",
+										"user"
+									]
+								},
+								"description": "## User Webhook (POST /webhook/user)\n\nWebhook route triggered by Clerk when user is created or updated or deleted. Used to sync user data to our database.\n\n### How it Works\n\n- **Input:** Send a POST request to `/webhook/user`.\n    \n- **Process:** Creates or updates user data with the data in Clerk database.\n    \n- **Output:** The endpoint returns a response indicating whether the webhook was successfully processed.\n    \n\n### Request Example\n\n``` http\nPOST {{host}}/webhook/user\nContent-Type: application/json\n\n ```\n\n### Response Example\n\n``` json\n{\n  \"status\": \"success\",\n  \"message\": \"User webhook processed successfully\"\n}\n\n ```\n\n### Use Case\n\n- Keeps the platform databasae for users updated with the data for users in Clerk database.\n    \n\n### Notes\n\n- This webhook is triggered by the Clerk user management system when a new user is created or an existing user is updated or deleted."
+							},
+							"response": []
+						}
+					],
+					"id": "18140686-e8e2a259-a8b4-4ed6-bb2a-0f7bb99b8603"
+				},
+				{
+					"name": "Curated Shortlists",
+					"item": [
+						{
+							"name": "Curated Shortlists",
+							"id": "18140686-b383342a-4b28-4943-bf08-a713b20f6adf",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/{{api_version}}/shortlists/curated",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"{{api_version}}",
+										"shortlists",
+										"curated"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"id": "18140686-a77362e3-10e1-41d4-89d4-8cd7de86a59d"
+				},
+				{
 					"name": "Update Instruments",
 					"id": "18140686-dc4c3f75-0b91-463f-a396-ecf18fc4d9fe",
 					"protocolProfileBehavior": {
