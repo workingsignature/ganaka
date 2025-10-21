@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "18140686-2bcc54fa-0379-4ccb-a0ef-f4281ba92a7f",
-		"name": "v1",
+		"name": "Platform",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -351,6 +351,11 @@
 				}
 			],
 			"id": "18140686-abd10236-aa90-447c-9d47-ab58ebdde752"
+		},
+		{
+			"name": "New Folder",
+			"item": [],
+			"id": "18140686-13cb385c-2a09-4584-ade3-e434ba61366d"
 		}
 	]
 }
