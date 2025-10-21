@@ -9,7 +9,7 @@
 			"name": "General",
 			"item": [
 				{
-					"name": "Webhooks",
+					"name": "Webhook",
 					"item": [
 						{
 							"name": "User",
