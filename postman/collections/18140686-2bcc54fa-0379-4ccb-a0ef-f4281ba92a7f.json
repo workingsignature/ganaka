@@ -248,7 +248,50 @@
 		},
 		{
 			"name": "General",
-			"item": [],
+			"item": [
+				{
+					"name": "Update Instruments",
+					"id": "18140686-dc4c3f75-0b91-463f-a396-ecf18fc4d9fe",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/update-instruments",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"update-instruments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Health",
+					"id": "18140686-de46466d-a26a-4df4-9326-f58d31331df1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/health",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			],
 			"id": "18140686-abd10236-aa90-447c-9d47-ab58ebdde752"
 		}
 	]
