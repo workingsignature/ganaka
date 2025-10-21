@@ -28,11 +28,15 @@ const sessionRoutes: FastifyPluginAsync = async (fastify) => {
         },
       });
       if (!bot) {
+        fastify.log.info(`Bot not found: ${validatedParams.id}`);
         return reply.notFound(
           "Bot not found or you are not authorized to access this bot"
         );
       }
       if (bot.owner.id !== user.id) {
+        fastify.log.info(
+          `Unauthorized: ${user.id} is not the owner of ${validatedParams.id}`
+        );
         return reply.unauthorized("You are not authorized to access this bot");
       }
 
@@ -42,6 +46,7 @@ const sessionRoutes: FastifyPluginAsync = async (fastify) => {
         data: {},
       });
     } catch (e) {
+      fastify.log.error(`Error in session route: ${e}`);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
