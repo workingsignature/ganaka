@@ -33,29 +33,6 @@
 				}
 			],
 			"id": "18140686-e8e2a259-a8b4-4ed6-bb2a-0f7bb99b8603"
-		},
-		{
-			"name": "Curated Shortlists",
-			"id": "18140686-b383342a-4b28-4943-bf08-a713b20f6adf",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/{{api_version}}/shortlists/curated",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"{{api_version}}",
-						"shortlists",
-						"curated"
-					]
-				}
-			},
-			"response": []
 		}
 	]
 }
