@@ -6,47 +6,6 @@
 	},
 	"item": [
 		{
-			"name": "Client",
-			"item": [],
-			"id": "18140686-71fa74ef-817f-410e-b2a9-a782c4094e40",
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "{{clerk_access_token}}",
-						"type": "string"
-					}
-				]
-			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "a8226561-3e07-4402-80ad-7bef72e16856",
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {},
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"id": "524478fb-7d99-4239-8a59-2d935453500b",
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {},
-						"exec": [
-							""
-						]
-					}
-				}
-			]
-		},
-		{
 			"name": "General",
 			"item": [
 				{
@@ -155,6 +114,47 @@
 		{
 			"name": "v1",
 			"item": [
+				{
+					"name": "Client",
+					"item": [],
+					"id": "18140686-71fa74ef-817f-410e-b2a9-a782c4094e40",
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{clerk_access_token}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a8226561-3e07-4402-80ad-7bef72e16856",
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "524478fb-7d99-4239-8a59-2d935453500b",
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
 				{
 					"name": "Developer",
 					"item": [
