@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from "fastify";
 import { verifyWebhook } from "@clerk/fastify/webhooks";
-import { prisma } from "../../helpers/prisma";
+import { prisma } from "../../../helpers/prisma";
 
 /**
  * Webhook route triggered by Clerk when user is created or updated or deleted.
