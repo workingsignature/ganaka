@@ -50,13 +50,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/shortlists/curated",
+									"raw": "{{host}}/shortlists",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"shortlists",
-										"curated"
+										"shortlists"
 									]
 								}
 							},
