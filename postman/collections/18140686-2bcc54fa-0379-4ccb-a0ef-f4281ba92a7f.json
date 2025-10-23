@@ -123,47 +123,6 @@
 			"item": [
 				{
 					"name": "Client",
-					"item": [],
-					"id": "18140686-71fa74ef-817f-410e-b2a9-a782c4094e40",
-					"auth": {
-						"type": "bearer",
-						"bearer": [
-							{
-								"key": "token",
-								"value": "{{clerk_access_token}}",
-								"type": "string"
-							}
-						]
-					},
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "a8226561-3e07-4402-80ad-7bef72e16856",
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {},
-								"exec": [
-									""
-								]
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "524478fb-7d99-4239-8a59-2d935453500b",
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {},
-								"exec": [
-									""
-								]
-							}
-						}
-					]
-				},
-				{
-					"name": "Developer",
 					"item": [
 						{
 							"name": "Keys",
@@ -217,14 +176,14 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/{{api_version}}/developer/keys",
+											"raw": "{{host}}/{{api_version}}/client/dkeys",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
 												"{{api_version}}",
-												"developer",
-												"keys"
+												"client",
+												"dkeys"
 											]
 										},
 										"description": "## Create Developer Key (POST {{host}}/{{api_version}}/developerkey)\n\n### Purpose\n\nThis endpoint is used to generate a new developer access key. The key can be used to authenticate subsequent API requests that require developer-level permissions. This is typically the first step for a developer to gain programmatic access to protected resources or endpoints.\n\n### How to Use\n\n- **Method:** POST\n    \n- **URL:** `{{host}}/{{api_version}}/developerkey`\n    \n- **Request Body:** _None required._ This endpoint does not require a request body.\n    \n- **Authentication:** Ensure that the required authentication (such as a valid access token) is provided if needed by your API gateway or backend.\n    \n\n### Variables Used\n\nThis request uses the following variables:\n\n- `{{host}}`: The base URL of the API server. Set this variable in your environment for the request to resolve correctly.\n    \n- `{{api_version}}`: The version of the API you are targeting (e.g., `v1`). Set this variable in your environment.\n    \n- `clerk_access_token`: (Global variable) Used for authentication if required by your API implementation. Ensure this is set before sending the request.\n    \n\n### Post-Response Script\n\nAfter the response is received, the following script is executed:\n\n``` javascript\nconst response = pm.response.json();\npm.globals.set(\"developer_access_token\", response.data.key);\n\n ```\n\n**What it does:**\n\n- Parses the JSON response.\n    \n- Extracts the `key` property from the `data` object in the response.\n    \n- Sets a global variable `developer_access_token` with the value of the key. This allows you to use the developer access token in subsequent requests by referencing `{{developer_access_token}}`.\n    \n\n### Typical Workflow\n\n1. Send this request to generate a new developer key.\n    \n2. The key is automatically saved as a global variable for use in other requests.\n    \n3. Use the `developer_access_token` in the headers or as required by other endpoints that need developer authentication.\n    \n\n### Notes\n\n- Make sure all required variables are set in your environment or globals before sending the request.\n    \n- If you encounter authentication errors, verify that your `clerk_access_token` (or other required tokens) are valid and up to date."
@@ -265,7 +224,49 @@
 								}
 							],
 							"id": "18140686-993773e1-f375-4c85-8079-95fdec9d92db"
+						}
+					],
+					"id": "18140686-71fa74ef-817f-410e-b2a9-a782c4094e40",
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{clerk_access_token}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a8226561-3e07-4402-80ad-7bef72e16856",
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
 						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "524478fb-7d99-4239-8a59-2d935453500b",
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Developer",
+					"item": [
 						{
 							"name": "Candle",
 							"id": "18140686-effffd52-113a-4c6d-890c-7b0ad10aa310",
