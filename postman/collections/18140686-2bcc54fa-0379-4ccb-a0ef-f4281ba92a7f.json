@@ -79,12 +79,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/trigger/instruments",
+									"raw": "{{host}}/triggers/instruments",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"trigger",
+										"triggers",
 										"instruments"
 									]
 								}
