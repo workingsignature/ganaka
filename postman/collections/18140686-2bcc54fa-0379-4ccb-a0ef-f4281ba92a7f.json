@@ -9,7 +9,7 @@
 			"name": "Public",
 			"item": [
 				{
-					"name": "Webhook",
+					"name": "Webhooks",
 					"item": [
 						{
 							"name": "User",
@@ -21,13 +21,12 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/webhook/user",
+									"raw": "{{host}}/webhooksuser",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"webhook",
-										"user"
+										"webhooksuser"
 									]
 								},
 								"description": "## User Webhook (POST /webhook/user)\n\nWebhook route triggered by Clerk when user is created or updated or deleted. Used to sync user data to our database.\n\n### How it Works\n\n- **Input:** Send a POST request to `/webhook/user`.\n    \n- **Process:** Creates or updates user data with the data in Clerk database.\n    \n- **Output:** The endpoint returns a response indicating whether the webhook was successfully processed.\n    \n\n### Request Example\n\n``` http\nPOST {{host}}/webhook/user\nContent-Type: application/json\n\n ```\n\n### Response Example\n\n``` json\n{\n  \"status\": \"success\",\n  \"message\": \"User webhook processed successfully\"\n}\n\n ```\n\n### Use Case\n\n- Keeps the platform databasae for users updated with the data for users in Clerk database.\n    \n\n### Notes\n\n- This webhook is triggered by the Clerk user management system when a new user is created or an existing user is updated or deleted."
