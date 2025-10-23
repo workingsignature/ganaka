@@ -295,7 +295,43 @@
 					"id": "18140686-993773e1-f375-4c85-8079-95fdec9d92db"
 				}
 			],
-			"id": "18140686-13cb385c-2a09-4584-ade3-e434ba61366d"
+			"id": "18140686-13cb385c-2a09-4584-ade3-e434ba61366d",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{clerk_access_token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "47690650-e4ab-44d4-be1a-d13e5245f7a2",
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "47c0bc5d-4af9-4bb1-b2f0-6523e6a5dcc6",
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		},
 		{
 			"name": "Clerk",
