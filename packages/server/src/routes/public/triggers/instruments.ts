@@ -1,10 +1,10 @@
 import axios from "axios";
 import { FastifyPluginAsync } from "fastify";
 import * as csv from "fast-csv";
-import { prisma } from "../../helpers/prisma";
+import { prisma } from "../../../helpers/prisma";
 
 const updateInstrumentsRoutes: FastifyPluginAsync = async (fastify, opts) => {
-  fastify.get("/update-instruments", async (request, reply) => {
+  fastify.get("/triggers/instruments", async (request, reply) => {
     try {
       const instruments = await axios.get(
         "https://growwapi-assets.groww.in/instruments/instrument.csv"

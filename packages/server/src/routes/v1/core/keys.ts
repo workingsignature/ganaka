@@ -5,7 +5,7 @@ import { validateRequest } from "../../../helpers/validator";
 import { DeveloperKeyStatus } from "../../../../generated/prisma";
 
 const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
-  fastify.get("/developerkey", async (request, reply) => {
+  fastify.get("/keys", async (request, reply) => {
     try {
       // Authentication is handled by userAuthPlugin
       // The request now has user information attached
@@ -38,7 +38,7 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
   // ---------------------------------------------------------------
-  fastify.post("/developerkey", async (request, reply) => {
+  fastify.post("/keys", async (request, reply) => {
     try {
       const user = request.user;
 
@@ -71,7 +71,7 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
   // ---------------------------------------------------------------
-  fastify.patch("/developerkey/:id/deactivate", async (request, reply) => {
+  fastify.patch("/keys/:id/deactivate", async (request, reply) => {
     try {
       const user = request.user;
 

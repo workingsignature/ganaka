@@ -29,12 +29,12 @@ fastify.register(cors, {
 // // Register routes with authentication plugins
 // User routes (/v1) - protected with Clerk authentication
 fastify.register(async function (fastify, opts) {
-  await authPlugin("user")(fastify, opts);
+  await authPlugin("core")(fastify, opts);
 
   // Register user routes
   fastify.register(autoLoad, {
-    dir: path.join(__dirname, "routes/v1/client"),
-    options: { prefix: "/v1/" },
+    dir: path.join(__dirname, "routes/v1/core"),
+    options: { prefix: "/v1/core/" },
   });
 });
 
@@ -51,7 +51,7 @@ fastify.register(async function (fastify, opts) {
 
 // General routes (no authentication required)
 fastify.register(autoLoad, {
-  dir: path.join(__dirname, "routes/general/"),
+  dir: path.join(__dirname, "routes/public/"),
 });
 
 // Register websocket

@@ -14,7 +14,7 @@ import { DeveloperKeyStatus } from "../../generated/prisma";
  * These are NOT developers who are accessing the APIs through their own keys (Bots).
  */
 const authPlugin =
-  (type: "user" | "developer"): FastifyPluginAsync =>
+  (type: "core" | "developer"): FastifyPluginAsync =>
   async (fastify) => {
     fastify.addHook("preHandler", async (request, reply) => {
       try {
@@ -41,7 +41,7 @@ const authPlugin =
 
         // authenticate user or developer
         switch (type) {
-          case "user": {
+          case "core": {
             // Verify the token with Clerk
             let jwtPayload: Awaited<ReturnType<typeof verifyToken>>;
             try {
