@@ -41,7 +41,7 @@
 					"name": "Shortlists",
 					"item": [
 						{
-							"name": "Curated",
+							"name": "All Curated",
 							"id": "18140686-b383342a-4b28-4943-bf08-a713b20f6adf",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
@@ -50,13 +50,14 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/shortlists/curated",
+									"raw": "{{host}}/shortlists/curated/all",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
 										"shortlists",
-										"curated"
+										"curated",
+										"all"
 									]
 								}
 							},
