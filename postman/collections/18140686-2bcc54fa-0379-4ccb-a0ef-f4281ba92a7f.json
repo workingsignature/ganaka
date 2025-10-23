@@ -63,7 +63,7 @@
 							"response": []
 						},
 						{
-							"name": "Curated",
+							"name": "Create Curated",
 							"id": "18140686-b9b68b6b-2c5b-478c-906e-02467be29367",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
