@@ -488,8 +488,91 @@
 		},
 		{
 			"name": "Groww",
-			"item": [],
-			"id": "18140686-dc49dcba-95a3-4801-b4d7-5b100edec5a6"
+			"item": [
+				{
+					"name": "Generate Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fae63e3b-0040-4ed6-8cde-aebab40f77ca",
+								"exec": [
+									"const response = pm.response.json();",
+									"pm.globals.set(\"groww_access_token\", response.access_token);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "18140686-bf9721c6-9494-4e62-a150-424f07974238",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"api_key\": \"{{vault:groww_api_key}}\",\n    \"api_secret\": \"{{vault:groww_api_secret}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://groww-access-token-generator.onrender.com",
+							"protocol": "https",
+							"host": [
+								"groww-access-token-generator",
+								"onrender",
+								"com"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "18140686-dc49dcba-95a3-4801-b4d7-5b100edec5a6",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{groww_access_token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0a35bc50-44c6-4ab2-b40e-cdb2e4f9291c",
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "8cf289fb-59d0-4f85-8452-ce59335ce980",
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		}
 	]
 }
