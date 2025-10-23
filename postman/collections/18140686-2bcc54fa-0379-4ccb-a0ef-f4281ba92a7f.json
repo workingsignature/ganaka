@@ -137,12 +137,13 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/{{api_version}}/keys",
+											"raw": "{{host}}/{{api_version}}/core/keys",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
 												"{{api_version}}",
+												"core",
 												"keys"
 											]
 										},
@@ -175,12 +176,13 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/{{api_version}}/keys",
+											"raw": "{{host}}/{{api_version}}/core/keys",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
 												"{{api_version}}",
+												"core",
 												"keys"
 											]
 										},
