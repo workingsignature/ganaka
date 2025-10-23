@@ -237,13 +237,14 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/shortlists/curated",
+											"raw": "{{host}}/v1/core/shortlists",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
-												"shortlists",
-												"curated"
+												"v1",
+												"core",
+												"shortlists"
 											]
 										}
 									},
