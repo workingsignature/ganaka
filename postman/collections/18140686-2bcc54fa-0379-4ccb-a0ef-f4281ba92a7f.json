@@ -490,6 +490,110 @@
 			"name": "Groww",
 			"item": [
 				{
+					"name": "Instruments",
+					"id": "18140686-b6d70f61-8a1d-433c-8059-a8caf1d693a3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://growwapi-assets.groww.in/instruments/instrument.csv",
+							"protocol": "https",
+							"host": [
+								"growwapi-assets",
+								"groww",
+								"in"
+							],
+							"path": [
+								"instruments",
+								"instrument.csv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Portfolio",
+					"id": "18140686-9e8b7383-a5c8-4bb1-b34e-922fba49b425",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.groww.in/v1/holdings/user",
+							"protocol": "https",
+							"host": [
+								"api",
+								"groww",
+								"in"
+							],
+							"path": [
+								"v1",
+								"holdings",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Historical Candle Data",
+					"id": "18140686-6ba5a481-1c08-45de-a94c-f6d46e761785",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.groww.in/v1/historical/candle/range?exchange=NSE&segment=CASH&trading_symbol=WIPRO&start_time=2025-09-26 09:15:00&end_time=2025-09-26 09:16:00&interval_in_minutes=5",
+							"protocol": "https",
+							"host": [
+								"api",
+								"groww",
+								"in"
+							],
+							"path": [
+								"v1",
+								"historical",
+								"candle",
+								"range"
+							],
+							"query": [
+								{
+									"key": "exchange",
+									"value": "NSE"
+								},
+								{
+									"key": "segment",
+									"value": "CASH"
+								},
+								{
+									"key": "trading_symbol",
+									"value": "WIPRO"
+								},
+								{
+									"key": "start_time",
+									"value": "2025-09-26 09:15:00"
+								},
+								{
+									"key": "end_time",
+									"value": "2025-09-26 09:16:00"
+								},
+								{
+									"key": "interval_in_minutes",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Generate Access Token",
 					"event": [
 						{
