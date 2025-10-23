@@ -63,14 +63,24 @@
 							"response": []
 						},
 						{
-							"name": "New Request",
-							"id": "18140686-2af2e902-5267-4d45-84ef-c606429f392c",
+							"name": "Curated",
+							"id": "18140686-b9b68b6b-2c5b-478c-906e-02467be29367",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
 							},
 							"request": {
 								"method": "GET",
-								"header": []
+								"header": [],
+								"url": {
+									"raw": "{{host}}/shortlists/curated",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"shortlists",
+										"curated"
+									]
+								}
 							},
 							"response": []
 						}
