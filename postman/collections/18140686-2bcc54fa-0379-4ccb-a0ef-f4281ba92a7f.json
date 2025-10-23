@@ -178,14 +178,14 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/{{api_version}}/developer/key",
+											"raw": "{{host}}/{{api_version}}/developer/keys",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
 												"{{api_version}}",
 												"developer",
-												"key"
+												"keys"
 											]
 										},
 										"description": "## All Keys (GET /developerkey)\n\nThis endpoint retrieves all developer keys available for the authenticated user or application. Use this endpoint to list and manage your API keys for bot authentication.\n\n### How it Works\n\n- **Input:** No request body is required. Ensure that the necessary authentication headers and variables (`clerk_access_token`, `host`, `api_version`) are set.\n    \n- **Process:** The API returns a list of all developer keys associated with your account or application.\n    \n- **Next Step:** Use the returned keys to authenticate API requests or manage your developer credentials as needed.\n    \n\n### Request Example\n\n``` http\nGET {{host}}/{{api_version}}/developerkey\nAuthorization: Bearer {{clerk_access_token}}\n\n ```\n\n### Response Example\n\n``` json\n[\n  {\n    \"id\": \"key_1234567890abcdef\",\n    \"name\": \"My First Key\",\n    \"created_at\": \"2024-06-01T12:34:56Z\",\n    \"last_used_at\": \"2024-06-10T08:21:00Z\",\n    \"scopes\": [\"read\", \"write\"]\n  },\n  {\n    \"id\": \"key_abcdef1234567890\",\n    \"name\": \"Integration Key\",\n    \"created_at\": \"2024-05-15T09:00:00Z\",\n    \"last_used_at\": null,\n    \"scopes\": [\"read\"]\n  }\n]\n\n ```\n\n- Each object in the array represents a developer key with its metadata.\n    \n\n### Use Case\n\n- Use this endpoint to programmatically retrieve all your developer keys.\n    \n- Useful for auditing, rotating, or managing API keys for your integrations.\n    \n\n### Related Endpoints\n\n- [Create a developer key](https://add-link-here): Generate a new developer key.\n    \n- [Delete a developer key](https://add-link-here): Remove an existing developer key.\n    \n\n### Notes\n\n- Ensure you have a valid `clerk_access_token` and the correct environment variables set.\n    \n- The response will include all keys you have access to, along with their metadata."
@@ -217,14 +217,14 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/{{api_version}}/developer/key",
+											"raw": "{{host}}/{{api_version}}/developer/keys",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
 												"{{api_version}}",
 												"developer",
-												"key"
+												"keys"
 											]
 										},
 										"description": "## Create Developer Key (POST {{host}}/{{api_version}}/developerkey)\n\n### Purpose\n\nThis endpoint is used to generate a new developer access key. The key can be used to authenticate subsequent API requests that require developer-level permissions. This is typically the first step for a developer to gain programmatic access to protected resources or endpoints.\n\n### How to Use\n\n- **Method:** POST\n    \n- **URL:** `{{host}}/{{api_version}}/developerkey`\n    \n- **Request Body:** _None required._ This endpoint does not require a request body.\n    \n- **Authentication:** Ensure that the required authentication (such as a valid access token) is provided if needed by your API gateway or backend.\n    \n\n### Variables Used\n\nThis request uses the following variables:\n\n- `{{host}}`: The base URL of the API server. Set this variable in your environment for the request to resolve correctly.\n    \n- `{{api_version}}`: The version of the API you are targeting (e.g., `v1`). Set this variable in your environment.\n    \n- `clerk_access_token`: (Global variable) Used for authentication if required by your API implementation. Ensure this is set before sending the request.\n    \n\n### Post-Response Script\n\nAfter the response is received, the following script is executed:\n\n``` javascript\nconst response = pm.response.json();\npm.globals.set(\"developer_access_token\", response.data.key);\n\n ```\n\n**What it does:**\n\n- Parses the JSON response.\n    \n- Extracts the `key` property from the `data` object in the response.\n    \n- Sets a global variable `developer_access_token` with the value of the key. This allows you to use the developer access token in subsequent requests by referencing `{{developer_access_token}}`.\n    \n\n### Typical Workflow\n\n1. Send this request to generate a new developer key.\n    \n2. The key is automatically saved as a global variable for use in other requests.\n    \n3. Use the `developer_access_token` in the headers or as required by other endpoints that need developer authentication.\n    \n\n### Notes\n\n- Make sure all required variables are set in your environment or globals before sending the request.\n    \n- If you encounter authentication errors, verify that your `clerk_access_token` (or other required tokens) are valid and up to date."
@@ -241,14 +241,14 @@
 										"method": "PATCH",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/{{api_version}}/developer/key/:id/deactivate",
+											"raw": "{{host}}/{{api_version}}/developer/keys/:id/deactivate",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
 												"{{api_version}}",
 												"developer",
-												"key",
+												"keys",
 												":id",
 												"deactivate"
 											],
