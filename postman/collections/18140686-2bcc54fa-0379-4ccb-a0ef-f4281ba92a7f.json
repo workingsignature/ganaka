@@ -122,78 +122,6 @@
 			"name": "v1",
 			"item": [
 				{
-					"name": "Developer",
-					"item": [
-						{
-							"name": "Candle",
-							"id": "18140686-effffd52-113a-4c6d-890c-7b0ad10aa310",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{host}}/{{api_version}}/developer/candle/:symbol",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"{{api_version}}",
-										"developer",
-										"candle",
-										":symbol"
-									],
-									"variable": [
-										{
-											"key": "symbol",
-											"value": "test"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"id": "18140686-281bdae0-c705-45f4-9350-703e1f4037a2",
-					"auth": {
-						"type": "bearer",
-						"bearer": [
-							{
-								"key": "token",
-								"value": "{{developer_access_token}}",
-								"type": "string"
-							}
-						]
-					},
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "b24bcb17-a820-48e7-a3ac-d3fcf995e4ad",
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {},
-								"exec": [
-									""
-								]
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "2a8d4407-baf9-4f87-bb9b-eec2f75f55ba",
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {},
-								"exec": [
-									""
-								]
-							}
-						}
-					]
-				},
-				{
 					"name": "Keys",
 					"item": [
 						{
@@ -295,6 +223,78 @@
 					"name": "core",
 					"item": [],
 					"id": "18140686-e0eaabe1-a99c-40b9-8879-383669abd95d"
+				},
+				{
+					"name": "Developer",
+					"item": [
+						{
+							"name": "Candle",
+							"id": "18140686-effffd52-113a-4c6d-890c-7b0ad10aa310",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/{{api_version}}/developer/candle/:symbol",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"{{api_version}}",
+										"developer",
+										"candle",
+										":symbol"
+									],
+									"variable": [
+										{
+											"key": "symbol",
+											"value": "test"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"id": "18140686-281bdae0-c705-45f4-9350-703e1f4037a2",
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{developer_access_token}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b24bcb17-a820-48e7-a3ac-d3fcf995e4ad",
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2a8d4407-baf9-4f87-bb9b-eec2f75f55ba",
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
 				}
 			],
 			"id": "18140686-13cb385c-2a09-4584-ade3-e434ba61366d",
