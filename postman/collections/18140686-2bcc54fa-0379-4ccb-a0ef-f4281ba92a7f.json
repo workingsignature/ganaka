@@ -198,12 +198,13 @@
 										"method": "PATCH",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/{{api_version}}/keys/:id/deactivate",
+											"raw": "{{host}}/{{api_version}}/core/keys/:id/deactivate",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
 												"{{api_version}}",
+												"core",
 												"keys",
 												":id",
 												"deactivate"
