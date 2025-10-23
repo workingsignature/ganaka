@@ -166,7 +166,7 @@
 					"name": "Developer",
 					"item": [
 						{
-							"name": "Access Keys",
+							"name": "Keys",
 							"item": [
 								{
 									"name": "All Keys",
@@ -241,13 +241,14 @@
 										"method": "PATCH",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/{{api_version}}/developerkey/:id/deactivate",
+											"raw": "{{host}}/{{api_version}}/developer/key/:id/deactivate",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
 												"{{api_version}}",
-												"developerkey",
+												"developer",
+												"key",
 												":id",
 												"deactivate"
 											],
