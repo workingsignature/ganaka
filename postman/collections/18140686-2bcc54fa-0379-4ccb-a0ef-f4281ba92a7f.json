@@ -61,28 +61,6 @@
 								}
 							},
 							"response": []
-						},
-						{
-							"name": "Create Curated",
-							"id": "18140686-b9b68b6b-2c5b-478c-906e-02467be29367",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{host}}/shortlists/curated",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"shortlists",
-										"curated"
-									]
-								}
-							},
-							"response": []
 						}
 					],
 					"id": "18140686-a77362e3-10e1-41d4-89d4-8cd7de86a59d"
@@ -248,7 +226,30 @@
 						},
 						{
 							"name": "Shortlists",
-							"item": [],
+							"item": [
+								{
+									"name": "Create Curated",
+									"id": "18140686-b9b68b6b-2c5b-478c-906e-02467be29367",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/shortlists/curated",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"shortlists",
+												"curated"
+											]
+										}
+									},
+									"response": []
+								}
+							],
 							"id": "18140686-ec0fe553-7c48-47df-8331-6d9c0f2c5d70"
 						}
 					],
