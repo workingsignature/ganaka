@@ -268,14 +268,13 @@
 								"method": "PATCH",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/{{api_version}}/developer/keys/:id/deactivate",
+									"raw": "{{host}}/{{api_version}}/developerkeys/:id/deactivate",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
 										"{{api_version}}",
-										"developer",
-										"keys",
+										"developerkeys",
 										":id",
 										"deactivate"
 									],
