@@ -315,6 +315,37 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Shortlists Copy",
+							"id": "18140686-9d3b09dd-051c-4aa1-86e9-619d85bc6d82",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/{{api_version}}/developer/candle/:symbol",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"{{api_version}}",
+										"developer",
+										"candle",
+										":symbol"
+									],
+									"variable": [
+										{
+											"id": "246dbc9f-335b-44ee-907f-e9c775c64be8",
+											"key": "symbol",
+											"value": "test"
+										}
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"id": "18140686-281bdae0-c705-45f4-9350-703e1f4037a2",
