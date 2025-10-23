@@ -264,7 +264,7 @@
 							"id": "18140686-993773e1-f375-4c85-8079-95fdec9d92db"
 						},
 						{
-							"name": "Candle Data",
+							"name": "Candle",
 							"id": "18140686-effffd52-113a-4c6d-890c-7b0ad10aa310",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
