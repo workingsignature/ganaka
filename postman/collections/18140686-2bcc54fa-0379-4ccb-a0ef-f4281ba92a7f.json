@@ -437,7 +437,7 @@
 							}
 						},
 						"url": {
-							"raw": "https://api.clerk.com/v1/sessions/{{session_id}}/tokens",
+							"raw": "https://api.clerk.com/v1/sessions/{{clerk_session_id}}/tokens",
 							"protocol": "https",
 							"host": [
 								"api",
@@ -447,7 +447,7 @@
 							"path": [
 								"v1",
 								"sessions",
-								"{{session_id}}",
+								"{{clerk_session_id}}",
 								"tokens"
 							]
 						},
