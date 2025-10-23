@@ -370,7 +370,7 @@
 								"id": "cbb9a473-1a44-4b93-a078-f1c113875b6a",
 								"exec": [
 									"const response = pm.response.json();",
-									"pm.collectionVariables.set(\"session_id\", response.id);",
+									"pm.globals.set(\"clerk_session_id\", response.id);",
 									""
 								],
 								"type": "text/javascript",
