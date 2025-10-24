@@ -62,7 +62,7 @@
 							"response": []
 						},
 						{
-							"name": "All Shortlists Copy",
+							"name": "Create Shortlist",
 							"id": "18140686-10941c4b-e49a-49ce-acb0-f11a0f072dc2",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
