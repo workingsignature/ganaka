@@ -38,6 +38,147 @@
 					"id": "18140686-e8e2a259-a8b4-4ed6-bb2a-0f7bb99b8603"
 				},
 				{
+					"name": "Shortlists Copy",
+					"item": [
+						{
+							"name": "All Shortlists",
+							"id": "18140686-441794c9-9f93-4397-b9a3-420472ac6474",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/v1/core/shortlists",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"v1",
+										"core",
+										"shortlists"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Shortlist",
+							"id": "18140686-2f9abb74-b1b2-49e7-b0c1-486bd4dbd189",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/v1/core/shortlists",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"v1",
+										"core",
+										"shortlists"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Shortlist",
+							"id": "18140686-cd1ff94f-af70-4a8a-a8c8-1a9c951def54",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/v1/core/shortlists/:id",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"v1",
+										"core",
+										"shortlists",
+										":id"
+									],
+									"variable": [
+										{
+											"id": "a8745f3a-03c5-4135-96b1-2008d03a22b6",
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Shortlist",
+							"id": "18140686-1e6f8ae1-5283-4db1-b118-8bb065ac9441",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/v1/core/shortlists/:id",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"v1",
+										"core",
+										"shortlists",
+										":id"
+									],
+									"variable": [
+										{
+											"id": "0667c3bb-ad1e-44d6-b4c8-3714fa3f68ce",
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"id": "18140686-8030c013-b301-4b28-879b-b9713085d7d9"
+				},
+				{
 					"name": "Shortlists",
 					"item": [
 						{
