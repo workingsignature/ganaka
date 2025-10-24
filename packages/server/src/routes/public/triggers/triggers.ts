@@ -2,9 +2,10 @@ import axios from "axios";
 import { FastifyPluginAsync } from "fastify";
 import * as csv from "fast-csv";
 import { prisma } from "../../../helpers/prisma";
+import { sendResponse } from "../../../helpers/sendResponse";
 
-const updateInstrumentsRoutes: FastifyPluginAsync = async (fastify, opts) => {
-  fastify.get("/triggers/instruments", async (request, reply) => {
+const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
+  fastify.get("/instruments", async (request, reply) => {
     try {
       const instruments = await axios.get(
         "https://growwapi-assets.groww.in/instruments/instrument.csv"
@@ -78,9 +79,13 @@ const updateInstrumentsRoutes: FastifyPluginAsync = async (fastify, opts) => {
         })
       );
 
-      return {
-        message: `${instrumentsArray.length} instruments inserted successfully.`,
-      };
+      return reply.send(
+        sendResponse({
+          statusCode: 200,
+          message: `${instrumentsArray.length} instruments inserted successfully.`,
+          data: undefined,
+        })
+      );
     } catch (error) {
       fastify.log.error(error);
       return reply.internalServerError("An unexpected error occurred.");
@@ -88,4 +93,4 @@ const updateInstrumentsRoutes: FastifyPluginAsync = async (fastify, opts) => {
   });
 };
 
-export default updateInstrumentsRoutes;
+export default triggersRoutes;

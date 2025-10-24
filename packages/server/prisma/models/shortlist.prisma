@@ -1,12 +1,21 @@
 model Shortlist {
     id String @id @default(uuid())
 
+    name        String
     instruments Instrument[]
+    type        ShortlistType
 
-    createdBy   User     @relation(fields: [createdById], references: [id])
-    createdById String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    // Only for USER shortlists - make this required when type = USER
+    createdBy   User?   @relation(fields: [createdById], references: [id])
+    createdById String?
 
-    @@index([createdById])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([createdById, name, type])
+}
+
+enum ShortlistType {
+    CURATED
+    USER
 }

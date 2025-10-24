@@ -6,8 +6,8 @@ import { prisma } from "../../../helpers/prisma";
  * Webhook route triggered by Clerk when user is created or updated or deleted.
  * Used to sync user data to our database.
  */
-const webHookUserRoutes: FastifyPluginAsync = async (fastify, opts) => {
-  fastify.post("/webhooks/user", async (request, reply) => {
+const webhooksRoutes: FastifyPluginAsync = async (fastify, opts) => {
+  fastify.post("/user", async (request, reply) => {
     try {
       const evt = await verifyWebhook(request);
 
@@ -70,4 +70,4 @@ const webHookUserRoutes: FastifyPluginAsync = async (fastify, opts) => {
   });
 };
 
-export default webHookUserRoutes;
+export default webhooksRoutes;

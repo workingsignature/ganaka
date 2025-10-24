@@ -35,6 +35,7 @@ fastify.register(async function (fastify, opts) {
   fastify.register(autoLoad, {
     dir: path.join(__dirname, "routes/v1/core"),
     options: { prefix: "/v1/core/" },
+    maxDepth: 3,
   });
 });
 
@@ -46,12 +47,14 @@ fastify.register(async function (fastify, opts) {
   fastify.register(autoLoad, {
     dir: path.join(__dirname, "routes/v1/developer"),
     options: { prefix: "/v1/developer/" },
+    maxDepth: 3,
   });
 });
 
 // General routes (no authentication required)
 fastify.register(autoLoad, {
   dir: path.join(__dirname, "routes/public/"),
+  maxDepth: 3,
 });
 
 // Register websocket

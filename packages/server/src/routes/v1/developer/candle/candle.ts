@@ -1,9 +1,9 @@
 import { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
-import { validateRequest } from "../../../helpers/validator";
+import { validateRequest } from "../../../../helpers/validator";
 
 const candleRoutes: FastifyPluginAsync = async (fastify) => {
-  fastify.get("/candle/:symbol", async (request, reply) => {
+  fastify.get("/:symbol", async (request, reply) => {
     try {
       // validate request
       const validatedParams = validateRequest(
