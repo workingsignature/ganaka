@@ -266,11 +266,13 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/shortlists",
+											"raw": "{{host}}/v1/core/shortlists",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
+												"v1",
+												"core",
 												"shortlists"
 											]
 										}
