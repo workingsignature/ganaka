@@ -318,7 +318,7 @@
 										"disableBodyPruning": true
 									},
 									"request": {
-										"method": "POST",
+										"method": "PUT",
 										"header": [],
 										"body": {
 											"mode": "raw",
@@ -330,28 +330,63 @@
 											}
 										},
 										"url": {
-											"raw": "{{host}}/v1/core/shortlists",
+											"raw": "{{host}}/v1/core/shortlists/:id",
 											"host": [
 												"{{host}}"
 											],
 											"path": [
 												"v1",
 												"core",
-												"shortlists"
+												"shortlists",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": ""
+												}
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "New Request",
-									"id": "18140686-18cfc95d-0ce0-4e0c-ab6a-67ad4c0c4c74",
+									"name": "Update Shortlist Copy",
+									"id": "18140686-abf373da-3923-4185-9739-76675733e6bb",
 									"protocolProfileBehavior": {
 										"disableBodyPruning": true
 									},
 									"request": {
-										"method": "GET",
-										"header": []
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/v1/core/shortlists/:id",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"v1",
+												"core",
+												"shortlists",
+												":id"
+											],
+											"variable": [
+												{
+													"id": "5615760e-5300-4c4d-b04f-50316bef26f9",
+													"key": "id",
+													"value": ""
+												}
+											]
+										}
 									},
 									"response": []
 								}
