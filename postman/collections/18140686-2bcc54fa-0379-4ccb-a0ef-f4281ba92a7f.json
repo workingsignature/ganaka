@@ -310,6 +310,38 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "Update Shortlist",
+									"id": "18140686-761e1fb8-64af-4474-88f3-0f272e6045bf",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/v1/core/shortlists",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"v1",
+												"core",
+												"shortlists"
+											]
+										}
+									},
+									"response": []
 								}
 							],
 							"id": "18140686-ec0fe553-7c48-47df-8331-6d9c0f2c5d70"
