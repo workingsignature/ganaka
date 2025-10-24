@@ -351,13 +351,13 @@
 									"response": []
 								},
 								{
-									"name": "Update Shortlist Copy",
+									"name": "Delete Shortlist",
 									"id": "18140686-abf373da-3923-4185-9739-76675733e6bb",
 									"protocolProfileBehavior": {
 										"disableBodyPruning": true
 									},
 									"request": {
-										"method": "PUT",
+										"method": "DELETE",
 										"header": [],
 										"body": {
 											"mode": "raw",
@@ -381,7 +381,6 @@
 											],
 											"variable": [
 												{
-													"id": "5615760e-5300-4c4d-b04f-50316bef26f9",
 													"key": "id",
 													"value": ""
 												}
