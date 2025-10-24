@@ -257,6 +257,27 @@
 							"name": "Shortlists",
 							"item": [
 								{
+									"name": "All Shortlists",
+									"id": "18140686-7327591d-6cf8-4543-8b15-1505cd9e8242",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/shortlists",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"shortlists"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Create Shortlist",
 									"id": "18140686-b9b68b6b-2c5b-478c-906e-02467be29367",
 									"protocolProfileBehavior": {
