@@ -179,63 +179,6 @@
 					"id": "18140686-8030c013-b301-4b28-879b-b9713085d7d9"
 				},
 				{
-					"name": "Shortlists",
-					"item": [
-						{
-							"name": "All Shortlists",
-							"id": "18140686-b383342a-4b28-4943-bf08-a713b20f6adf",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{host}}/shortlists",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"shortlists"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Create Shortlist",
-							"id": "18140686-10941c4b-e49a-49ce-acb0-f11a0f072dc2",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\": \"Shortlist 1\",\n    \"instruments\": [\"\"]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{host}}/shortlists",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"shortlists"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"id": "18140686-a77362e3-10e1-41d4-89d4-8cd7de86a59d"
-				},
-				{
 					"name": "Triggers",
 					"item": [
 						{
