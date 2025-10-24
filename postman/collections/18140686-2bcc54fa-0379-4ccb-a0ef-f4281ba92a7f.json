@@ -41,7 +41,7 @@
 					"name": "Shortlists",
 					"item": [
 						{
-							"name": "All Curated",
+							"name": "All Shortlists",
 							"id": "18140686-b383342a-4b28-4943-bf08-a713b20f6adf",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
