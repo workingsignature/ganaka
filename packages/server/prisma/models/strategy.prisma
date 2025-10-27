@@ -1,0 +1,66 @@
+model Strategy {
+    id String @id @default(uuid())
+
+    name             String
+    description      String
+    user             User      @relation(fields: [userId], references: [id])
+    tags             String[]
+    isPublic         Boolean   @default(false)
+    versions         Version[]
+    customAttributes Json?     @default("{}")
+
+    userId    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId, name])
+}
+
+model Version {
+    id String @id @default(uuid())
+
+    name             String
+    version          String
+    runs             Run[]
+    strategy         Strategy @relation(fields: [strategyId], references: [id])
+    customAttributes Json?    @default("{}")
+
+    strategyId String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+}
+
+model Run {
+    id String @id @default(uuid())
+
+    startTime        DateTime
+    endTime          DateTime
+    currentBalance   Float    @default(0)
+    startingBalance  Float    @default(0)
+    endingBalance    Float    @default(0)
+    runType          RunType
+    errorLog         String?
+    customAttributes Json?    @default("{}")
+
+    status  RunStatus @default(PENDING)
+    version Version   @relation(fields: [versionId], references: [id])
+
+    versionId String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([versionId])
+}
+
+enum RunType {
+    BACKTEST
+    LIVE
+}
+
+enum RunStatus {
+    PENDING
+    RUNNING
+    COMPLETED
+    FAILED
+    CANCELLED
+}

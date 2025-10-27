@@ -5,7 +5,7 @@ model User {
     lastName  String
     email     String?
 
-    bots          Bot[]
+    strategies    Strategy[]
     shortlists    Shortlist[]
     developerKeys DeveloperKeys[]
 

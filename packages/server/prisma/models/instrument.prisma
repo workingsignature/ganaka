@@ -1,7 +1,6 @@
 model Instrument {
-    id           String      @id @default(uuid())
-    includedIn   Shortlist[]
-    partOfOrders Order[]
+    id         String      @id @default(uuid())
+    includedIn Shortlist[]
 
     exchange                String
     exchange_token          String
