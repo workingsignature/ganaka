@@ -1,0 +1,4 @@
+include README.md
+include src/ganaka/py.typed
+recursive-include src/ganaka *.py
+

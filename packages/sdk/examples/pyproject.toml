@@ -1,0 +1,12 @@
+[project]
+name = "ganaka-examples"
+version = "0.1.0"
+description = "Examples for Ganaka SDK"
+requires-python = ">=3.9"
+dependencies = [
+    "ganaka @ file:///${PROJECT_ROOT}/..",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.uv]
+dev-dependencies = []
