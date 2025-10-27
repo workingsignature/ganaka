@@ -221,7 +221,8 @@
 									"response": []
 								}
 							],
-							"id": "18140686-993773e1-f375-4c85-8079-95fdec9d92db"
+							"id": "18140686-993773e1-f375-4c85-8079-95fdec9d92db",
+							"description": "Keys are used to authorize users for developer APIs. A user can have multiple keys active at a time, and deactivate them as required."
 						},
 						{
 							"name": "Shortlists",
