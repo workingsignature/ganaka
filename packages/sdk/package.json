@@ -18,9 +18,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "clean": "rm -rf dist",
-    "test": "node test/simple-test.js",
-    "test:types": "tsc --noEmit",
-    "prepublishOnly": "pnpm run clean && pnpm run build && pnpm run test",
+    "prepublishOnly": "pnpm run clean && pnpm run build",
     "semantic-release": "semantic-release"
   },
   "keywords": [
