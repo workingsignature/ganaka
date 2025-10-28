@@ -1,6 +1,6 @@
 {
   "name": "@workingsignature/ganaka",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Ganaka SDK - TypeScript client library",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
