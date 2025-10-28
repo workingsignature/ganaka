@@ -3,7 +3,7 @@ name: Version & Publish SDK
 on:
   push:
     branches:
-      - main
+      - release
     paths:
       - "packages/sdk/**"
       - ".github/workflows/publish-sdk.yml"
