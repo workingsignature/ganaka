@@ -1,7 +1,18 @@
 {
-  "branches": ["main"],
+  "branches": ["release"],
   "plugins": [
-    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "angular",
+        "releaseRules": [
+          { "scope": "sdk", "release": "patch" },
+          { "scope": "sdk", "type": "feat", "release": "minor" },
+          { "scope": "sdk", "breaking": true, "release": "major" },
+          { "scope": "!sdk", "release": false }
+        ]
+      }
+    ],
     [
       "@semantic-release/release-notes-generator",
       {
