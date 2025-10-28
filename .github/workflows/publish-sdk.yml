@@ -20,37 +20,26 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
-          cache-dependency-path: "packages/sdk/pnpm-lock.yaml"
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 8
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+
       - name: Install dependencies
-        run: |
-          cd packages/sdk
-          pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: |
-          cd packages/sdk
-          pnpm run build
-
-      - name: Test
-        run: |
-          cd packages/sdk
-          pnpm run test
+        run: pnpm --filter @workingsignature/ganaka run build
 
       - name: Semantic Release
-        run: |
-          cd packages/sdk
-          pnpm run semantic-release
+        run: pnpm --filter @workingsignature/ganaka run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
