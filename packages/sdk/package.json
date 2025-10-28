@@ -1,5 +1,5 @@
 {
-  "name": "@ganaka/sdk",
+  "name": "@workingsignature/ganaka",
   "version": "0.0.1",
   "description": "Ganaka SDK - TypeScript client library",
   "main": "dist/index.js",
@@ -21,11 +21,7 @@
     "test": "node test/simple-test.js",
     "test:types": "tsc --noEmit",
     "prepublishOnly": "pnpm run clean && pnpm run build && pnpm run test",
-    "release": "node scripts/prepare-release.js",
-    "release:patch": "node scripts/prepare-release.js patch",
-    "release:minor": "node scripts/prepare-release.js minor",
-    "release:major": "node scripts/prepare-release.js major",
-    "release:beta": "node scripts/prepare-release.js prerelease"
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "ganaka",
@@ -37,7 +33,14 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.6",
+    "@semantic-release/npm": "^10.0.4",
+    "@semantic-release/release-notes-generator": "^12.1.0",
     "@types/node": "^20.10.0",
+    "semantic-release": "^22.0.12",
     "typescript": "^5.3.3",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.0"
@@ -48,13 +51,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/ganaka.git",
+    "url": "git+https://github.com/workingsignature/ganaka.git",
     "directory": "packages/sdk"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ganaka/issues"
+    "url": "https://github.com/workingsignature/ganaka/issues"
   },
-  "homepage": "https://github.com/yourusername/ganaka#readme",
+  "homepage": "https://github.com/workingsignature/ganaka#readme",
   "engines": {
     "node": ">=18.0.0"
   }
