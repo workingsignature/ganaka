@@ -1,5 +1,7 @@
 # Ganaka
 
+[![npm version](https://badge.fury.io/js/@workingsignature%2Fganaka.svg)](https://badge.fury.io/js/@workingsignature%2Fganaka)
+
 Platform that helps build day-trading bots.
 
 ## Main Features:
