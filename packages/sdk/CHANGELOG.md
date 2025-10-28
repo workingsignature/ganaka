@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/workingsignature/ganaka/compare/v1.0.0...v1.0.1) (2025-10-28)
+
+
+### Bug Fixes
+
+* Simplify prepublishOnly script in package.json by removing test commands to streamline the build process. ([49267e1](https://github.com/workingsignature/ganaka/commit/49267e1facdaca609e73b54c3f458777fc36196a))
+
 # 1.0.0 (2025-10-28)
 
 
