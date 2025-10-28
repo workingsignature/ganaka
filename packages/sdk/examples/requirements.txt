@@ -1,8 +1,0 @@
-# This file is kept for compatibility with pip
-# For uv users, see pyproject.toml or use make setup
-
-# Install the local SDK
--e ..
-
-# Optional: for examples that need additional features
-python-dotenv>=1.0.0  # For loading .env files

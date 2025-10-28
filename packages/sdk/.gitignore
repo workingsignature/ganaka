@@ -1,50 +1,40 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+# Dependencies
+node_modules/
 
-# Virtual environments
-.venv/
-venv/
-ENV/
-env/
+# Build output
+dist/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # IDE
-.vscode/
-.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+*.sublime-*
 *.swp
 *.swo
-*~
+.DS_Store
 
-# Type checking
-.mypy_cache/
-.dmypy.json
-dmypy.json
-.pyright/
-pyrightconfig.json.lock
+# Environment
+.env
+.env.local
+.env.*.local
 
-# Ruff
-.ruff_cache/
+# Testing
+coverage/
+*.lcov
+.nyc_output
 
-# Distribution
-dist/
-build/
-*.egg-info/
+# Temp files
+*.tmp
+*.bak
+.cache/
 

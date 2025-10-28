@@ -1,0 +1,37 @@
+# Source files (dist is already built)
+src/
+*.ts
+!dist/**/*.d.ts
+
+# Config files
+tsconfig.json
+tsup.config.ts
+
+# Development files
+examples/
+test/
+*.test.ts
+*.spec.ts
+
+# IDE and temp files
+.vscode/
+.idea/
+*.log
+.DS_Store
+*.tmp
+*.bak
+
+# Environment files
+.env
+.env.*
+
+# Git files
+.gitignore
+.git/
+
+# Documentation source
+docs/
+
+# Build artifacts not needed
+*.map
+

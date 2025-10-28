@@ -1,0 +1,61 @@
+{
+  "name": "@ganaka/sdk",
+  "version": "0.0.1",
+  "description": "Ganaka SDK - TypeScript client library",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "build:watch": "vite build --watch",
+    "dev": "vite build --watch",
+    "lint": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
+    "clean": "rm -rf dist",
+    "test": "node test/simple-test.js",
+    "test:types": "tsc --noEmit",
+    "prepublishOnly": "pnpm run clean && pnpm run build && pnpm run test",
+    "release": "node scripts/prepare-release.js",
+    "release:patch": "node scripts/prepare-release.js patch",
+    "release:minor": "node scripts/prepare-release.js minor",
+    "release:major": "node scripts/prepare-release.js major",
+    "release:beta": "node scripts/prepare-release.js prerelease"
+  },
+  "keywords": [
+    "ganaka",
+    "sdk",
+    "typescript",
+    "trading",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.6.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/ganaka.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ganaka/issues"
+  },
+  "homepage": "https://github.com/yourusername/ganaka#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
