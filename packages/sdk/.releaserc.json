@@ -2,7 +2,14 @@
   "branches": ["main"],
   "plugins": [
     "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "writerOpts": {
+          "headerPartial": "## [@workingsignature/ganaka v{{version}}](https://www.npmjs.com/package/@workingsignature/ganaka/v/{{version}})\n\n[![npm version](https://badge.fury.io/js/%40workingsignature%2Fganaka.svg)](https://www.npmjs.com/package/@workingsignature/ganaka)\n\n"
+        }
+      }
+    ],
     [
       "@semantic-release/changelog",
       {
@@ -31,7 +38,9 @@
             "path": "dist/*.tgz",
             "label": "Package"
           }
-        ]
+        ],
+        "addReleases": "bottom",
+        "releasedLabels": false
       }
     ]
   ],
