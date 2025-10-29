@@ -1,16 +1,9 @@
 import { FastifyPluginAsync } from "fastify";
-import { prisma } from "../../../../helpers/prisma";
 import { z } from "zod";
-import { validateRequest } from "../../../../helpers/validator";
-import {
-  DeveloperKeyStatus,
-  ShortlistType,
-} from "../../../../../generated/prisma";
+import { InputJsonValue } from "../../../../../generated/prisma/runtime/library";
+import { prisma } from "../../../../helpers/prisma";
 import { sendResponse } from "../../../../helpers/sendResponse";
-import {
-  InputJsonValue,
-  JsonValue,
-} from "../../../../../generated/prisma/runtime/library";
+import { validateRequest } from "../../../../helpers/validator";
 
 const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {
@@ -49,6 +42,66 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
         })
       );
     } catch (e) {
+      fastify.log.error(e);
+      return reply.internalServerError("An unexpected error occurred.");
+    }
+  });
+  // ---------------------------------------------------------------
+  fastify.get("/:id", async (request, reply) => {
+    try {
+      const user = request.user;
+
+      // validate request
+      const validatedParams = validateRequest(
+        request.params,
+        reply,
+        z.object({
+          id: z.string(),
+        })
+      );
+      if (!validatedParams) {
+        return;
+      }
+
+      // get strategies
+      const strategy = await prisma.strategy.findUnique({
+        where: {
+          id: validatedParams.id,
+          owner: {
+            id: user.id,
+          },
+        },
+        include: {
+          versions: true,
+        },
+      });
+      if (!strategy) {
+        return reply.notFound(
+          "Strategy not found or you are not authorized to view this strategy"
+        );
+      }
+
+      // return
+      return reply.send(
+        sendResponse({
+          statusCode: 200,
+          message: "Strategies fetched successfully",
+          data: {
+            id: strategy.id,
+            name: strategy.name,
+            description: strategy.description,
+            isPublic: strategy.isPublic,
+            customAttributes: strategy.customAttributes,
+            versions: strategy.versions.map((version) => ({
+              id: version.id,
+              name: version.name,
+              version: version.version,
+            })),
+          },
+        })
+      );
+    } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
@@ -114,6 +167,7 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
@@ -160,6 +214,7 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
@@ -255,6 +310,7 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
