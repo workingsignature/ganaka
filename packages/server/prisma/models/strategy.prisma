@@ -3,34 +3,33 @@ model Strategy {
 
     name             String
     description      String
-    user             User      @relation(fields: [userId], references: [id])
-    tags             String[]
-    isPublic         Boolean   @default(false)
-    versions         Version[]
-    customAttributes Json?     @default("{}")
+    owner            User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    isPublic         Boolean           @default(false)
+    versions         StrategyVersion[]
+    customAttributes Json?             @default("{}")
 
-    userId    String
+    ownerId   String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([userId, name])
+    @@index([ownerId, name])
 }
 
-model Version {
+model StrategyVersion {
     id String @id @default(uuid())
 
     name             String
     version          String
-    runs             Run[]
-    strategy         Strategy @relation(fields: [strategyId], references: [id])
-    customAttributes Json?    @default("{}")
+    runs             StrategyVersionRun[]
+    strategy         Strategy             @relation(fields: [strategyId], references: [id], onDelete: Cascade)
+    customAttributes Json?                @default("{}")
 
     strategyId String
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
 }
 
-model Run {
+model StrategyVersionRun {
     id String @id @default(uuid())
 
     startTime        DateTime
@@ -42,8 +41,8 @@ model Run {
     errorLog         String?
     customAttributes Json?    @default("{}")
 
-    status  RunStatus @default(PENDING)
-    version Version   @relation(fields: [versionId], references: [id])
+    status  RunStatus       @default(PENDING)
+    version StrategyVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
     versionId String
     createdAt DateTime @default(now())

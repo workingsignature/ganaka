@@ -6,7 +6,7 @@ model Shortlist {
     type        ShortlistType
 
     // Only for USER shortlists - make this required when type = USER
-    createdBy   User?   @relation(fields: [createdById], references: [id])
+    createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: Cascade)
     createdById String?
 
     createdAt DateTime @default(now())
