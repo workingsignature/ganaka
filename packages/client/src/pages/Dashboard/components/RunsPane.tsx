@@ -7,6 +7,7 @@ import {
   Stack,
   Divider,
 } from "@mantine/core";
+import { formatRelative } from "date-fns";
 
 const RunCard = ({
   name,
@@ -65,16 +66,20 @@ const RunCard = ({
         <Group justify="space-between" grow>
           <div>
             <Text size="xs" c="dimmed">
-              Start Time
+              Started At
             </Text>
-            <Text size="sm">{new Date(startTime).toLocaleString()}</Text>
+            <Text size="sm">
+              {startTime
+                ? formatRelative(new Date(startTime), new Date())
+                : "—"}
+            </Text>
           </div>
           <div>
             <Text size="xs" c="dimmed">
-              End Time
+              Ended At
             </Text>
             <Text size="sm">
-              {endTime ? new Date(endTime).toLocaleString() : "—"}
+              {endTime ? formatRelative(new Date(endTime), new Date()) : "—"}
             </Text>
           </div>
         </Group>

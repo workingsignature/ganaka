@@ -10,7 +10,7 @@ export const App = () => {
   return (
     <MantineProvider
       theme={{
-        primaryColor: "violet",
+        primaryColor: "cyan",
         components: {
           Tabs: Tabs.Tab.extend({
             defaultProps: {

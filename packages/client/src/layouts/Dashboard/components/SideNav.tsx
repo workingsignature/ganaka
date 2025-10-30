@@ -20,7 +20,7 @@ const NavbarLink = ({
       <ActionIcon
         size="lg"
         variant={active ? "filled" : "subtle"}
-        color={active ? "dark" : "dark"}
+        color={active ? "cyan" : "dark"}
         onClick={onClick}
       >
         <Icon icon={icon} height={20} />
