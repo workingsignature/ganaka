@@ -1,15 +1,11 @@
-import { MantineProvider } from "@mantine/core";
-import { Tabs } from "@mantine/core";
-import { format } from "date-fns";
+import { MantineProvider, Tabs } from "@mantine/core";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Auth } from "./layouts/Auth/Auth.layout";
 import { Dashboard } from "./layouts/Dashboard/Dashboard.layout";
 import { NotFound } from "./layouts/NotFound/NotFound";
+import { Protect } from "@clerk/clerk-react";
 
 export const App = () => {
-  // VARIABLES
-  const today = format(new Date(), "yyyy-MM-dd");
-
   // DRAW
   return (
     <MantineProvider
@@ -31,9 +27,15 @@ export const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/auth/*" element={<Auth />} />
-          <Route path="/:date/shedule/:sheduleid" element={<Dashboard />} />
-          <Route path="/:date" element={<Dashboard />} />
-          <Route path="/" element={<Navigate to={`/${today}`} replace />} />
+          <Route
+            path="/dashboard"
+            element={
+              <Protect fallback={<Navigate to="/auth" replace />}>
+                <Dashboard />
+              </Protect>
+            }
+          />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
