@@ -28,11 +28,7 @@ const RunCard = ({
   );
 
   return (
-    <Paper
-      withBorder
-      p="md"
-      className="w-full hover:shadow-md transition-shadow"
-    >
+    <Paper withBorder p="md" className="w-full">
       <div className="flex flex-col gap-3">
         {/* Header: Name, Status, and Run Type */}
         <div className="flex items-center justify-between w-full gap-2">

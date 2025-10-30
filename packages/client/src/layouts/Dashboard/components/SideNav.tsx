@@ -59,7 +59,7 @@ export const SideNav = () => {
   return (
     <nav className="w-full h-full rounded-sm flex flex-col items-center justify-between gap-2 py-2">
       <div className="w-full flex items-center justify-center mb-5">
-        <img src={ganakaLogo} alt="Ganaka" />
+        <img src={ganakaLogo} alt="Ganaka" className="w-10 h-10" />
       </div>
       <div className="w-full h-full flex flex-col items-center justify-between gap-5">
         <div className="w-full h-fit flex flex-col items-center justify-start gap-4">
