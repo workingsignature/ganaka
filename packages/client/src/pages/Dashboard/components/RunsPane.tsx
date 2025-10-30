@@ -1,12 +1,5 @@
-import {
-  Paper,
-  Title,
-  Badge,
-  Text,
-  Group,
-  Stack,
-  Divider,
-} from "@mantine/core";
+import { Icon } from "@iconify/react";
+import { Badge, Button, Divider, Paper, Text, Title } from "@mantine/core";
 import { formatRelative } from "date-fns";
 
 const RunCard = ({
@@ -40,13 +33,13 @@ const RunCard = ({
       p="md"
       className="w-full hover:shadow-md transition-shadow"
     >
-      <Stack gap="sm">
+      <div className="flex flex-col gap-3">
         {/* Header: Name, Status, and Run Type */}
-        <Group justify="space-between" align="center">
+        <div className="flex items-center justify-between w-full gap-2">
           <Text fw={600} size="lg">
             {name}
           </Text>
-          <Group gap="xs">
+          <div className="flex items-center gap-1">
             <Badge
               color={isActive ? "green" : "gray"}
               variant="light"
@@ -57,13 +50,13 @@ const RunCard = ({
             <Badge color="blue" variant="outline" size="sm">
               {runType}
             </Badge>
-          </Group>
-        </Group>
+          </div>
+        </div>
 
         <Divider />
 
         {/* Time Information */}
-        <Group justify="space-between" grow>
+        <div className="flex items-center justify-between w-full gap-2">
           <div>
             <Text size="xs" c="dimmed">
               Started At
@@ -82,12 +75,10 @@ const RunCard = ({
               {endTime ? formatRelative(new Date(endTime), new Date()) : "—"}
             </Text>
           </div>
-        </Group>
-
+        </div>
         <Divider />
-
         {/* Balance Information */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="flex items-center justify-between w-full gap-2">
           <div>
             <Text size="xs" c="dimmed">
               Starting Balance
@@ -113,13 +104,13 @@ const RunCard = ({
             </Text>
           </div>
         </div>
-
+        <Divider />
         {/* Profit/Loss */}
-        <Group justify="space-between" className="mt-2">
+        <div className="flex items-center justify-between w-full gap-2">
           <Text size="xs" c="dimmed">
             P&L
           </Text>
-          <Group gap="xs">
+          <div className="flex items-center gap-1">
             <Text size="sm" fw={600} c={profitLoss >= 0 ? "green" : "red"}>
               {profitLoss >= 0 ? "+" : ""}₹{profitLoss.toLocaleString()}
             </Text>
@@ -127,9 +118,9 @@ const RunCard = ({
               ({profitLoss >= 0 ? "+" : ""}
               {profitLossPercentage}%)
             </Text>
-          </Group>
-        </Group>
-      </Stack>
+          </div>
+        </div>
+      </div>
     </Paper>
   );
 };
@@ -140,10 +131,19 @@ export const RunsPane = () => {
     <Paper
       withBorder
       p="md"
-      className="h-full w-full !grid grid-rows-[20px_1fr] gap-2"
+      className="h-full w-full !grid grid-rows-[32px_1fr] gap-2"
     >
       <div className="flex items-center justify-between">
-        <Title order={4}>Runs</Title>
+        <Title className="block" order={4}>
+          Runs
+        </Title>
+        <Button
+          variant="light"
+          size="xs"
+          leftSection={<Icon icon="mdi:plus" />}
+        >
+          Schedule Run
+        </Button>
       </div>
       <div>
         <RunCard
