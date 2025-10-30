@@ -28,7 +28,7 @@ export const App = () => {
         <Routes>
           <Route path="/auth/*" element={<Auth />} />
           <Route
-            path="/dashboard"
+            path="/dashboard/*"
             element={
               <Protect fallback={<Navigate to="/auth" replace />}>
                 <Dashboard />
