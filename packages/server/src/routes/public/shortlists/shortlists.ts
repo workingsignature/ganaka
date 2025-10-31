@@ -1,12 +1,10 @@
 import { FastifyPluginAsync } from "fastify";
 import { ShortlistType } from "../../../../generated/prisma";
 import { prisma } from "../../../helpers/prisma";
-import { z } from "zod";
-import { validateRequest } from "../../../helpers/validator";
 import { sendResponse } from "../../../helpers/sendResponse";
 
 const shortlistsRoutes: FastifyPluginAsync = async (fastify, opts) => {
-  fastify.get("/", async (request, reply) => {
+  fastify.get("/", async (_, reply) => {
     try {
       const shortlists = await prisma.shortlist.findMany({
         where: {

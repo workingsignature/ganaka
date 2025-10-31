@@ -13,11 +13,6 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, "src/index.ts"),
-        common: resolve(__dirname, "src/common.ts"),
-        strategies: resolve(__dirname, "src/strategies.ts"),
-        versions: resolve(__dirname, "src/versions.ts"),
-        shortlists: resolve(__dirname, "src/shortlists.ts"),
-        keys: resolve(__dirname, "src/keys.ts"),
       },
       formats: ["es", "cjs"],
     },
@@ -29,4 +24,3 @@ export default defineConfig({
     },
   },
 });
-

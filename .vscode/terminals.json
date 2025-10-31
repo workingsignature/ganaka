@@ -19,6 +19,12 @@
       "onlySingle": true
     },
     {
+      "name": "Api Schemas:build",
+      "focus": true,
+      "command": "pnpm run build:api-schemas",
+      "onlySingle": true
+    },
+    {
       "name": "Bot:dev",
       "focus": true,
       "command": "pnpm run dev:bot",

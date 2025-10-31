@@ -46,7 +46,7 @@ export const createStrategy = {
     name: z.string(),
     description: z.string(),
     isPublic: z.boolean(),
-    customAttributes: z.record(z.unknown()).optional().default({}),
+    customAttributes: z.record(z.string(), z.unknown()).optional().default({}),
   }),
   response: z.object({
     id: z.string(),
@@ -67,7 +67,7 @@ export const updateStrategy = {
     name: z.string().optional(),
     description: z.string().optional(),
     isPublic: z.boolean().optional(),
-    customAttributes: z.record(z.unknown()).optional(),
+    customAttributes: z.record(z.string(), z.unknown()).optional(),
   }),
   response: strategyItemSchema,
 };

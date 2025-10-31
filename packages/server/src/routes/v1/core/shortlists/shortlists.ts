@@ -1,18 +1,15 @@
+import { shortlistsSchemas } from "@ganaka/api-schemas";
 import { FastifyPluginAsync } from "fastify";
-import { prisma } from "../../../../helpers/prisma";
 import { z } from "zod";
-import { validateRequest } from "../../../../helpers/validator";
-import {
-  DeveloperKeyStatus,
-  ShortlistType,
-} from "../../../../../generated/prisma";
+import { ShortlistType } from "../../../../../generated/prisma";
+import { prisma } from "../../../../helpers/prisma";
 import { sendResponse } from "../../../../helpers/sendResponse";
+import { validateRequest } from "../../../../helpers/validator";
 
 const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {
     try {
-      // Authentication is handled by userAuthPlugin
-      // The request now has user information attached
+      // get user
       const user = request.user;
 
       // get shortlists
@@ -30,7 +27,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<z.infer<typeof shortlistsSchemas.getShortlists.response>>({
           statusCode: 200,
           message: "Shortlists fetched successfully",
           data: shortlists.map((shortlist) => {
@@ -46,25 +43,27 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
   // ---------------------------------------------------------------
   fastify.post("/", async (request, reply) => {
     try {
+      // get user
+      const user = request.user;
+
       // validate request
       const validatedBody = validateRequest(
         request.body,
         reply,
-        z.object({
-          name: z.string(),
-          instruments: z.array(z.string()),
-        })
+        shortlistsSchemas.createShortlist.body
       );
       if (!validatedBody) {
         return;
       }
 
+      // check if instruments exist
       const instruments = await prisma.instrument.findMany({
         where: {
           id: {
@@ -82,6 +81,9 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
         data: {
           name: validatedBody.name,
           type: ShortlistType.USER,
+          createdBy: {
+            connect: { id: user.id },
+          },
           instruments: {
             connect: instruments.map((instrument) => ({ id: instrument.id })),
           },
@@ -93,7 +95,9 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<typeof shortlistsSchemas.createShortlist.response>
+        >({
           statusCode: 200,
           message: "Shortlist created successfully",
           data: {
@@ -107,25 +111,27 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
   // ---------------------------------------------------------------
   fastify.delete("/:id", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
+      // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          id: z.string(),
-        })
+        shortlistsSchemas.deleteShortlist.params
       );
       if (!validatedParams) {
         return;
       }
 
+      // check if shortlist exists
       const shortlist = await prisma.shortlist.findUnique({
         where: {
           id: validatedParams.id,
@@ -134,52 +140,54 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
           },
         },
       });
-
       if (!shortlist) {
         return reply.notFound(
           "Shortlist not found or you are not authorized to delete this shortlist"
         );
       }
 
+      // delete shortlist
       await prisma.shortlist.delete({
         where: { id: validatedParams.id },
       });
 
+      // return
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<typeof shortlistsSchemas.deleteShortlist.response>
+        >({
           statusCode: 200,
           message: "Shortlist deleted successfully",
           data: undefined,
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
   // ---------------------------------------------------------------
   fastify.put("/:id", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
+
+      // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          id: z.string(),
-        })
+        shortlistsSchemas.updateShortlist.params
       );
       const validatedBody = validateRequest(
         request.body,
         reply,
-        z.object({
-          name: z.string(),
-          instruments: z.array(z.string()),
-        })
+        shortlistsSchemas.updateShortlist.body
       );
-
       if (!validatedParams || !validatedBody) {
         return;
       }
 
+      // check if instruments exist
       const instruments = await prisma.instrument.findMany({
         where: {
           id: {
@@ -187,11 +195,11 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
           },
         },
       });
-
       if (instruments.length !== validatedBody.instruments.length) {
         return reply.badRequest("Some instruments were not found.");
       }
 
+      // update shortlist
       const shortlist = await prisma.shortlist.update({
         where: { id: validatedParams.id, createdBy: { id: user.id } },
         data: {
@@ -205,8 +213,11 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
         },
       });
 
+      // return
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<typeof shortlistsSchemas.updateShortlist.response>
+        >({
           statusCode: 200,
           message: "Shortlist updated successfully",
           data: {
@@ -220,6 +231,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });

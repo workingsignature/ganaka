@@ -10,31 +10,6 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./common": {
-      "import": "./dist/common.mjs",
-      "require": "./dist/common.js",
-      "types": "./dist/common.d.ts"
-    },
-    "./strategies": {
-      "import": "./dist/strategies.mjs",
-      "require": "./dist/strategies.js",
-      "types": "./dist/strategies.d.ts"
-    },
-    "./versions": {
-      "import": "./dist/versions.mjs",
-      "require": "./dist/versions.js",
-      "types": "./dist/versions.d.ts"
-    },
-    "./shortlists": {
-      "import": "./dist/shortlists.mjs",
-      "require": "./dist/shortlists.js",
-      "types": "./dist/shortlists.d.ts"
-    },
-    "./keys": {
-      "import": "./dist/keys.mjs",
-      "require": "./dist/keys.js",
-      "types": "./dist/keys.d.ts"
     }
   },
   "files": [
@@ -57,7 +32,7 @@
   "license": "MIT",
   "peerDependencies": {
     "semver": "^7.0.0",
-    "zod": "^3.0.0"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
@@ -66,6 +41,6 @@
     "typescript": "^5.3.3",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.0",
-    "zod": "^3.22.4"
+    "zod": "^4.1.11"
   }
 }

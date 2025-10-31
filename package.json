@@ -7,6 +7,7 @@
     "dev:client": "pnpm --filter @ganaka/client dev",
     "dev:server": "pnpm --filter @ganaka/server dev",
     "build:server": "pnpm --filter @ganaka/server build",
+    "build:api-schemas": "pnpm --filter @ganaka/api-schemas build",
     "prisma:migrate:dev": "pnpm --filter @ganaka/server prisma:migrate:dev"
   },
   "author": {

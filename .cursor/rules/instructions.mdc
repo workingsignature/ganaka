@@ -3,3 +3,4 @@ alwaysApply: true
 ---
 
 This project uses MantineUI along with TailwindCSS for layouts and components.
+This project also uses pnpm instead of npm.

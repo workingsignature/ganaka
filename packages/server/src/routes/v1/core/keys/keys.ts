@@ -4,12 +4,12 @@ import { z } from "zod";
 import { validateRequest } from "../../../../helpers/validator";
 import { DeveloperKeyStatus } from "../../../../../generated/prisma";
 import { sendResponse } from "../../../../helpers/sendResponse";
+import { keysSchemas } from "@ganaka/api-schemas";
 
 const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {
     try {
-      // Authentication is handled by userAuthPlugin
-      // The request now has user information attached
+      // get user
       const user = request.user;
 
       // get developer key
@@ -23,27 +23,27 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<z.infer<typeof keysSchemas.getKeys.response>>({
           statusCode: 200,
           message: "Developer keys fetched successfully",
-          data: developerKeys.map((key) => {
-            return {
-              id: key.id,
-              key: key.key,
-              status: key.status,
-              createdAt: key.createdAt,
-              updatedAt: key.updatedAt,
-            };
-          }),
+          data: developerKeys.map((key) => ({
+            id: key.id,
+            key: key.key,
+            status: key.status,
+            createdAt: key.createdAt,
+            updatedAt: key.updatedAt,
+          })),
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
   // ---------------------------------------------------------------
   fastify.post("/", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // create developer key
@@ -60,7 +60,7 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<z.infer<typeof keysSchemas.createKey.response>>({
           statusCode: 200,
           message: "Developer key created successfully",
           data: {
@@ -73,23 +73,22 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });
   // ---------------------------------------------------------------
   fastify.patch("/:id/deactivate", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          id: z.string(),
-        })
+        keysSchemas.deactivateKey.params
       );
-
       if (!validatedParams) {
         return;
       }
@@ -115,7 +114,7 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<z.infer<typeof keysSchemas.deactivateKey.response>>({
           statusCode: 200,
           message: "Developer key deactivated successfully",
           data: {
@@ -128,6 +127,7 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
         })
       );
     } catch (e) {
+      fastify.log.error(e);
       return reply.internalServerError("An unexpected error occurred.");
     }
   });

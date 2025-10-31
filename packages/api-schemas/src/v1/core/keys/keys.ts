@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { DeveloperKeyStatus } from "./common";
 
 // ==================== Schemas ====================
 
@@ -9,7 +8,7 @@ import { DeveloperKeyStatus } from "./common";
 export const developerKeyItemSchema = z.object({
   id: z.string(),
   key: z.string(),
-  status: z.nativeEnum(DeveloperKeyStatus),
+  status: z.enum(["ACTIVE", "INACTIVE", "EXPIRED"]),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

@@ -15,11 +15,3 @@ export const apiResponseSchema = z.object({
 export const idParamSchema = z.object({
   id: z.string(),
 });
-
-/**
- * Developer Key Status enum (matches Prisma enum)
- */
-export enum DeveloperKeyStatus {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-}

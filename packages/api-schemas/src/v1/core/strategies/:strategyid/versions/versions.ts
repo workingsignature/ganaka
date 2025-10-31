@@ -43,7 +43,7 @@ export const createVersion = {
     version: z.string().refine((version) => semver.valid(version), {
       message: "Invalid version format",
     }),
-    customAttributes: z.record(z.unknown()).optional().default({}),
+    customAttributes: z.record(z.string(), z.unknown()).optional().default({}),
   }),
   response: versionItemSchema,
 };
@@ -63,7 +63,7 @@ export const updateVersion = {
         message: "Invalid version format",
       })
       .optional(),
-    customAttributes: z.record(z.unknown()).optional(),
+    customAttributes: z.record(z.string(), z.unknown()).optional(),
   }),
   response: versionItemSchema,
 };

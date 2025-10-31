@@ -9,7 +9,7 @@
 export * from "./common";
 
 // Re-export all endpoint-specific types
-export * from "./strategies";
-export * from "./versions";
-export * from "./shortlists";
-export * from "./keys";
+export * as strategiesSchemas from "./v1/core/strategies/strategies";
+export * as strategyVersionsSchemas from "./v1/core/strategies/:strategyid/versions/versions";
+export * as shortlistsSchemas from "./v1/core/shortlists/shortlists";
+export * as keysSchemas from "./v1/core/keys/keys";

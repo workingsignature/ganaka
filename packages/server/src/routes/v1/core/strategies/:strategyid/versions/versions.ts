@@ -4,19 +4,20 @@ import { z } from "zod";
 import { prisma } from "../../../../../../helpers/prisma";
 import { sendResponse } from "../../../../../../helpers/sendResponse";
 import { validateRequest } from "../../../../../../helpers/validator";
+import { strategyVersionsSchemas } from "@ganaka/api-schemas";
+import { InputJsonValue } from "../../../../../../../generated/prisma/runtime/library";
 
 const versionsRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          strategyid: z.string(),
-        })
+        strategyVersionsSchemas.getVersions.params
       );
       if (!validatedParams) {
         return;
@@ -48,7 +49,6 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
           },
         },
       });
-
       if (!versions) {
         return reply.notFound(
           "Versions not found or you are not authorized to view this strategy"
@@ -57,7 +57,9 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<typeof strategyVersionsSchemas.getVersions.response>
+        >({
           statusCode: 200,
           message: "Versions fetched successfully",
           data: versions.map((version) => ({
@@ -76,16 +78,14 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
   // ---------------------------------------------------------------
   fastify.get("/:id", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          strategyid: z.string(),
-          id: z.string(),
-        })
+        strategyVersionsSchemas.getVersion.params
       );
       if (!validatedParams) {
         return;
@@ -106,7 +106,7 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
         );
       }
 
-      // get strategies
+      // get version
       const version = await prisma.strategyVersion.findUnique({
         where: {
           id: validatedParams.id,
@@ -118,7 +118,6 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
           },
         },
       });
-
       if (!version) {
         return reply.notFound(
           "Version not found or you are not authorized to view this version"
@@ -127,7 +126,9 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<typeof strategyVersionsSchemas.getVersion.response>
+        >({
           statusCode: 200,
           message: "Version fetched successfully",
           data: {
@@ -146,15 +147,14 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
   // ---------------------------------------------------------------
   fastify.post("/", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          strategyid: z.string(),
-        })
+        strategyVersionsSchemas.createVersion.params
       );
       const validatedBody = validateRequest(
         request.body,
@@ -223,7 +223,9 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<typeof strategyVersionsSchemas.createVersion.response>
+        >({
           statusCode: 200,
           message: "Version created successfully",
           data: {
@@ -242,16 +244,14 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
   // ---------------------------------------------------------------
   fastify.delete("/:id", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          strategyid: z.string(),
-          id: z.string(),
-        })
+        strategyVersionsSchemas.deleteVersion.params
       );
       if (!validatedParams) {
         return;
@@ -290,6 +290,7 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
         );
       }
 
+      // delete version
       await prisma.strategyVersion.delete({
         where: {
           id: validatedParams.id,
@@ -302,8 +303,11 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
         },
       });
 
+      // return
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<typeof strategyVersionsSchemas.deleteVersion.response>
+        >({
           statusCode: 200,
           message: "Version deleted successfully",
           data: undefined,
@@ -317,38 +321,25 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
   // ---------------------------------------------------------------
   fastify.put("/:id", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          strategyid: z.string(),
-          id: z.string(),
-        })
+        strategyVersionsSchemas.updateVersion.params
       );
       const validatedBody = validateRequest(
         request.body,
         reply,
-        z.object({
-          name: z.string().optional(),
-          version: z
-            .string()
-            .refine((version) => semver.valid(version), {
-              message: "Invalid version format",
-            })
-            .optional(),
-          customAttributes: z.object({}).optional().default({}),
-        })
+        strategyVersionsSchemas.updateVersion.body
       );
-
       if (!validatedParams || !validatedBody) {
         return;
       }
 
-      // ----------------------------------------
-
+      // check if strategy exists
       const strategy = await prisma.strategy.findUnique({
         where: {
           id: validatedParams.strategyid,
@@ -363,8 +354,7 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
         );
       }
 
-      // ----------------------------------------
-
+      // check if version exists
       const version = await prisma.strategyVersion.findUnique({
         where: {
           id: validatedParams.id,
@@ -382,10 +372,8 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
         );
       }
 
-      // ----------------------------------------
-
+      // check if version is incremented over the latest version
       if (validatedBody.version) {
-        // check if version is incremented over the latest version
         const latestVersion = version.version;
         if (!semver.gt(validatedBody.version, latestVersion)) {
           return reply.badRequest(
@@ -394,8 +382,7 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
 
-      // ----------------------------------------
-
+      // update version
       const updatedStrategyVersion = await prisma.strategyVersion.update({
         where: {
           id: validatedParams.id,
@@ -410,12 +397,16 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
           name: validatedBody.name ?? version.name,
           version: validatedBody.version ?? version.version,
           customAttributes:
-            validatedBody.customAttributes ?? version.customAttributes,
+            (validatedBody.customAttributes as InputJsonValue) ??
+            (version.customAttributes as InputJsonValue),
         },
       });
 
+      // return
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<typeof strategyVersionsSchemas.updateVersion.response>
+        >({
           statusCode: 200,
           message: "Version updated successfully",
           data: {

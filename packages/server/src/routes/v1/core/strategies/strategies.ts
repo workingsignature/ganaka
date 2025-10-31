@@ -1,13 +1,15 @@
 import { FastifyPluginAsync } from "fastify";
-import { z } from "zod";
+import { strategiesSchemas } from "@ganaka/api-schemas";
 import { InputJsonValue } from "../../../../../generated/prisma/runtime/library";
 import { prisma } from "../../../../helpers/prisma";
 import { sendResponse } from "../../../../helpers/sendResponse";
 import { validateRequest } from "../../../../helpers/validator";
+import z from "zod";
 
 const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // get strategies
@@ -24,7 +26,7 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<z.infer<typeof strategiesSchemas.getStrategies.response>>({
           statusCode: 200,
           message: "Strategies fetched successfully",
           data: strategies.map((strategy) => ({
@@ -49,15 +51,14 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
   // ---------------------------------------------------------------
   fastify.get("/:id", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          id: z.string(),
-        })
+        strategiesSchemas.getStrategy.params
       );
       if (!validatedParams) {
         return;
@@ -83,9 +84,9 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
+        sendResponse<z.infer<typeof strategiesSchemas.getStrategy.response>>({
           statusCode: 200,
-          message: "Strategies fetched successfully",
+          message: "Strategy fetched successfully",
           data: {
             id: strategy.id,
             name: strategy.name,
@@ -108,22 +109,19 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
   // ---------------------------------------------------------------
   fastify.post("/", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
       // validate request
       const validatedBody = validateRequest(
         request.body,
         reply,
-        z.object({
-          name: z.string(),
-          description: z.string(),
-          isPublic: z.boolean(),
-          customAttributes: z.object({}).optional().default({}),
-        })
+        strategiesSchemas.createStrategy.body
       );
       if (!validatedBody) {
         return;
       }
+
       // check if strategy already exists
       const existingStrategy = await prisma.strategy.findFirst({
         where: {
@@ -145,7 +143,7 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
           name: validatedBody.name,
           description: validatedBody.description,
           isPublic: validatedBody.isPublic,
-          customAttributes: validatedBody.customAttributes,
+          customAttributes: validatedBody.customAttributes as InputJsonValue,
           owner: {
             connect: { id: user.id },
           },
@@ -154,17 +152,19 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse({
-          statusCode: 200,
-          message: "Strategy created successfully",
-          data: {
-            id: strategy.id,
-            name: strategy.name,
-            description: strategy.description,
-            isPublic: strategy.isPublic,
-            customAttributes: strategy.customAttributes,
-          },
-        })
+        sendResponse<z.infer<typeof strategiesSchemas.createStrategy.response>>(
+          {
+            statusCode: 200,
+            message: "Strategy created successfully",
+            data: {
+              id: strategy.id,
+              name: strategy.name,
+              description: strategy.description,
+              isPublic: strategy.isPublic,
+              customAttributes: strategy.customAttributes,
+            },
+          }
+        )
       );
     } catch (e) {
       fastify.log.error(e);
@@ -174,19 +174,20 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
   // ---------------------------------------------------------------
   fastify.delete("/:id", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
 
+      // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          id: z.string(),
-        })
+        strategiesSchemas.deleteStrategy.params
       );
       if (!validatedParams) {
         return;
       }
 
+      // check if strategy exists
       const strategy = await prisma.strategy.findUnique({
         where: {
           id: validatedParams.id,
@@ -195,23 +196,26 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
           },
         },
       });
-
       if (!strategy) {
         return reply.notFound(
           "Strategy not found or you are not authorized to delete this strategy"
         );
       }
 
+      // delete strategy
       await prisma.strategy.delete({
         where: { id: validatedParams.id },
       });
 
+      // return
       return reply.send(
-        sendResponse({
-          statusCode: 200,
-          message: "Strategy deleted successfully",
-          data: undefined,
-        })
+        sendResponse<z.infer<typeof strategiesSchemas.deleteStrategy.response>>(
+          {
+            statusCode: 200,
+            message: "Strategy deleted successfully",
+            data: undefined,
+          }
+        )
       );
     } catch (e) {
       fastify.log.error(e);
@@ -221,31 +225,25 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
   // ---------------------------------------------------------------
   fastify.put("/:id", async (request, reply) => {
     try {
+      // get user
       const user = request.user;
+
+      // validate request
       const validatedParams = validateRequest(
         request.params,
         reply,
-        z.object({
-          id: z.string(),
-        })
+        strategiesSchemas.updateStrategy.params
       );
       const validatedBody = validateRequest(
         request.body,
         reply,
-        z.object({
-          name: z.string().optional(),
-          description: z.string().optional(),
-          isPublic: z.boolean().optional(),
-          customAttributes: z.object({}).optional(),
-        })
+        strategiesSchemas.updateStrategy.body
       );
-
       if (!validatedParams || !validatedBody) {
         return;
       }
 
-      // ----------------------------------------
-
+      // check if strategy exists
       const strategy = await prisma.strategy.findUnique({
         where: { id: validatedParams.id, owner: { id: user.id } },
       });
@@ -254,6 +252,8 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
           "Strategy not found or you are not authorized to update this strategy"
         );
       }
+
+      // check if name is already taken
       if (validatedBody.name) {
         if (validatedBody.name !== strategy.name) {
           const existingStrategy = await prisma.strategy.findFirst({
@@ -272,8 +272,7 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
 
-      // ----------------------------------------
-
+      // update strategy
       const updatedStrategy = await prisma.strategy.update({
         where: { id: validatedParams.id, owner: { id: user.id } },
         data: {
@@ -289,25 +288,26 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
         },
       });
 
-      // ----------------------------------------
-
+      // return
       return reply.send(
-        sendResponse({
-          statusCode: 200,
-          message: "Shortlist updated successfully",
-          data: {
-            id: updatedStrategy.id,
-            name: updatedStrategy.name,
-            description: updatedStrategy.description,
-            isPublic: updatedStrategy.isPublic,
-            customAttributes: updatedStrategy.customAttributes,
-            versions: updatedStrategy.versions.map((version) => ({
-              id: version.id,
-              name: version.name,
-              version: version.version,
-            })),
-          },
-        })
+        sendResponse<z.infer<typeof strategiesSchemas.updateStrategy.response>>(
+          {
+            statusCode: 200,
+            message: "Strategy updated successfully",
+            data: {
+              id: updatedStrategy.id,
+              name: updatedStrategy.name,
+              description: updatedStrategy.description,
+              isPublic: updatedStrategy.isPublic,
+              customAttributes: updatedStrategy.customAttributes,
+              versions: updatedStrategy.versions.map((version) => ({
+                id: version.id,
+                name: version.name,
+                version: version.version,
+              })),
+            },
+          }
+        )
       );
     } catch (e) {
       fastify.log.error(e);
