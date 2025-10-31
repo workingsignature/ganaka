@@ -1,0 +1,71 @@
+{
+  "name": "@ganaka/api-schemas",
+  "version": "1.0.0",
+  "description": "Shared API schemas for Ganaka",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./common": {
+      "import": "./dist/common.mjs",
+      "require": "./dist/common.js",
+      "types": "./dist/common.d.ts"
+    },
+    "./strategies": {
+      "import": "./dist/strategies.mjs",
+      "require": "./dist/strategies.js",
+      "types": "./dist/strategies.d.ts"
+    },
+    "./versions": {
+      "import": "./dist/versions.mjs",
+      "require": "./dist/versions.js",
+      "types": "./dist/versions.d.ts"
+    },
+    "./shortlists": {
+      "import": "./dist/shortlists.mjs",
+      "require": "./dist/shortlists.js",
+      "types": "./dist/shortlists.d.ts"
+    },
+    "./keys": {
+      "import": "./dist/keys.mjs",
+      "require": "./dist/keys.js",
+      "types": "./dist/keys.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "build:watch": "vite build --watch",
+    "dev": "vite build --watch",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "ganaka",
+    "types",
+    "api",
+    "schemas"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "semver": "^7.0.0",
+    "zod": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/semver": "^7.5.6",
+    "semver": "^7.5.4",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.6.0",
+    "zod": "^3.22.4"
+  }
+}

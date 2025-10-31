@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "./common";
+import z from "zod";
 
 // Define types for your API
 export interface StrategyItem {
@@ -9,15 +10,18 @@ export interface StrategyItem {
   isPublic: boolean;
 }
 
-export interface GetStrategiesParams {
-  botId: string;
-}
-
-export interface GetStrategiesResponse {
-  data: StrategyItem[];
-  success: boolean;
-  message?: string;
-}
+export const createStrategyAPISchema = {
+  body: z.object({
+    name: z.string(),
+    description: z.string(),
+  }),
+  response: z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    isPublic: z.boolean(),
+  }),
+};
 
 // Define a service using a base URL and expected endpoints
 export const strategiesApi = createApi({
@@ -25,15 +29,19 @@ export const strategiesApi = createApi({
   baseQuery: baseQueryWithAuth,
   tagTypes: ["strategies"],
   endpoints: (builder) => ({
-    getStrategies: builder.query<GetStrategiesResponse, GetStrategiesParams>({
-      query: () => ({
+    createStrategy: builder.mutation<
+      z.infer<typeof createStrategyAPISchema.response>,
+      z.infer<typeof createStrategyAPISchema.body>
+    >({
+      query: (body) => ({
         url: `/strategies`,
-        method: "GET",
+        method: "POST",
+        body,
       }),
-      providesTags: ["strategies"],
+      invalidatesTags: ["strategies"],
     }),
   }),
 });
 
 // Export hooks for usage in functional components
-export const { useGetStrategiesQuery } = strategiesApi;
+export const { useCreateStrategyMutation } = strategiesApi;
