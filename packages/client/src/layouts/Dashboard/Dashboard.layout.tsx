@@ -3,6 +3,9 @@ import { SideNav } from "./components/SideNav";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { NotFound } from "../NotFound/NotFound";
 import { ShortlistsPage } from "@/pages/Dashboard/Shortlists.page";
+import { RunForm } from "@/components/forms/Run.form";
+import { StrategyForm } from "@/components/forms/Strategy.form";
+import { VersionForm } from "@/components/forms/Version.form";
 
 export const Dashboard = () => {
   // DRAW
@@ -15,6 +18,9 @@ export const Dashboard = () => {
         <Route path="/" element={<Navigate to="overview" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <RunForm />
+      <VersionForm />
+      <StrategyForm />
     </div>
   );
 };

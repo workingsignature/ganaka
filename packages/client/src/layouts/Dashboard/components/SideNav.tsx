@@ -3,6 +3,7 @@ import { Icon } from "@iconify/react";
 import { ActionIcon, Tooltip } from "@mantine/core";
 import { useLocation, useNavigate } from "react-router-dom";
 import ganakaLogo from "../../../assets/ganaka.svg";
+import { icons } from "@/components/icons";
 
 const NavbarLink = ({
   icon,
@@ -31,12 +32,12 @@ const NavbarLink = ({
 
 const testNavItems = [
   {
-    icon: "grommet-icons:overview",
+    icon: icons.sideNav_overview,
     label: "Overview",
     path: "/dashboard/overview",
   },
   {
-    icon: "tabler:list-details",
+    icon: icons.sideNav_shortlists,
     label: "Instrument Shortlists",
     path: "/dashboard/shortlists",
   },
@@ -44,7 +45,7 @@ const testNavItems = [
 
 const bottomNavItems = [
   {
-    icon: "hugeicons:access",
+    icon: icons.sideNav_keys,
     label: "Keys",
     path: "/dashboard/keys",
   },
