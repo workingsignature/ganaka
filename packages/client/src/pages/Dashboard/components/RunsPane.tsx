@@ -139,10 +139,19 @@ const RunCard = ({
               P&L
             </Text>
             <div className="flex items-center gap-1">
-              <Text size="sm" fw={600} c={profitLoss >= 0 ? "green" : "red"}>
+              <Text
+                className="block"
+                size="sm"
+                fw={600}
+                c={profitLoss >= 0 ? "green" : "red"}
+              >
                 {profitLoss >= 0 ? "+" : ""}₹{profitLoss.toLocaleString()}
               </Text>
-              <Text size="xs" c={profitLoss >= 0 ? "green" : "red"}>
+              <Text
+                className="block"
+                size="xs"
+                c={profitLoss >= 0 ? "green" : "red"}
+              >
                 ({profitLoss >= 0 ? "+" : ""}
                 {profitLossPercentage}%)
               </Text>

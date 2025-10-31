@@ -8,6 +8,10 @@ export const icons = {
   rename: "mdi:pencil",
   clone: "grommet-icons:clone",
   delete: "material-symbols:delete-outline",
+  save: "teenyicons:save-solid",
+  filter: "mynaui:filter",
+  sort: "solar:sort-vertical-linear",
+  search: "iconamoon:search-light",
   // ----------------------------------------
   timeline: "mdi:timeline-outline",
   shortlist: "tabler:list-details",

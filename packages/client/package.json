@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.49.0",
+    "@hookform/resolvers": "^5.2.2",
     "@mantine/charts": "^8.3.2",
     "@mantine/core": "^8.3.2",
     "@mantine/dates": "^8.3.2",
@@ -26,17 +27,19 @@
     "react": "^19.1.1",
     "react-complex-tree": "^2.6.1",
     "react-dom": "^19.1.1",
+    "react-hook-form": "^7.65.0",
     "react-redux": "^9.2.0",
     "react-resizable-panels": "^3.0.6",
     "react-router-dom": "^7.9.3",
     "recharts": "^3.2.1",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^4.1.13"
+    "tailwindcss": "^4.1.13",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
     "@iconify/react": "^6.0.2",
-    "@types/lodash": "^4.14.202",
+    "@types/lodash": "^4.17.20",
     "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",

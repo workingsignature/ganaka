@@ -1,9 +1,16 @@
-import { MantineProvider, Tabs } from "@mantine/core";
+import { Protect } from "@clerk/clerk-react";
+import {
+  MantineProvider,
+  NumberInput,
+  Tabs,
+  Textarea,
+  TagsInput,
+  TextInput,
+} from "@mantine/core";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Auth } from "./layouts/Auth/Auth.layout";
 import { Dashboard } from "./layouts/Dashboard/Dashboard.layout";
 import { NotFound } from "./layouts/NotFound/NotFound";
-import { Protect } from "@clerk/clerk-react";
 
 export const App = () => {
   // DRAW
@@ -20,6 +27,40 @@ export const App = () => {
                 },
               },
             },
+          }),
+          TagsInput: TagsInput.extend({
+            classNames: (_, ref) => ({
+              label: ref.description ? undefined : "mb-1",
+              // reserving space for error message
+              error: "mt-1",
+              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+            }),
+          }),
+          TextInput: TextInput.extend({
+            classNames: (_, ref) => ({
+              label: ref.description ? undefined : "mb-1",
+              description: "mb-2",
+              // reserving space for error message
+              error: "mt-1",
+              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+            }),
+          }),
+          Textarea: Textarea.extend({
+            classNames: (_, ref) => ({
+              label: ref.description ? undefined : "mb-1",
+              description: "mb-2",
+              // reserving space for error message
+              error: "mt-1",
+              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+            }),
+          }),
+          NumberInput: NumberInput.extend({
+            classNames: (_, ref) => ({
+              label: ref.description ? undefined : "mb-1",
+              // reserving space for error message
+              error: "mt-1",
+              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+            }),
           }),
         },
       }}
