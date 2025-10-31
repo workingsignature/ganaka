@@ -4,7 +4,7 @@ import { z } from "zod";
 import { prisma } from "../../../../../../helpers/prisma";
 import { sendResponse } from "../../../../../../helpers/sendResponse";
 import { validateRequest } from "../../../../../../helpers/validator";
-import { strategyVersionsSchemas } from "@ganaka/api-schemas";
+import { v1_core_strategies_versions_schemas } from "@ganaka/api-schemas";
 import { InputJsonValue } from "../../../../../../../generated/prisma/runtime/library";
 
 const versionsRoutes: FastifyPluginAsync = async (fastify) => {
@@ -17,7 +17,7 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        strategyVersionsSchemas.getVersions.params
+        v1_core_strategies_versions_schemas.getVersions.params
       );
       if (!validatedParams) {
         return;
@@ -58,7 +58,9 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       // return
       return reply.send(
         sendResponse<
-          z.infer<typeof strategyVersionsSchemas.getVersions.response>
+          z.infer<
+            typeof v1_core_strategies_versions_schemas.getVersions.response
+          >
         >({
           statusCode: 200,
           message: "Versions fetched successfully",
@@ -85,7 +87,7 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        strategyVersionsSchemas.getVersion.params
+        v1_core_strategies_versions_schemas.getVersion.params
       );
       if (!validatedParams) {
         return;
@@ -127,7 +129,9 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       // return
       return reply.send(
         sendResponse<
-          z.infer<typeof strategyVersionsSchemas.getVersion.response>
+          z.infer<
+            typeof v1_core_strategies_versions_schemas.getVersion.response
+          >
         >({
           statusCode: 200,
           message: "Version fetched successfully",
@@ -154,7 +158,7 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        strategyVersionsSchemas.createVersion.params
+        v1_core_strategies_versions_schemas.createVersion.params
       );
       const validatedBody = validateRequest(
         request.body,
@@ -224,7 +228,9 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       // return
       return reply.send(
         sendResponse<
-          z.infer<typeof strategyVersionsSchemas.createVersion.response>
+          z.infer<
+            typeof v1_core_strategies_versions_schemas.createVersion.response
+          >
         >({
           statusCode: 200,
           message: "Version created successfully",
@@ -251,7 +257,7 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        strategyVersionsSchemas.deleteVersion.params
+        v1_core_strategies_versions_schemas.deleteVersion.params
       );
       if (!validatedParams) {
         return;
@@ -306,7 +312,9 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       // return
       return reply.send(
         sendResponse<
-          z.infer<typeof strategyVersionsSchemas.deleteVersion.response>
+          z.infer<
+            typeof v1_core_strategies_versions_schemas.deleteVersion.response
+          >
         >({
           statusCode: 200,
           message: "Version deleted successfully",
@@ -328,12 +336,12 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        strategyVersionsSchemas.updateVersion.params
+        v1_core_strategies_versions_schemas.updateVersion.params
       );
       const validatedBody = validateRequest(
         request.body,
         reply,
-        strategyVersionsSchemas.updateVersion.body
+        v1_core_strategies_versions_schemas.updateVersion.body
       );
       if (!validatedParams || !validatedBody) {
         return;
@@ -405,7 +413,9 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       // return
       return reply.send(
         sendResponse<
-          z.infer<typeof strategyVersionsSchemas.updateVersion.response>
+          z.infer<
+            typeof v1_core_strategies_versions_schemas.updateVersion.response
+          >
         >({
           statusCode: 200,
           message: "Version updated successfully",

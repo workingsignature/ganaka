@@ -2,6 +2,8 @@ import { FastifyPluginAsync } from "fastify";
 import { ShortlistType } from "../../../../generated/prisma";
 import { prisma } from "../../../helpers/prisma";
 import { sendResponse } from "../../../helpers/sendResponse";
+import { public_shortlists_schemas } from "@ganaka/api-schemas";
+import z from "zod";
 
 const shortlistsRoutes: FastifyPluginAsync = async (fastify, opts) => {
   fastify.get("/", async (_, reply) => {
@@ -16,15 +18,15 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify, opts) => {
       });
 
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<typeof public_shortlists_schemas.getPublicShortlists.response>
+        >({
           statusCode: 200,
           message: "Shortlists fetched successfully",
-          data: shortlists.map((shortlist) => {
-            return {
-              id: shortlist.id,
-              name: shortlist.name,
-            };
-          }),
+          data: shortlists.map((shortlist) => ({
+            id: shortlist.id,
+            name: shortlist.name,
+          })),
         })
       );
     } catch (error) {

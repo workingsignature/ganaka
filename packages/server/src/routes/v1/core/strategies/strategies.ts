@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from "fastify";
-import { strategiesSchemas } from "@ganaka/api-schemas";
+import { v1_core_strategies_schemas } from "@ganaka/api-schemas";
 import { InputJsonValue } from "../../../../../generated/prisma/runtime/library";
 import { prisma } from "../../../../helpers/prisma";
 import { sendResponse } from "../../../../helpers/sendResponse";
@@ -26,7 +26,9 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse<z.infer<typeof strategiesSchemas.getStrategies.response>>({
+        sendResponse<
+          z.infer<typeof v1_core_strategies_schemas.getStrategies.response>
+        >({
           statusCode: 200,
           message: "Strategies fetched successfully",
           data: strategies.map((strategy) => ({
@@ -58,7 +60,7 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        strategiesSchemas.getStrategy.params
+        v1_core_strategies_schemas.getStrategy.params
       );
       if (!validatedParams) {
         return;
@@ -84,7 +86,9 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse<z.infer<typeof strategiesSchemas.getStrategy.response>>({
+        sendResponse<
+          z.infer<typeof v1_core_strategies_schemas.getStrategy.response>
+        >({
           statusCode: 200,
           message: "Strategy fetched successfully",
           data: {
@@ -116,7 +120,7 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedBody = validateRequest(
         request.body,
         reply,
-        strategiesSchemas.createStrategy.body
+        v1_core_strategies_schemas.createStrategy.body
       );
       if (!validatedBody) {
         return;
@@ -152,19 +156,19 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse<z.infer<typeof strategiesSchemas.createStrategy.response>>(
-          {
-            statusCode: 200,
-            message: "Strategy created successfully",
-            data: {
-              id: strategy.id,
-              name: strategy.name,
-              description: strategy.description,
-              isPublic: strategy.isPublic,
-              customAttributes: strategy.customAttributes,
-            },
-          }
-        )
+        sendResponse<
+          z.infer<typeof v1_core_strategies_schemas.createStrategy.response>
+        >({
+          statusCode: 200,
+          message: "Strategy created successfully",
+          data: {
+            id: strategy.id,
+            name: strategy.name,
+            description: strategy.description,
+            isPublic: strategy.isPublic,
+            customAttributes: strategy.customAttributes,
+          },
+        })
       );
     } catch (e) {
       fastify.log.error(e);
@@ -181,7 +185,7 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        strategiesSchemas.deleteStrategy.params
+        v1_core_strategies_schemas.deleteStrategy.params
       );
       if (!validatedParams) {
         return;
@@ -209,13 +213,13 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse<z.infer<typeof strategiesSchemas.deleteStrategy.response>>(
-          {
-            statusCode: 200,
-            message: "Strategy deleted successfully",
-            data: undefined,
-          }
-        )
+        sendResponse<
+          z.infer<typeof v1_core_strategies_schemas.deleteStrategy.response>
+        >({
+          statusCode: 200,
+          message: "Strategy deleted successfully",
+          data: undefined,
+        })
       );
     } catch (e) {
       fastify.log.error(e);
@@ -232,12 +236,12 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        strategiesSchemas.updateStrategy.params
+        v1_core_strategies_schemas.updateStrategy.params
       );
       const validatedBody = validateRequest(
         request.body,
         reply,
-        strategiesSchemas.updateStrategy.body
+        v1_core_strategies_schemas.updateStrategy.body
       );
       if (!validatedParams || !validatedBody) {
         return;
@@ -290,24 +294,24 @@ const strategiesRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse<z.infer<typeof strategiesSchemas.updateStrategy.response>>(
-          {
-            statusCode: 200,
-            message: "Strategy updated successfully",
-            data: {
-              id: updatedStrategy.id,
-              name: updatedStrategy.name,
-              description: updatedStrategy.description,
-              isPublic: updatedStrategy.isPublic,
-              customAttributes: updatedStrategy.customAttributes,
-              versions: updatedStrategy.versions.map((version) => ({
-                id: version.id,
-                name: version.name,
-                version: version.version,
-              })),
-            },
-          }
-        )
+        sendResponse<
+          z.infer<typeof v1_core_strategies_schemas.updateStrategy.response>
+        >({
+          statusCode: 200,
+          message: "Strategy updated successfully",
+          data: {
+            id: updatedStrategy.id,
+            name: updatedStrategy.name,
+            description: updatedStrategy.description,
+            isPublic: updatedStrategy.isPublic,
+            customAttributes: updatedStrategy.customAttributes,
+            versions: updatedStrategy.versions.map((version) => ({
+              id: version.id,
+              name: version.name,
+              version: version.version,
+            })),
+          },
+        })
       );
     } catch (e) {
       fastify.log.error(e);

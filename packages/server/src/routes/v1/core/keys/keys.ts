@@ -4,9 +4,9 @@ import { z } from "zod";
 import { validateRequest } from "../../../../helpers/validator";
 import { DeveloperKeyStatus } from "../../../../../generated/prisma";
 import { sendResponse } from "../../../../helpers/sendResponse";
-import { keysSchemas } from "@ganaka/api-schemas";
+import { v1_core_keys_schemas } from "@ganaka/api-schemas";
 
-const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
+const keysRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {
     try {
       // get user
@@ -23,7 +23,7 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse<z.infer<typeof keysSchemas.getKeys.response>>({
+        sendResponse<z.infer<typeof v1_core_keys_schemas.getKeys.response>>({
           statusCode: 200,
           message: "Developer keys fetched successfully",
           data: developerKeys.map((key) => ({
@@ -60,7 +60,7 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse<z.infer<typeof keysSchemas.createKey.response>>({
+        sendResponse<z.infer<typeof v1_core_keys_schemas.createKey.response>>({
           statusCode: 200,
           message: "Developer key created successfully",
           data: {
@@ -87,7 +87,7 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        keysSchemas.deactivateKey.params
+        v1_core_keys_schemas.deactivateKey.params
       );
       if (!validatedParams) {
         return;
@@ -114,7 +114,9 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse<z.infer<typeof keysSchemas.deactivateKey.response>>({
+        sendResponse<
+          z.infer<typeof v1_core_keys_schemas.deactivateKey.response>
+        >({
           statusCode: 200,
           message: "Developer key deactivated successfully",
           data: {
@@ -133,4 +135,4 @@ const developerKeyRoutes: FastifyPluginAsync = async (fastify) => {
   });
 };
 
-export default developerKeyRoutes;
+export default keysRoutes;

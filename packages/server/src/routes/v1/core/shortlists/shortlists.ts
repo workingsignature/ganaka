@@ -1,4 +1,4 @@
-import { shortlistsSchemas } from "@ganaka/api-schemas";
+import { v1_core_shortlists_schemas } from "@ganaka/api-schemas";
 import { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { ShortlistType } from "../../../../../generated/prisma";
@@ -27,7 +27,9 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
 
       // return
       return reply.send(
-        sendResponse<z.infer<typeof shortlistsSchemas.getShortlists.response>>({
+        sendResponse<
+          z.infer<typeof v1_core_shortlists_schemas.getShortlists.response>
+        >({
           statusCode: 200,
           message: "Shortlists fetched successfully",
           data: shortlists.map((shortlist) => {
@@ -57,7 +59,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedBody = validateRequest(
         request.body,
         reply,
-        shortlistsSchemas.createShortlist.body
+        v1_core_shortlists_schemas.createShortlist.body
       );
       if (!validatedBody) {
         return;
@@ -96,7 +98,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
       // return
       return reply.send(
         sendResponse<
-          z.infer<typeof shortlistsSchemas.createShortlist.response>
+          z.infer<typeof v1_core_shortlists_schemas.createShortlist.response>
         >({
           statusCode: 200,
           message: "Shortlist created successfully",
@@ -125,7 +127,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        shortlistsSchemas.deleteShortlist.params
+        v1_core_shortlists_schemas.deleteShortlist.params
       );
       if (!validatedParams) {
         return;
@@ -154,7 +156,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
       // return
       return reply.send(
         sendResponse<
-          z.infer<typeof shortlistsSchemas.deleteShortlist.response>
+          z.infer<typeof v1_core_shortlists_schemas.deleteShortlist.response>
         >({
           statusCode: 200,
           message: "Shortlist deleted successfully",
@@ -176,12 +178,12 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
       const validatedParams = validateRequest(
         request.params,
         reply,
-        shortlistsSchemas.updateShortlist.params
+        v1_core_shortlists_schemas.updateShortlist.params
       );
       const validatedBody = validateRequest(
         request.body,
         reply,
-        shortlistsSchemas.updateShortlist.body
+        v1_core_shortlists_schemas.updateShortlist.body
       );
       if (!validatedParams || !validatedBody) {
         return;
@@ -216,7 +218,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
       // return
       return reply.send(
         sendResponse<
-          z.infer<typeof shortlistsSchemas.updateShortlist.response>
+          z.infer<typeof v1_core_shortlists_schemas.updateShortlist.response>
         >({
           statusCode: 200,
           message: "Shortlist updated successfully",

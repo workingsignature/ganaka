@@ -3,6 +3,8 @@ import { FastifyPluginAsync } from "fastify";
 import * as csv from "fast-csv";
 import { prisma } from "../../../helpers/prisma";
 import { sendResponse } from "../../../helpers/sendResponse";
+import { public_triggers_schemas } from "@ganaka/api-schemas";
+import z from "zod";
 
 const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
   fastify.get("/instruments", async (request, reply) => {
@@ -80,7 +82,11 @@ const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
       );
 
       return reply.send(
-        sendResponse({
+        sendResponse<
+          z.infer<
+            typeof public_triggers_schemas.triggerInstrumentsUpdate.response
+          >
+        >({
           statusCode: 200,
           message: `${instrumentsArray.length} instruments inserted successfully.`,
           data: undefined,

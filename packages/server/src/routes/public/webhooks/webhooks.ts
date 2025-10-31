@@ -1,6 +1,9 @@
 import { FastifyPluginAsync } from "fastify";
 import { verifyWebhook } from "@clerk/fastify/webhooks";
 import { prisma } from "../../../helpers/prisma";
+import z from "zod";
+import { public_webhooks_schemas } from "@ganaka/api-schemas";
+import { sendResponse } from "../../../helpers/sendResponse";
 
 /**
  * Webhook route triggered by Clerk when user is created or updated or deleted.
@@ -22,7 +25,15 @@ const webhooksRoutes: FastifyPluginAsync = async (fastify, opts) => {
             },
           });
           fastify.log.info(`User created: ${evt.data.id}`);
-          return reply.send({ message: "User created" });
+          return sendResponse<
+            z.infer<typeof public_webhooks_schemas.clerkUserWebhook.response>
+          >({
+            statusCode: 200,
+            message: "User created",
+            data: {
+              message: "User created",
+            },
+          });
         }
         case "user.updated": {
           const user = await prisma.user.findUnique({
@@ -41,7 +52,15 @@ const webhooksRoutes: FastifyPluginAsync = async (fastify, opts) => {
             },
           });
           fastify.log.info(`User updated: ${evt.data.id}`);
-          return reply.send({ message: "User updated" });
+          return sendResponse<
+            z.infer<typeof public_webhooks_schemas.clerkUserWebhook.response>
+          >({
+            statusCode: 200,
+            message: "User updated",
+            data: {
+              message: "User updated",
+            },
+          });
         }
         case "user.deleted": {
           const user = await prisma.user.findUnique({
@@ -55,7 +74,15 @@ const webhooksRoutes: FastifyPluginAsync = async (fastify, opts) => {
             where: { clerkId: evt.data.id },
           });
           fastify.log.info(`User deleted: ${evt.data.id}`);
-          return reply.send({ message: "User deleted" });
+          return reply.send(
+            sendResponse<
+              z.infer<typeof public_webhooks_schemas.clerkUserWebhook.response>
+            >({
+              statusCode: 200,
+              message: "User deleted",
+              data: { message: "User deleted" },
+            })
+          );
         }
         default: {
           fastify.log.info(`Invalid event type: ${evt.type}`);
