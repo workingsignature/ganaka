@@ -3,7 +3,7 @@ import { FastifyPluginAsync } from "fastify";
 import * as csv from "fast-csv";
 import { prisma } from "../../../helpers/prisma";
 import { sendResponse } from "../../../helpers/sendResponse";
-import { public_triggers_schemas } from "@ganaka/api-schemas";
+import { public_triggers_schemas } from "@ganaka/server-schemas";
 import z from "zod";
 
 const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {

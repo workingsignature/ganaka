@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from "fastify";
-import { v1_core_strategies_schemas } from "@ganaka/api-schemas";
+import { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 import { InputJsonValue } from "../../../../../generated/prisma/runtime/library";
 import { prisma } from "../../../../helpers/prisma";
 import { sendResponse } from "../../../../helpers/sendResponse";

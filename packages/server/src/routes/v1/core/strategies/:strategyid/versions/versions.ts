@@ -4,7 +4,7 @@ import { z } from "zod";
 import { prisma } from "../../../../../../helpers/prisma";
 import { sendResponse } from "../../../../../../helpers/sendResponse";
 import { validateRequest } from "../../../../../../helpers/validator";
-import { v1_core_strategies_versions_schemas } from "@ganaka/api-schemas";
+import { v1_core_strategies_versions_schemas } from "@ganaka/server-schemas";
 import { InputJsonValue } from "../../../../../../../generated/prisma/runtime/library";
 
 const versionsRoutes: FastifyPluginAsync = async (fastify) => {

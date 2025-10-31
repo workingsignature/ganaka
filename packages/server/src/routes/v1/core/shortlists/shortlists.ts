@@ -1,4 +1,4 @@
-import { v1_core_shortlists_schemas } from "@ganaka/api-schemas";
+import { v1_core_shortlists_schemas } from "@ganaka/server-schemas";
 import { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { ShortlistType } from "../../../../../generated/prisma";

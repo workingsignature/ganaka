@@ -2,7 +2,7 @@ import { FastifyPluginAsync } from "fastify";
 import { verifyWebhook } from "@clerk/fastify/webhooks";
 import { prisma } from "../../../helpers/prisma";
 import z from "zod";
-import { public_webhooks_schemas } from "@ganaka/api-schemas";
+import { public_webhooks_schemas } from "@ganaka/server-schemas";
 import { sendResponse } from "../../../helpers/sendResponse";
 
 /**

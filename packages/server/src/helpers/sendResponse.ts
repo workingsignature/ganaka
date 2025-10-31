@@ -1,4 +1,4 @@
-import { apiResponseSchema } from "@ganaka/api-schemas";
+import { apiResponseSchema } from "@ganaka/server-schemas";
 
 export function sendResponse<T>({
   statusCode,

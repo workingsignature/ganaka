@@ -1,5 +1,5 @@
 {
-  "name": "@ganaka/api-schemas",
+  "name": "@ganaka/server-schemas",
   "version": "1.0.0",
   "description": "Shared API schemas for Ganaka",
   "main": "dist/index.js",

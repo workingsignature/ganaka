@@ -2,36 +2,36 @@
   "autorun": false,
   "terminals": [
     {
-      "name": "Client:dev",
+      "name": "Client: Dev",
       "focus": true,
       "command": "pnpm run dev:client"
     },
     {
-      "name": "Server:dev",
+      "name": "Server: Dev",
       "focus": true,
       "split": "Client:dev",
       "command": "pnpm run dev:server"
     },
     {
-      "name": "Server:build",
+      "name": "Server: Build",
       "focus": true,
       "command": "pnpm run build:server",
       "onlySingle": true
     },
     {
-      "name": "Api Schemas:build",
+      "name": "Server Schemas: Build",
       "focus": true,
-      "command": "pnpm run build:api-schemas",
+      "command": "pnpm run build:server-schemas",
       "onlySingle": true
     },
     {
-      "name": "Bot:dev",
+      "name": "Bot: Dev",
       "focus": true,
       "command": "pnpm run dev:bot",
       "onlySingle": true
     },
     {
-      "name": "Server: Migrate-Dev",
+      "name": "Server: Migrate:dev",
       "focus": true,
       "command": "pnpm run prisma:migrate:dev",
       "onlySingle": true

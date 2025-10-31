@@ -4,7 +4,7 @@ import { z } from "zod";
 import { validateRequest } from "../../../../helpers/validator";
 import { DeveloperKeyStatus } from "../../../../../generated/prisma";
 import { sendResponse } from "../../../../helpers/sendResponse";
-import { v1_core_keys_schemas } from "@ganaka/api-schemas";
+import { v1_core_keys_schemas } from "@ganaka/server-schemas";
 
 const keysRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {

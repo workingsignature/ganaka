@@ -2,7 +2,7 @@ import { FastifyPluginAsync } from "fastify";
 import { ShortlistType } from "../../../../generated/prisma";
 import { prisma } from "../../../helpers/prisma";
 import { sendResponse } from "../../../helpers/sendResponse";
-import { public_shortlists_schemas } from "@ganaka/api-schemas";
+import { public_shortlists_schemas } from "@ganaka/server-schemas";
 import z from "zod";
 
 const shortlistsRoutes: FastifyPluginAsync = async (fastify, opts) => {

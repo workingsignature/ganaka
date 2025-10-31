@@ -15,30 +15,6 @@ importers:
         specifier: ^5.0.9
         version: 5.0.9
 
-  packages/api-schemas:
-    devDependencies:
-      '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
-      '@types/semver':
-        specifier: ^7.5.6
-        version: 7.7.1
-      semver:
-        specifier: ^7.5.4
-        version: 7.7.3
-      typescript:
-        specifier: ^5.3.3
-        version: 5.8.3
-      vite:
-        specifier: ^5.0.0
-        version: 5.4.21(@types/node@24.5.2)(lightningcss@1.30.1)(sugarss@5.0.1(postcss@8.5.6))
-      vite-plugin-dts:
-        specifier: ^3.6.0
-        version: 3.9.1(@types/node@24.5.2)(rollup@4.52.2)(typescript@5.8.3)(vite@5.4.21(@types/node@24.5.2)(lightningcss@1.30.1)(sugarss@5.0.1(postcss@8.5.6)))
-      zod:
-        specifier: ^4.1.11
-        version: 4.1.11
-
   packages/bot:
     dependencies:
       date-fns:
@@ -259,9 +235,9 @@ importers:
       '@fastify/websocket':
         specifier: ^11.2.0
         version: 11.2.0
-      '@ganaka/api-schemas':
+      '@ganaka/server-schemas':
         specifier: workspace:*
-        version: link:../api-schemas
+        version: link:../server-schemas
       '@prisma/client':
         specifier: 6.16.2
         version: 6.16.2(prisma@6.16.2(typescript@5.9.2))(typescript@5.9.2)
@@ -314,6 +290,30 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.9.2
+
+  packages/server-schemas:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.5.2
+        version: 24.5.2
+      '@types/semver':
+        specifier: ^7.5.6
+        version: 7.7.1
+      semver:
+        specifier: ^7.5.4
+        version: 7.7.3
+      typescript:
+        specifier: ^5.3.3
+        version: 5.8.3
+      vite:
+        specifier: ^5.0.0
+        version: 5.4.21(@types/node@24.5.2)(lightningcss@1.30.1)(sugarss@5.0.1(postcss@8.5.6))
+      vite-plugin-dts:
+        specifier: ^3.6.0
+        version: 3.9.1(@types/node@24.5.2)(rollup@4.52.2)(typescript@5.8.3)(vite@5.4.21(@types/node@24.5.2)(lightningcss@1.30.1)(sugarss@5.0.1(postcss@8.5.6)))
+      zod:
+        specifier: ^4.1.11
+        version: 4.1.11
 
 packages:
 

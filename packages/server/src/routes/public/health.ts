@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from "fastify";
 import { sendResponse } from "../../helpers/sendResponse";
 import z from "zod";
-import { public_health_schemas } from "@ganaka/api-schemas";
+import { public_health_schemas } from "@ganaka/server-schemas";
 
 const healthRoutes: FastifyPluginAsync = async (fastify, opts) => {
   // Health check
