@@ -9,7 +9,7 @@
     {
       "name": "Server: Dev",
       "focus": true,
-      "split": "Client:dev",
+      "split": "Client: Dev",
       "command": "pnpm run dev:server"
     },
     {

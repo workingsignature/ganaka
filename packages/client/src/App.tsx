@@ -1,4 +1,5 @@
 import { Protect } from "@clerk/clerk-react";
+import { Notifications } from "@mantine/notifications";
 import {
   MantineProvider,
   NumberInput,
@@ -6,6 +7,7 @@ import {
   Textarea,
   TagsInput,
   TextInput,
+  Notification,
 } from "@mantine/core";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Auth } from "./layouts/Auth/Auth.layout";
@@ -62,9 +64,15 @@ export const App = () => {
               wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
             }),
           }),
+          Notification: Notification.extend({
+            defaultProps: {
+              withBorder: true,
+            },
+          }),
         },
       }}
     >
+      <Notifications />
       <BrowserRouter>
         <Routes>
           <Route path="/auth/*" element={<Auth />} />

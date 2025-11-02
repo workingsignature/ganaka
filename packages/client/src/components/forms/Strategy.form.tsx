@@ -1,3 +1,4 @@
+import { strategiesApi } from "@/store/api/strategies.api";
 import { strategyFormSlice } from "@/store/forms/strategyFormSlice";
 import { useAppDispatch, useAppSelector } from "@/utils/hooks/storeHooks";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +17,7 @@ export const StrategyForm = () => {
   const { opened, isCreateMode } = useAppSelector(
     (state) => state.strategyForm
   );
+  const [createStrategy] = strategiesApi.useCreateStrategyMutation();
   const form = useForm<z.infer<typeof strategyFormSchema>>({
     resolver: zodResolver(strategyFormSchema),
     defaultValues: {
@@ -34,9 +36,14 @@ export const StrategyForm = () => {
     dispatch(strategyFormSlice.actions.setOpened(false));
     resetFormState();
   };
-  const handleSubmit = () => {
-    form.handleSubmit((data) => {
-      console.log(data);
+  const handleSubmit = async () => {
+    await form.handleSubmit(async (data) => {
+      await createStrategy({
+        name: data.name,
+        description: data.description,
+        isPublic: false,
+        customAttributes: {},
+      });
     })();
   };
 
