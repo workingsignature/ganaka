@@ -4,7 +4,7 @@ import z from "zod";
 import { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 
 // Define a service using a base URL and expected endpoints
-export const strategiesApi = createApi({
+export const strategiesAPI = createApi({
   reducerPath: "strategiesAPI",
   baseQuery: baseQueryWithAuth,
   tagTypes: ["strategies", "strategy"],

@@ -21,7 +21,7 @@ export interface GetShortlistResponse {
 }
 
 // Define a service using a base URL and expected endpoints
-export const shortlistApi = createApi({
+export const shortlistsAPI = createApi({
   reducerPath: "shortlistAPI",
   baseQuery: baseQueryWithAuth,
   tagTypes: ["shortlist"],

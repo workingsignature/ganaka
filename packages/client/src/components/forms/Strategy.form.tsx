@@ -1,4 +1,4 @@
-import { strategiesApi } from "@/store/api/strategies.api";
+import { strategiesAPI } from "@/store/api/strategies.api";
 import { strategyFormSlice } from "@/store/forms/strategyFormSlice";
 import { useAppDispatch, useAppSelector } from "@/utils/hooks/storeHooks";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,10 +25,10 @@ export const StrategyForm = () => {
     (state) => state.strategyForm
   );
   const [createStrategy, createStrategyAPI] =
-    strategiesApi.useCreateStrategyMutation();
+    strategiesAPI.useCreateStrategyMutation();
   const [updateStrategy, updateStrategyAPI] =
-    strategiesApi.useUpdateStrategyMutation();
-  const [getStrategy, getStrategyAPI] = strategiesApi.useLazyGetStrategyQuery();
+    strategiesAPI.useUpdateStrategyMutation();
+  const [getStrategy, getStrategyAPI] = strategiesAPI.useLazyGetStrategyQuery();
   const form = useForm<z.infer<typeof strategyFormSchema>>({
     resolver: zodResolver(strategyFormSchema),
     defaultValues,

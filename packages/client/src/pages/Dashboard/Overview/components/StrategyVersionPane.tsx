@@ -24,11 +24,12 @@ import {
   type TreeRef,
 } from "react-complex-tree";
 import { debounce, times } from "lodash";
-import { strategiesApi } from "@/store/api/strategies.api";
+import { strategiesAPI } from "@/store/api/strategies.api";
 import type { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 import type { z } from "zod";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
+import { versionsAPI } from "@/store/api/versions.api";
 
 // Types
 type StrategyResponse = z.infer<
@@ -60,7 +61,9 @@ const compileTreeData = (strategies: StrategyResponse["data"] | undefined) => {
   strategies.forEach((strategy) => {
     const strategyId = `strategy-${strategy.id}`;
     const versionChildren =
-      strategy.versions?.map((v) => `version-${v.id}`) || [];
+      strategy.versions?.map(
+        (v) => `strategy-${strategy.id}|version-${v.id}`
+      ) || [];
 
     treeData[strategyId] = {
       index: strategyId,
@@ -70,7 +73,7 @@ const compileTreeData = (strategies: StrategyResponse["data"] | undefined) => {
     };
 
     strategy.versions?.forEach((version) => {
-      const versionId = `version-${version.id}`;
+      const versionId = `strategy-${strategy.id}|version-${version.id}`;
       treeData[versionId] = {
         index: versionId,
         children: [],
@@ -88,10 +91,27 @@ const renderItem =
     handleCreateVersion,
     handleEditStrategy,
     handleDeleteStrategy,
+    handleEditVersion,
+    handleDeleteVersion,
   }: {
-    handleCreateVersion: () => void;
+    handleCreateVersion: (strategyId: string) => void;
     handleEditStrategy: (strategyId: string) => void;
-    handleDeleteStrategy: (strategyId: string, strategyName: string) => void;
+    handleDeleteStrategy: (data: {
+      strategyId: string;
+      strategyName: string;
+    }) => void;
+    handleEditVersion: ({
+      versionId,
+      strategyId,
+    }: {
+      versionId: string;
+      strategyId: string;
+    }) => void;
+    handleDeleteVersion: (data: {
+      strategyId: string;
+      versionId: string;
+      versionName: string;
+    }) => void;
   }) =>
   ({
     item,
@@ -106,12 +126,35 @@ const renderItem =
     arrow: React.ReactNode;
     context: TreeItemRenderContext;
   }) => {
-    // const isActive = item.data?.includes("Active");
-    // const isLatest = item.data?.includes("Latest");
-    // const isVersion = !item.isFolder;
     // VARIABLES
     const isActive = context.isSelected;
-    const strategyId = item.index.toString().replace("strategy-", "");
+    const strategyId = item.index
+      .toString()
+      .split("|")[0]
+      .replace("strategy-", "");
+    const versionId = !item.isFolder
+      ? item.index.toString().split("|")[1]?.replace("version-", "")
+      : null;
+
+    // HANDLERS
+    const handleEdit = () => {
+      if (item.isFolder) {
+        handleEditStrategy(strategyId);
+      } else if (versionId) {
+        handleEditVersion({ versionId: versionId, strategyId });
+      }
+    };
+    const handleDelete = () => {
+      if (item.isFolder) {
+        handleDeleteStrategy({ strategyId, strategyName: item.data });
+      } else if (versionId) {
+        handleDeleteVersion({
+          strategyId,
+          versionId,
+          versionName: item.data,
+        });
+      }
+    };
 
     // DRAW
     return (
@@ -173,23 +216,25 @@ const renderItem =
         )} */}
 
             <div className="flex items-center justify-between gap-1">
-              <Tooltip label="Create Version">
-                <ActionIcon
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCreateVersion();
-                  }}
-                  variant="subtle"
-                  size="xs"
-                  color="dark"
-                  aria-label="Settings"
-                >
-                  <Icon
-                    className="cursor-pointer"
-                    icon={icons.create_version}
-                  />
-                </ActionIcon>
-              </Tooltip>
+              {item.isFolder ? (
+                <Tooltip label="Create Version">
+                  <ActionIcon
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCreateVersion(strategyId);
+                    }}
+                    variant="subtle"
+                    size="xs"
+                    color="dark"
+                    aria-label="Settings"
+                  >
+                    <Icon
+                      className="cursor-pointer"
+                      icon={icons.create_version}
+                    />
+                  </ActionIcon>
+                </Tooltip>
+              ) : null}
               <Menu shadow="md" width={150} position="bottom-end">
                 <Menu.Target>
                   <ActionIcon
@@ -203,16 +248,25 @@ const renderItem =
                   </ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item
-                    leftSection={<Icon icon={icons.edit} />}
-                    onClick={() => handleEditStrategy(strategyId)}
-                  >
-                    Edit Strategy
-                  </Menu.Item>
+                  {item.isFolder ? (
+                    <Menu.Item
+                      leftSection={<Icon icon={icons.edit} />}
+                      onClick={() => handleEdit()}
+                    >
+                      Edit Strategy
+                    </Menu.Item>
+                  ) : (
+                    <Menu.Item
+                      leftSection={<Icon icon={icons.edit} />}
+                      onClick={() => handleEdit()}
+                    >
+                      Edit Version
+                    </Menu.Item>
+                  )}
                   <Menu.Item
                     color="red"
                     leftSection={<Icon icon={icons.delete} />}
-                    onClick={() => handleDeleteStrategy(strategyId, item.data)}
+                    onClick={() => handleDelete()}
                   >
                     Delete
                   </Menu.Item>
@@ -233,16 +287,18 @@ export const StrategyVersionPane = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // API
-  const getStrategiesAPI = strategiesApi.useGetStrategiesQuery();
-  const [deleteStrategy, { isLoading: isDeletingStrategy }] =
-    strategiesApi.useDeleteStrategyMutation();
+  const getstrategiesAPI = strategiesAPI.useGetStrategiesQuery();
+  const [deleteStrategy, deleteStrategyAPI] =
+    strategiesAPI.useDeleteStrategyMutation();
+  const [deleteVersion, deleteVersionAPI] =
+    versionsAPI.useDeleteVersionMutation();
 
   // VARIABLES
   const dataProvider = useMemo(
     () =>
-      getStrategiesAPI.data?.data
+      getstrategiesAPI.data?.data
         ? new StaticTreeDataProvider(
-            compileTreeData(getStrategiesAPI.data.data),
+            compileTreeData(getstrategiesAPI.data.data),
             (item, data) => ({
               ...item,
               data,
@@ -262,27 +318,78 @@ export const StrategyVersionPane = () => {
               data,
             })
           ),
-    [getStrategiesAPI.data]
+    [getstrategiesAPI.data]
   );
 
   // Generate a stable key that changes whenever data changes
   const treeKey = useMemo(() => {
-    if (!getStrategiesAPI.data?.data) return "empty";
+    if (!getstrategiesAPI.data?.data) return "empty";
     // Create a lightweight key from strategy and version IDs
-    return getStrategiesAPI.data.data
+    return getstrategiesAPI.data.data
       .map((s) => `${s.id}:${s.versions?.map((v) => v.id).join(",") || ""}`)
       .join("|");
-  }, [getStrategiesAPI.data]);
+  }, [getstrategiesAPI.data]);
 
   // HANDLERS
   const handleCreateStrategy = () => {
     dispatch(strategyFormSlice.actions.setOpened(true));
   };
   const handleRefreshStrategies = () => {
-    getStrategiesAPI.refetch();
+    getstrategiesAPI.refetch();
   };
-  const handleCreateVersion = () => {
+  const handleCreateVersion = (strategyId: string) => {
+    dispatch(versionFormSlice.actions.setStrategyId(strategyId));
+    dispatch(versionFormSlice.actions.setVersionId(""));
+    dispatch(versionFormSlice.actions.setIsCreateMode(true));
     dispatch(versionFormSlice.actions.setOpened(true));
+  };
+  const handleEditVersion = ({
+    versionId,
+    strategyId,
+  }: {
+    versionId: string;
+    strategyId: string;
+  }) => {
+    dispatch(versionFormSlice.actions.setVersionId(versionId));
+    dispatch(versionFormSlice.actions.setStrategyId(strategyId));
+    dispatch(versionFormSlice.actions.setIsCreateMode(false));
+    dispatch(versionFormSlice.actions.setOpened(true));
+  };
+  const handleDeleteVersion = ({
+    strategyId,
+    versionId,
+    versionName,
+  }: {
+    strategyId: string;
+    versionId: string;
+    versionName: string;
+  }) => {
+    modals.openConfirmModal({
+      title: `Delete Version "${versionName}"`,
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete this version? This action cannot be
+          undone.
+        </Text>
+      ),
+      labels: { confirm: "Delete Version", cancel: "No, don't delete it" },
+      confirmProps: { color: "red", loading: deleteVersionAPI.isLoading },
+      onConfirm: async () => {
+        const response = await deleteVersion({
+          strategyid: strategyId,
+          id: versionId,
+        });
+        if (response.data) {
+          notifications.show({
+            title: "Success",
+            message: response.data.message,
+            color: "green",
+          });
+          getstrategiesAPI.refetch();
+        }
+      },
+    });
   };
   const findItemPath = useCallback(
     async (
@@ -326,7 +433,13 @@ export const StrategyVersionPane = () => {
     dispatch(strategyFormSlice.actions.setStrategyId(strategyId));
     dispatch(strategyFormSlice.actions.setOpened(true));
   };
-  const handleDeleteStrategy = (strategyId: string, strategyName: string) => {
+  const handleDeleteStrategy = ({
+    strategyId,
+    strategyName,
+  }: {
+    strategyId: string;
+    strategyName: string;
+  }) => {
     modals.openConfirmModal({
       title: `Delete Strategy "${strategyName}"`,
       centered: true,
@@ -337,7 +450,7 @@ export const StrategyVersionPane = () => {
         </Text>
       ),
       labels: { confirm: "Delete Strategy", cancel: "No, don't delete it" },
-      confirmProps: { color: "red", loading: isDeletingStrategy },
+      confirmProps: { color: "red", loading: deleteStrategyAPI.isLoading },
       onConfirm: async () => {
         const response = await deleteStrategy({ id: strategyId });
         if (response.data) {
@@ -346,7 +459,7 @@ export const StrategyVersionPane = () => {
             message: response.data.message,
             color: "green",
           });
-          getStrategiesAPI.refetch();
+          getstrategiesAPI.refetch();
         }
       },
     });
@@ -418,13 +531,13 @@ export const StrategyVersionPane = () => {
           }}
         />
       </div>
-      {getStrategiesAPI.isLoading ? (
+      {getstrategiesAPI.isLoading ? (
         <div className="h-full w-full flex flex-col gap-2">
           {times(10, (index) => (
             <Skeleton animate key={index} height={28} radius="sm" />
           ))}
         </div>
-      ) : getStrategiesAPI.data && getStrategiesAPI.data.data.length > 0 ? (
+      ) : getstrategiesAPI.data && getstrategiesAPI.data.data.length > 0 ? (
         <div className="h-full w-full">
           <UncontrolledTreeEnvironment
             key={treeKey}
@@ -440,6 +553,8 @@ export const StrategyVersionPane = () => {
               handleCreateVersion,
               handleEditStrategy,
               handleDeleteStrategy,
+              handleEditVersion,
+              handleDeleteVersion,
             })}
             renderSearchInput={() => null}
             canSearch={false}

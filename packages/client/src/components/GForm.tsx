@@ -49,7 +49,7 @@ export const GForm = ({
             >
               {primaryAction.label}
             </Button>
-            <Drawer.CloseButton />
+            <Drawer.CloseButton className="!h-9" />
           </div>
         </Drawer.Header>
         <Drawer.Body>{children}</Drawer.Body>
