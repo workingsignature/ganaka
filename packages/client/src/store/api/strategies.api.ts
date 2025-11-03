@@ -28,6 +28,18 @@ export const strategiesApi = createApi({
         url: `/strategies`,
         method: "GET",
       }),
+      providesTags: ["strategies"],
+    }),
+    deleteStrategy: builder.mutation<
+      z.infer<typeof v1_core_strategies_schemas.deleteStrategy.response>,
+      z.infer<typeof v1_core_strategies_schemas.deleteStrategy.params>
+    >({
+      query: (params) => ({
+        url: `/strategies/${params.id}`,
+        method: "DELETE",
+        body: {},
+      }),
+      invalidatesTags: ["strategies"],
     }),
   }),
 });

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { apiResponseSchema } from "../../../common";
 
 // ==================== Schemas ====================
 
@@ -23,7 +24,9 @@ export const shortlistItemSchema = z.object({
 
 export const getShortlists = {
   query: z.object({}).optional(),
-  response: z.array(shortlistItemSchema),
+  response: apiResponseSchema.extend({
+    data: z.array(shortlistItemSchema),
+  }),
 };
 
 // ==================== POST /shortlists ====================
@@ -33,7 +36,9 @@ export const createShortlist = {
     name: z.string(),
     instruments: z.array(z.string()),
   }),
-  response: shortlistItemSchema,
+  response: apiResponseSchema.extend({
+    data: shortlistItemSchema,
+  }),
 };
 
 // ==================== PUT /shortlists/:id ====================
@@ -46,7 +51,9 @@ export const updateShortlist = {
     name: z.string(),
     instruments: z.array(z.string()),
   }),
-  response: shortlistItemSchema,
+  response: apiResponseSchema.extend({
+    data: shortlistItemSchema,
+  }),
 };
 
 // ==================== DELETE /shortlists/:id ====================
@@ -55,6 +62,7 @@ export const deleteShortlist = {
   params: z.object({
     id: z.string(),
   }),
-  response: z.undefined(),
+  response: apiResponseSchema.extend({
+    data: z.undefined(),
+  }),
 };
-

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import semver from "semver";
+import { apiResponseSchema } from "../../../../../common";
 
 // ==================== Schemas ====================
 
@@ -19,7 +20,9 @@ export const getVersions = {
   params: z.object({
     strategyid: z.string(),
   }),
-  response: z.array(versionItemSchema),
+  response: apiResponseSchema.extend({
+    data: z.array(versionItemSchema),
+  }),
 };
 
 // ==================== GET /strategies/:strategyid/versions/:id ====================
@@ -29,7 +32,9 @@ export const getVersion = {
     strategyid: z.string(),
     id: z.string(),
   }),
-  response: versionItemSchema,
+  response: apiResponseSchema.extend({
+    data: versionItemSchema,
+  }),
 };
 
 // ==================== POST /strategies/:strategyid/versions ====================
@@ -45,7 +50,9 @@ export const createVersion = {
     }),
     customAttributes: z.record(z.string(), z.unknown()).optional().default({}),
   }),
-  response: versionItemSchema,
+  response: apiResponseSchema.extend({
+    data: versionItemSchema,
+  }),
 };
 
 // ==================== PUT /strategies/:strategyid/versions/:id ====================
@@ -65,7 +72,9 @@ export const updateVersion = {
       .optional(),
     customAttributes: z.record(z.string(), z.unknown()).optional(),
   }),
-  response: versionItemSchema,
+  response: apiResponseSchema.extend({
+    data: versionItemSchema,
+  }),
 };
 
 // ==================== DELETE /strategies/:strategyid/versions/:id ====================
@@ -75,6 +84,7 @@ export const deleteVersion = {
     strategyid: z.string(),
     id: z.string(),
   }),
-  response: z.undefined(),
+  response: apiResponseSchema.extend({
+    data: z.undefined(),
+  }),
 };
-

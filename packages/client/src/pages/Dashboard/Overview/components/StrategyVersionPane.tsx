@@ -27,6 +27,8 @@ import { debounce, times } from "lodash";
 import { strategiesApi } from "@/store/api/strategies.api";
 import type { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 import type { z } from "zod";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 
 // Types
 type StrategyResponse = z.infer<
@@ -77,13 +79,20 @@ const compileTreeData = (strategies: StrategyResponse["data"] | undefined) => {
     });
   });
 
-  console.log(treeData);
   return treeData;
 };
 
 // Custom render function for tree items
 const renderItem =
-  ({ handleCreateVersion }: { handleCreateVersion: () => void }) =>
+  ({
+    handleCreateVersion,
+    handleEditStrategy,
+    handleDeleteStrategy,
+  }: {
+    handleCreateVersion: () => void;
+    handleEditStrategy: (strategyId: string) => void;
+    handleDeleteStrategy: (strategyId: string, strategyName: string) => void;
+  }) =>
   ({
     item,
     depth,
@@ -100,7 +109,9 @@ const renderItem =
     // const isActive = item.data?.includes("Active");
     // const isLatest = item.data?.includes("Latest");
     // const isVersion = !item.isFolder;
+    // VARIABLES
     const isActive = context.isSelected;
+    const strategyId = item.index.toString().replace("strategy-", "");
 
     // DRAW
     return (
@@ -192,12 +203,16 @@ const renderItem =
                   </ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item leftSection={<Icon icon={icons.rename} />}>
-                    Rename
+                  <Menu.Item
+                    leftSection={<Icon icon={icons.edit} />}
+                    onClick={() => handleEditStrategy(strategyId)}
+                  >
+                    Edit Strategy
                   </Menu.Item>
                   <Menu.Item
                     color="red"
                     leftSection={<Icon icon={icons.delete} />}
+                    onClick={() => handleDeleteStrategy(strategyId, item.data)}
                   >
                     Delete
                   </Menu.Item>
@@ -218,18 +233,16 @@ export const StrategyVersionPane = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // API
-  const {
-    data: strategiesResponse,
-    isFetching: isFetchingStrategies,
-    isLoading: isLoadingStrategies,
-  } = strategiesApi.useGetStrategiesQuery();
+  const getStrategiesAPI = strategiesApi.useGetStrategiesQuery();
+  const [deleteStrategy, { isLoading: isDeletingStrategy }] =
+    strategiesApi.useDeleteStrategyMutation();
 
   // VARIABLES
   const dataProvider = useMemo(
     () =>
-      strategiesResponse?.data
+      getStrategiesAPI.data?.data
         ? new StaticTreeDataProvider(
-            compileTreeData(strategiesResponse.data),
+            compileTreeData(getStrategiesAPI.data.data),
             (item, data) => ({
               ...item,
               data,
@@ -249,17 +262,17 @@ export const StrategyVersionPane = () => {
               data,
             })
           ),
-    [strategiesResponse]
+    [getStrategiesAPI.data]
   );
 
   // Generate a stable key that changes whenever data changes
   const treeKey = useMemo(() => {
-    if (!strategiesResponse?.data) return "empty";
+    if (!getStrategiesAPI.data?.data) return "empty";
     // Create a lightweight key from strategy and version IDs
-    return strategiesResponse.data
+    return getStrategiesAPI.data.data
       .map((s) => `${s.id}:${s.versions?.map((v) => v.id).join(",") || ""}`)
       .join("|");
-  }, [strategiesResponse]);
+  }, [getStrategiesAPI.data]);
 
   // HANDLERS
   const handleCreateStrategy = () => {
@@ -288,7 +301,6 @@ export const StrategyVersionPane = () => {
     },
     [dataProvider]
   );
-
   const handleSearchOnChange = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       event.preventDefault();
@@ -306,6 +318,36 @@ export const StrategyVersionPane = () => {
     },
     600
   );
+  const handleEditStrategy = (strategyId: string) => {
+    dispatch(strategyFormSlice.actions.setIsCreateMode(false));
+    dispatch(strategyFormSlice.actions.setStrategyId(strategyId));
+    dispatch(strategyFormSlice.actions.setOpened(true));
+  };
+  const handleDeleteStrategy = (strategyId: string, strategyName: string) => {
+    modals.openConfirmModal({
+      title: `Delete Strategy "${strategyName}"`,
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete this strategy? This will also delete
+          all versions associated with this strategy.
+        </Text>
+      ),
+      labels: { confirm: "Delete Strategy", cancel: "No, don't delete it" },
+      confirmProps: { color: "red", loading: isDeletingStrategy },
+      onConfirm: async () => {
+        const response = await deleteStrategy({ id: strategyId });
+        if (response.data) {
+          notifications.show({
+            title: "Success",
+            message: response.data.message,
+            color: "green",
+          });
+          getStrategiesAPI.refetch();
+        }
+      },
+    });
+  };
 
   // DRAW
   return (
@@ -363,13 +405,13 @@ export const StrategyVersionPane = () => {
           }}
         />
       </div>
-      {isFetchingStrategies || isLoadingStrategies ? (
+      {getStrategiesAPI.isLoading ? (
         <div className="h-full w-full flex flex-col gap-2">
           {times(10, (index) => (
             <Skeleton animate key={index} height={28} radius="sm" />
           ))}
         </div>
-      ) : (
+      ) : getStrategiesAPI.data && getStrategiesAPI.data.data.length > 0 ? (
         <div className="h-full w-full">
           <UncontrolledTreeEnvironment
             key={treeKey}
@@ -381,7 +423,11 @@ export const StrategyVersionPane = () => {
               },
             }}
             canSearchByStartingTyping={false}
-            renderItem={renderItem({ handleCreateVersion })}
+            renderItem={renderItem({
+              handleCreateVersion,
+              handleEditStrategy,
+              handleDeleteStrategy,
+            })}
             renderSearchInput={() => null}
             canSearch={false}
           >
@@ -392,6 +438,15 @@ export const StrategyVersionPane = () => {
               ref={treeRef}
             />
           </UncontrolledTreeEnvironment>
+        </div>
+      ) : (
+        <div className="h-full w-full flex flex-col items-center justify-center gap-5">
+          <Icon icon={icons.empty} height={60} />
+          <Text size="md" c="dimmed" ta="center">
+            No strategies found.
+            <br />
+            Create a new strategy to get started.
+          </Text>
         </div>
       )}
     </Paper>

@@ -36,6 +36,3 @@ export const shortlistApi = createApi({
     }),
   }),
 });
-
-// Export hooks for usage in functional components
-export const { useGetShortlistQuery } = shortlistApi;

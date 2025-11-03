@@ -24,6 +24,7 @@ fastify.register(websocket);
 fastify.register(sensible);
 fastify.register(cors, {
   origin: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 });
 
 // // Register routes with authentication plugins

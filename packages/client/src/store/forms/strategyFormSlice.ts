@@ -3,11 +3,13 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 export interface StrategyFormState {
   opened: boolean;
   isCreateMode: boolean;
+  strategyId: string | null;
 }
 
 const initialState: StrategyFormState = {
   opened: false,
   isCreateMode: true,
+  strategyId: null,
 };
 
 export const strategyFormSlice = createSlice({
@@ -19,6 +21,9 @@ export const strategyFormSlice = createSlice({
     },
     setOpened: (state, action: PayloadAction<boolean>) => {
       state.opened = action.payload;
+    },
+    setStrategyId: (state, action: PayloadAction<string | null>) => {
+      state.strategyId = action.payload;
     },
   },
 });

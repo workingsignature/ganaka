@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { apiResponseSchema } from "../../common";
 
 // ==================== POST /webhooks/user ====================
 
@@ -7,8 +8,9 @@ import { z } from "zod";
  */
 export const clerkUserWebhook = {
   body: z.unknown(), // Clerk webhook payload is verified by @clerk/fastify
-  response: z.object({
-    message: z.string(),
+  response: apiResponseSchema.extend({
+    data: z.object({
+      message: z.string(),
+    }),
   }),
 };
-
