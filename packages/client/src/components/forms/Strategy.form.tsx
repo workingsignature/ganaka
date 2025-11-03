@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea, TextInput } from "@mantine/core";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { GForm } from "./GForm";
+import { GForm } from "../GForm";
 import { notifications } from "@mantine/notifications";
 import { useCallback, useEffect } from "react";
 
@@ -24,12 +24,11 @@ export const StrategyForm = () => {
   const { opened, isCreateMode, strategyId } = useAppSelector(
     (state) => state.strategyForm
   );
-  const [createStrategy, createStrategyAPIState] =
+  const [createStrategy, createStrategyAPI] =
     strategiesApi.useCreateStrategyMutation();
-  const [updateStrategy, updateStrategyAPIState] =
+  const [updateStrategy, updateStrategyAPI] =
     strategiesApi.useUpdateStrategyMutation();
-  const [getStrategy, getStrategyAPIState] =
-    strategiesApi.useLazyGetStrategyQuery();
+  const [getStrategy, getStrategyAPI] = strategiesApi.useLazyGetStrategyQuery();
   const form = useForm<z.infer<typeof strategyFormSchema>>({
     resolver: zodResolver(strategyFormSchema),
     defaultValues,
@@ -107,10 +106,9 @@ export const StrategyForm = () => {
       primaryAction={{
         label: isCreateMode ? "Create Strategy" : "Save Changes",
         onClick: handleSubmit,
-        loading:
-          createStrategyAPIState.isLoading || updateStrategyAPIState.isLoading,
+        loading: createStrategyAPI.isLoading || updateStrategyAPI.isLoading,
       }}
-      loading={getStrategyAPIState.isLoading}
+      loading={getStrategyAPI.isLoading}
       title={isCreateMode ? "Create a new Strategy" : "Edit Strategy"}
     >
       <div className="w-full h-full flex flex-col">
