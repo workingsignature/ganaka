@@ -26,7 +26,6 @@ export const strategyItemSchema = z.object({
 // ==================== GET /strategies ====================
 
 export const getStrategies = {
-  query: z.object({}).optional(),
   response: z.array(strategyItemSchema),
 };
 
@@ -80,4 +79,3 @@ export const deleteStrategy = {
   }),
   response: z.undefined(),
 };
-

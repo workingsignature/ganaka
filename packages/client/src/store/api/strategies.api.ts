@@ -20,5 +20,14 @@ export const strategiesApi = createApi({
       }),
       invalidatesTags: ["strategies"],
     }),
+    getStrategies: builder.query<
+      z.infer<typeof v1_core_strategies_schemas.getStrategies.response>,
+      void
+    >({
+      query: () => ({
+        url: `/strategies`,
+        method: "GET",
+      }),
+    }),
   }),
 });

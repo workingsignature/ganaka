@@ -23,6 +23,7 @@ import {
   type TreeRef,
 } from "react-complex-tree";
 import { debounce } from "lodash";
+import { strategiesApi } from "@/store/api/strategies.api";
 
 // Custom render function for tree items
 const renderItem =
@@ -159,6 +160,10 @@ export const StrategyVersionPane = () => {
   const dispatch = useAppDispatch();
   const treeRef = useRef<TreeRef>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // API
+  const { data: strategies, isLoading: isLoadingStrategies } =
+    strategiesApi.useGetStrategiesQuery();
 
   // VARIABLES
   const dataProvider = useMemo(
