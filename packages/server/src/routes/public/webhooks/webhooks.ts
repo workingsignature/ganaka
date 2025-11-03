@@ -12,10 +12,25 @@ import { sendResponse } from "../../../helpers/sendResponse";
 const webhooksRoutes: FastifyPluginAsync = async (fastify, opts) => {
   fastify.post("/user", async (request, reply) => {
     try {
-      const evt = await verifyWebhook(request);
+      let evt: Awaited<ReturnType<typeof verifyWebhook>>;
+
+      try {
+        evt = await verifyWebhook(request);
+      } catch (err) {
+        fastify.log.error(err);
+        return reply.badRequest("Error verifying webhook");
+      }
 
       switch (evt.type) {
         case "user.created": {
+          const user = await prisma.user.findUnique({
+            where: { clerkId: evt.data.id },
+          });
+          if (user) {
+            fastify.log.info(`User already exists: ${evt.data.id}`);
+            return reply.badRequest("User already exists");
+          }
+
           await prisma.user.create({
             data: {
               clerkId: evt.data.id,
@@ -43,6 +58,7 @@ const webhooksRoutes: FastifyPluginAsync = async (fastify, opts) => {
             fastify.log.info(`User not found for update: ${evt.data.id}`);
             return reply.notFound("User not found");
           }
+
           await prisma.user.update({
             where: { clerkId: evt.data.id },
             data: {
@@ -52,6 +68,7 @@ const webhooksRoutes: FastifyPluginAsync = async (fastify, opts) => {
             },
           });
           fastify.log.info(`User updated: ${evt.data.id}`);
+
           return sendResponse<
             z.infer<typeof public_webhooks_schemas.clerkUserWebhook.response>
           >({
@@ -74,6 +91,7 @@ const webhooksRoutes: FastifyPluginAsync = async (fastify, opts) => {
             where: { clerkId: evt.data.id },
           });
           fastify.log.info(`User deleted: ${evt.data.id}`);
+
           return reply.send(
             sendResponse<
               z.infer<typeof public_webhooks_schemas.clerkUserWebhook.response>
@@ -90,9 +108,8 @@ const webhooksRoutes: FastifyPluginAsync = async (fastify, opts) => {
         }
       }
     } catch (err) {
-      fastify.log.error("Error verifying webhook:");
       fastify.log.error(err);
-      return reply.badRequest("Error verifying webhook");
+      return reply.badRequest("Error processing webhook");
     }
   });
 };

@@ -49,7 +49,7 @@ export const baseQueryWithAuth: BaseQueryFn = async (
 ) => {
   const token = await getCachedToken();
   const result = await fetchBaseQuery({
-    baseUrl: `${import.meta.env.VITE_API_URL}/v1/core`,
+    baseUrl: `${import.meta.env.VITE_API_DOMAIN}/v1/core`,
     prepareHeaders: (headers) => {
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
