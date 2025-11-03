@@ -7,7 +7,7 @@ import { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 export const strategiesApi = createApi({
   reducerPath: "strategiesAPI",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["strategies"],
+  tagTypes: ["strategies", "strategy"],
   endpoints: (builder) => ({
     createStrategy: builder.mutation<
       z.infer<typeof v1_core_strategies_schemas.createStrategy.response>,
@@ -38,6 +38,7 @@ export const strategiesApi = createApi({
         url: `/strategies/${params.id}`,
         method: "GET",
       }),
+      providesTags: ["strategy"],
     }),
     deleteStrategy: builder.mutation<
       z.infer<typeof v1_core_strategies_schemas.deleteStrategy.response>,
@@ -48,7 +49,7 @@ export const strategiesApi = createApi({
         method: "DELETE",
         body: {},
       }),
-      invalidatesTags: ["strategies"],
+      invalidatesTags: ["strategies", "strategy"],
     }),
     updateStrategy: builder.mutation<
       z.infer<typeof v1_core_strategies_schemas.updateStrategy.response>,
@@ -64,7 +65,7 @@ export const strategiesApi = createApi({
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["strategies"],
+      invalidatesTags: ["strategies", "strategy"],
     }),
   }),
 });

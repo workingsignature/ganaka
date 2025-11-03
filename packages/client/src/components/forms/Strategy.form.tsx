@@ -14,6 +14,11 @@ const strategyFormSchema = z.object({
   description: z.string(),
 });
 
+const defaultValues: z.infer<typeof strategyFormSchema> = {
+  name: "",
+  description: "",
+};
+
 export const StrategyForm = () => {
   // HOOKS
   const { opened, isCreateMode, strategyId } = useAppSelector(
@@ -27,17 +32,15 @@ export const StrategyForm = () => {
     strategiesApi.useLazyGetStrategyQuery();
   const form = useForm<z.infer<typeof strategyFormSchema>>({
     resolver: zodResolver(strategyFormSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-    },
+    defaultValues,
   });
   const dispatch = useAppDispatch();
 
   // HANDLERS
   const resetFormState = () => {
     dispatch(strategyFormSlice.actions.setIsCreateMode(true));
-    form.reset();
+    dispatch(strategyFormSlice.actions.setStrategyId(null));
+    form.reset(defaultValues);
   };
   const handleClose = () => {
     dispatch(strategyFormSlice.actions.setOpened(false));

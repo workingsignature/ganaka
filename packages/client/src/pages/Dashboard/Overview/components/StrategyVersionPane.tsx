@@ -278,6 +278,9 @@ export const StrategyVersionPane = () => {
   const handleCreateStrategy = () => {
     dispatch(strategyFormSlice.actions.setOpened(true));
   };
+  const handleRefreshStrategies = () => {
+    getStrategiesAPI.refetch();
+  };
   const handleCreateVersion = () => {
     dispatch(versionFormSlice.actions.setOpened(true));
   };
@@ -361,6 +364,16 @@ export const StrategyVersionPane = () => {
           Strategies
         </Title>
         <div className="flex items-center justify-end">
+          <Tooltip label="Refresh Strategies">
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              color="dark"
+              onClick={handleRefreshStrategies}
+            >
+              <Icon icon={icons.refresh} height={20} />
+            </ActionIcon>
+          </Tooltip>
           <Tooltip label="Sort Strategies">
             <ActionIcon
               variant="subtle"

@@ -14,6 +14,7 @@ export const icons = {
   sort: "solar:sort-vertical-linear",
   search: "iconamoon:search-light",
   empty: "qlementine-icons:empty-slot-24",
+  refresh: "ic:twotone-refresh",
   // ----------------------------------------
   timeline: "mdi:timeline-outline",
   shortlist: "tabler:list-details",
