@@ -14,6 +14,7 @@ export const GForm = ({
   primaryAction: {
     label: string;
     onClick: () => void;
+    loading?: boolean;
   };
   onClose: () => void;
   onExitTransitionEnd: () => void;
@@ -33,7 +34,11 @@ export const GForm = ({
         <Drawer.Header>
           <Drawer.Title>{title}</Drawer.Title>
           <div className="flex items-center justify-between gap-2">
-            <Button variant="filled" onClick={primaryAction.onClick}>
+            <Button
+              variant="filled"
+              loading={primaryAction.loading}
+              onClick={primaryAction.onClick}
+            >
               {primaryAction.label}
             </Button>
             <Drawer.CloseButton />

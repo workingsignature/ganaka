@@ -6,6 +6,7 @@ import { Textarea, TextInput } from "@mantine/core";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { GForm } from "./GForm";
+import { notifications } from "@mantine/notifications";
 
 const strategyFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -17,7 +18,8 @@ export const StrategyForm = () => {
   const { opened, isCreateMode } = useAppSelector(
     (state) => state.strategyForm
   );
-  const [createStrategy] = strategiesApi.useCreateStrategyMutation();
+  const [createStrategy, { isLoading: isCreateStrategyLoading }] =
+    strategiesApi.useCreateStrategyMutation();
   const form = useForm<z.infer<typeof strategyFormSchema>>({
     resolver: zodResolver(strategyFormSchema),
     defaultValues: {
@@ -38,12 +40,20 @@ export const StrategyForm = () => {
   };
   const handleSubmit = async () => {
     await form.handleSubmit(async (data) => {
-      await createStrategy({
+      const response = await createStrategy({
         name: data.name,
         description: data.description,
         isPublic: false,
         customAttributes: {},
       });
+      if (response.data) {
+        handleClose();
+        notifications.show({
+          title: "Success",
+          message: response.data.message,
+          color: "green",
+        });
+      }
     })();
   };
 
@@ -56,6 +66,7 @@ export const StrategyForm = () => {
       primaryAction={{
         label: isCreateMode ? "Create Strategy" : "Save Strategy",
         onClick: handleSubmit,
+        loading: isCreateStrategyLoading,
       }}
       title={isCreateMode ? "Create a new Strategy" : "Edit Strategy"}
     >

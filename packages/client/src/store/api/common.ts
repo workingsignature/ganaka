@@ -1,4 +1,7 @@
+import type { apiErrorResponseSchema } from "@ganaka/server-schemas";
+import { notifications } from "@mantine/notifications";
 import { fetchBaseQuery, type BaseQueryFn } from "@reduxjs/toolkit/query/react";
+import type z from "zod";
 
 // Declare Clerk on window object
 declare global {
@@ -58,6 +61,17 @@ export const baseQueryWithAuth: BaseQueryFn = async (
       return headers;
     },
   })(args, api, extraOptions);
+
+  if (result.error) {
+    const errorData = result.error.data as z.infer<
+      typeof apiErrorResponseSchema
+    >;
+    notifications.show({
+      title: "Error",
+      message: errorData.message,
+      color: "red",
+    });
+  }
 
   return result;
 };

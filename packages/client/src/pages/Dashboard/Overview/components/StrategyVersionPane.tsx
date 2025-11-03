@@ -8,6 +8,7 @@ import {
   Input,
   Menu,
   Paper,
+  Skeleton,
   Text,
   Title,
   Tooltip,
@@ -22,8 +23,63 @@ import {
   type TreeItemRenderContext,
   type TreeRef,
 } from "react-complex-tree";
-import { debounce } from "lodash";
+import { debounce, times } from "lodash";
 import { strategiesApi } from "@/store/api/strategies.api";
+import type { v1_core_strategies_schemas } from "@ganaka/server-schemas";
+import type { z } from "zod";
+
+// Types
+type StrategyResponse = z.infer<
+  typeof v1_core_strategies_schemas.getStrategies.response
+>;
+
+// Helper function to compile tree data from strategies
+const compileTreeData = (strategies: StrategyResponse["data"] | undefined) => {
+  if (!strategies || strategies.length === 0) {
+    return {
+      root: {
+        index: "root",
+        isFolder: true,
+        children: [],
+        data: "Root",
+      },
+    };
+  }
+
+  const treeData: Record<string, TreeItem<string>> = {
+    root: {
+      index: "root",
+      isFolder: true,
+      children: strategies.map((s) => `strategy-${s.id}`),
+      data: "Root",
+    },
+  };
+
+  strategies.forEach((strategy) => {
+    const strategyId = `strategy-${strategy.id}`;
+    const versionChildren =
+      strategy.versions?.map((v) => `version-${v.id}`) || [];
+
+    treeData[strategyId] = {
+      index: strategyId,
+      isFolder: true,
+      children: versionChildren,
+      data: strategy.name,
+    };
+
+    strategy.versions?.forEach((version) => {
+      const versionId = `version-${version.id}`;
+      treeData[versionId] = {
+        index: versionId,
+        children: [],
+        data: version.version,
+      };
+    });
+  });
+
+  console.log(treeData);
+  return treeData;
+};
 
 // Custom render function for tree items
 const renderItem =
@@ -162,76 +218,48 @@ export const StrategyVersionPane = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // API
-  const { data: strategies, isLoading: isLoadingStrategies } =
-    strategiesApi.useGetStrategiesQuery();
+  const {
+    data: strategiesResponse,
+    isFetching: isFetchingStrategies,
+    isLoading: isLoadingStrategies,
+  } = strategiesApi.useGetStrategiesQuery();
 
   // VARIABLES
   const dataProvider = useMemo(
     () =>
-      new StaticTreeDataProvider(
-        {
-          root: {
-            index: "root",
-            isFolder: true,
-            children: ["strategy-1", "strategy-2", "strategy-3"],
-            data: "Root",
-          },
-          "strategy-1": {
-            index: "strategy-1",
-            isFolder: true,
-            children: ["strategy-1-v1", "strategy-1-v2", "strategy-1-v3"],
-            data: "Mean Reversion Strategy",
-          },
-          "strategy-1-v1": {
-            index: "strategy-1-v1",
-            children: [],
-            data: "v1.0.0 (Active)",
-          },
-          "strategy-1-v2": {
-            index: "strategy-1-v2",
-            children: [],
-            data: "v1.1.0",
-          },
-          "strategy-1-v3": {
-            index: "strategy-1-v3",
-            children: [],
-            data: "v2.0.0 (Latest)",
-          },
-          "strategy-2": {
-            index: "strategy-2",
-            isFolder: true,
-            children: ["strategy-2-v1", "strategy-2-v2"],
-            data: "Momentum Breakout",
-          },
-          "strategy-2-v1": {
-            index: "strategy-2-v1",
-            children: [],
-            data: "v1.0.0",
-          },
-          "strategy-2-v2": {
-            index: "strategy-2-v2",
-            children: [],
-            data: "v1.5.0 (Active)",
-          },
-          "strategy-3": {
-            index: "strategy-3",
-            isFolder: true,
-            children: ["strategy-3-v1"],
-            data: "Options Straddle",
-          },
-          "strategy-3-v1": {
-            index: "strategy-3-v1",
-            children: [],
-            data: "v1.0.0 (Active)",
-          },
-        },
-        (item, data) => ({
-          ...item,
-          data,
-        })
-      ),
-    []
+      strategiesResponse?.data
+        ? new StaticTreeDataProvider(
+            compileTreeData(strategiesResponse.data),
+            (item, data) => ({
+              ...item,
+              data,
+            })
+          )
+        : new StaticTreeDataProvider(
+            {
+              root: {
+                index: "root",
+                isFolder: true,
+                children: [],
+                data: "Root",
+              },
+            },
+            (item, data) => ({
+              ...item,
+              data,
+            })
+          ),
+    [strategiesResponse]
   );
+
+  // Generate a stable key that changes whenever data changes
+  const treeKey = useMemo(() => {
+    if (!strategiesResponse?.data) return "empty";
+    // Create a lightweight key from strategy and version IDs
+    return strategiesResponse.data
+      .map((s) => `${s.id}:${s.versions?.map((v) => v.id).join(",") || ""}`)
+      .join("|");
+  }, [strategiesResponse]);
 
   // HANDLERS
   const handleCreateStrategy = () => {
@@ -335,91 +363,37 @@ export const StrategyVersionPane = () => {
           }}
         />
       </div>
-      <div>
-        <UncontrolledTreeEnvironment
-          dataProvider={
-            new StaticTreeDataProvider(
-              {
-                root: {
-                  index: "root",
-                  isFolder: true,
-                  children: ["strategy-1", "strategy-2", "strategy-3"],
-                  data: "Root",
-                },
-                "strategy-1": {
-                  index: "strategy-1",
-                  isFolder: true,
-                  children: ["strategy-1-v1", "strategy-1-v2", "strategy-1-v3"],
-                  data: "Mean Reversion Strategy",
-                },
-                "strategy-1-v1": {
-                  index: "strategy-1-v1",
-                  children: [],
-                  data: "v1.0.0 (Active)",
-                },
-                "strategy-1-v2": {
-                  index: "strategy-1-v2",
-                  children: [],
-                  data: "v1.1.0",
-                },
-                "strategy-1-v3": {
-                  index: "strategy-1-v3",
-                  children: [],
-                  data: "v2.0.0 (Latest)",
-                },
-                "strategy-2": {
-                  index: "strategy-2",
-                  isFolder: true,
-                  children: ["strategy-2-v1", "strategy-2-v2"],
-                  data: "Momentum Breakout",
-                },
-                "strategy-2-v1": {
-                  index: "strategy-2-v1",
-                  children: [],
-                  data: "v1.0.0",
-                },
-                "strategy-2-v2": {
-                  index: "strategy-2-v2",
-                  children: [],
-                  data: "v1.5.0 (Active)",
-                },
-                "strategy-3": {
-                  index: "strategy-3",
-                  isFolder: true,
-                  children: ["strategy-3-v1"],
-                  data: "Options Straddle",
-                },
-                "strategy-3-v1": {
-                  index: "strategy-3-v1",
-                  children: [],
-                  data: "v1.0.0 (Active)",
-                },
+      {isFetchingStrategies || isLoadingStrategies ? (
+        <div className="h-full w-full flex flex-col gap-2">
+          {times(10, (index) => (
+            <Skeleton animate key={index} height={28} radius="sm" />
+          ))}
+        </div>
+      ) : (
+        <div className="h-full w-full">
+          <UncontrolledTreeEnvironment
+            key={treeKey}
+            dataProvider={dataProvider}
+            getItemTitle={(item) => item.data}
+            viewState={{
+              "tree-1": {
+                expandedItems: ["root"],
               },
-              (item, data) => ({
-                ...item,
-                data,
-              })
-            )
-          }
-          getItemTitle={(item) => item.data}
-          viewState={{
-            "tree-1": {
-              expandedItems: ["root"],
-            },
-          }}
-          canSearchByStartingTyping={false}
-          renderItem={renderItem({ handleCreateVersion })}
-          renderSearchInput={() => null}
-          canSearch={false}
-        >
-          <Tree
-            treeId="tree-1"
-            rootItem="root"
-            treeLabel="Strategies"
-            ref={treeRef}
-          />
-        </UncontrolledTreeEnvironment>
-      </div>
+            }}
+            canSearchByStartingTyping={false}
+            renderItem={renderItem({ handleCreateVersion })}
+            renderSearchInput={() => null}
+            canSearch={false}
+          >
+            <Tree
+              treeId="tree-1"
+              rootItem="root"
+              treeLabel="Strategies"
+              ref={treeRef}
+            />
+          </UncontrolledTreeEnvironment>
+        </div>
+      )}
     </Paper>
   );
 };
