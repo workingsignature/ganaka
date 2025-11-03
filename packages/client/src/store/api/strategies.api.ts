@@ -30,6 +30,15 @@ export const strategiesApi = createApi({
       }),
       providesTags: ["strategies"],
     }),
+    getStrategy: builder.query<
+      z.infer<typeof v1_core_strategies_schemas.getStrategy.response>,
+      z.infer<typeof v1_core_strategies_schemas.getStrategy.params>
+    >({
+      query: (params) => ({
+        url: `/strategies/${params.id}`,
+        method: "GET",
+      }),
+    }),
     deleteStrategy: builder.mutation<
       z.infer<typeof v1_core_strategies_schemas.deleteStrategy.response>,
       z.infer<typeof v1_core_strategies_schemas.deleteStrategy.params>
@@ -38,6 +47,22 @@ export const strategiesApi = createApi({
         url: `/strategies/${params.id}`,
         method: "DELETE",
         body: {},
+      }),
+      invalidatesTags: ["strategies"],
+    }),
+    updateStrategy: builder.mutation<
+      z.infer<typeof v1_core_strategies_schemas.updateStrategy.response>,
+      {
+        params: z.infer<
+          typeof v1_core_strategies_schemas.updateStrategy.params
+        >;
+        body: z.infer<typeof v1_core_strategies_schemas.updateStrategy.body>;
+      }
+    >({
+      query: ({ params, body }) => ({
+        url: `/strategies/${params.id}`,
+        method: "PUT",
+        body,
       }),
       invalidatesTags: ["strategies"],
     }),

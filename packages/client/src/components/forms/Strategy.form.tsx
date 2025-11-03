@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { GForm } from "./GForm";
 import { notifications } from "@mantine/notifications";
+import { useCallback, useEffect } from "react";
 
 const strategyFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -15,11 +16,15 @@ const strategyFormSchema = z.object({
 
 export const StrategyForm = () => {
   // HOOKS
-  const { opened, isCreateMode } = useAppSelector(
+  const { opened, isCreateMode, strategyId } = useAppSelector(
     (state) => state.strategyForm
   );
-  const [createStrategy, { isLoading: isCreateStrategyLoading }] =
+  const [createStrategy, createStrategyAPIState] =
     strategiesApi.useCreateStrategyMutation();
+  const [updateStrategy, updateStrategyAPIState] =
+    strategiesApi.useUpdateStrategyMutation();
+  const [getStrategy, getStrategyAPIState] =
+    strategiesApi.useLazyGetStrategyQuery();
   const form = useForm<z.infer<typeof strategyFormSchema>>({
     resolver: zodResolver(strategyFormSchema),
     defaultValues: {
@@ -39,23 +44,56 @@ export const StrategyForm = () => {
     resetFormState();
   };
   const handleSubmit = async () => {
-    await form.handleSubmit(async (data) => {
-      const response = await createStrategy({
-        name: data.name,
-        description: data.description,
-        isPublic: false,
-        customAttributes: {},
-      });
-      if (response.data) {
-        handleClose();
-        notifications.show({
-          title: "Success",
-          message: response.data.message,
-          color: "green",
+    if (!strategyId) {
+      await form.handleSubmit(async (data) => {
+        const response = await createStrategy({
+          name: data.name,
+          description: data.description,
+          isPublic: false,
+          customAttributes: {},
         });
-      }
-    })();
+        if (response.data) {
+          handleClose();
+          notifications.show({
+            title: "Success",
+            message: response.data.message,
+            color: "green",
+          });
+        }
+      })();
+    } else {
+      await form.handleSubmit(async (data) => {
+        const response = await updateStrategy({
+          params: { id: strategyId },
+          body: { name: data.name, description: data.description },
+        });
+        if (response.data) {
+          handleClose();
+          notifications.show({
+            title: "Success",
+            message: response.data.message,
+            color: "green",
+          });
+        }
+      })();
+    }
   };
+  const handleGetStrategy = useCallback(async () => {
+    if (!strategyId) return;
+    const response = await getStrategy({ id: strategyId });
+    if (response.data && response.data.data) {
+      form.reset({
+        name: response.data.data.name,
+        description: response.data.data.description,
+      });
+    }
+  }, [form, getStrategy, strategyId]);
+
+  useEffect(() => {
+    if (strategyId) {
+      handleGetStrategy();
+    }
+  }, [handleGetStrategy, strategyId]);
 
   // DRAW
   return (
@@ -64,10 +102,12 @@ export const StrategyForm = () => {
       onClose={handleClose}
       onExitTransitionEnd={resetFormState}
       primaryAction={{
-        label: isCreateMode ? "Create Strategy" : "Save Strategy",
+        label: isCreateMode ? "Create Strategy" : "Save Changes",
         onClick: handleSubmit,
-        loading: isCreateStrategyLoading,
+        loading:
+          createStrategyAPIState.isLoading || updateStrategyAPIState.isLoading,
       }}
+      loading={getStrategyAPIState.isLoading}
       title={isCreateMode ? "Create a new Strategy" : "Edit Strategy"}
     >
       <div className="w-full h-full flex flex-col">
