@@ -1,8 +1,8 @@
-import { OverviewPage } from "@/pages/Dashboard/Overview.page";
+import { OverviewPage } from "@/pages/Dashboard/Overview/Overview.page";
 import { SideNav } from "./components/SideNav";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { NotFound } from "../NotFound/NotFound";
-import { ShortlistsPage } from "@/pages/Dashboard/Shortlists.page";
+import { ShortlistsPage } from "@/pages/Dashboard/Shortlists/Shortlists.page";
 import { RunForm } from "@/components/forms/Run.form";
 import { StrategyForm } from "@/components/forms/Strategy.form";
 import { VersionForm } from "@/components/forms/Version.form";

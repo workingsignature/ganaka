@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { apiResponseSchema } from "../../../common";
 
 // ==================== Schemas ====================
 
@@ -17,14 +18,18 @@ export const developerKeyItemSchema = z.object({
 
 export const getKeys = {
   query: z.object({}).optional(),
-  response: z.array(developerKeyItemSchema),
+  response: apiResponseSchema.extend({
+    data: z.array(developerKeyItemSchema),
+  }),
 };
 
 // ==================== POST /keys ====================
 
 export const createKey = {
   body: z.object({}).optional(),
-  response: developerKeyItemSchema,
+  response: apiResponseSchema.extend({
+    data: developerKeyItemSchema,
+  }),
 };
 
 // ==================== PATCH /keys/:id/deactivate ====================
@@ -33,5 +38,7 @@ export const deactivateKey = {
   params: z.object({
     id: z.string(),
   }),
-  response: developerKeyItemSchema,
+  response: apiResponseSchema.extend({
+    data: developerKeyItemSchema,
+  }),
 };

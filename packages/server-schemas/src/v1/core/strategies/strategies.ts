@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { apiResponseSchema } from "../../..";
 
 // ==================== Schemas ====================
 
@@ -26,8 +27,9 @@ export const strategyItemSchema = z.object({
 // ==================== GET /strategies ====================
 
 export const getStrategies = {
-  query: z.object({}).optional(),
-  response: z.array(strategyItemSchema),
+  response: apiResponseSchema.extend({
+    data: z.array(strategyItemSchema),
+  }),
 };
 
 // ==================== GET /strategies/:id ====================
@@ -36,7 +38,9 @@ export const getStrategy = {
   params: z.object({
     id: z.string(),
   }),
-  response: strategyItemSchema,
+  response: apiResponseSchema.extend({
+    data: strategyItemSchema,
+  }),
 };
 
 // ==================== POST /strategies ====================
@@ -48,12 +52,14 @@ export const createStrategy = {
     isPublic: z.boolean(),
     customAttributes: z.record(z.string(), z.unknown()).optional().default({}),
   }),
-  response: z.object({
-    id: z.string(),
-    name: z.string(),
-    description: z.string(),
-    isPublic: z.boolean(),
-    customAttributes: z.unknown().optional(),
+  response: apiResponseSchema.extend({
+    data: z.object({
+      id: z.string(),
+      name: z.string(),
+      description: z.string(),
+      isPublic: z.boolean(),
+      customAttributes: z.unknown().optional(),
+    }),
   }),
 };
 
@@ -69,7 +75,9 @@ export const updateStrategy = {
     isPublic: z.boolean().optional(),
     customAttributes: z.record(z.string(), z.unknown()).optional(),
   }),
-  response: strategyItemSchema,
+  response: apiResponseSchema.extend({
+    data: strategyItemSchema,
+  }),
 };
 
 // ==================== DELETE /strategies/:id ====================
@@ -78,6 +86,7 @@ export const deleteStrategy = {
   params: z.object({
     id: z.string(),
   }),
-  response: z.undefined(),
+  response: apiResponseSchema.extend({
+    data: z.undefined(),
+  }),
 };
-

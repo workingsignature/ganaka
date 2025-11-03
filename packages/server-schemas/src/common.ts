@@ -9,6 +9,12 @@ export const apiResponseSchema = z.object({
   data: z.unknown(),
 });
 
+export const apiErrorResponseSchema = z.object({
+  error: z.string(),
+  statusCode: z.number(),
+  message: z.string(),
+});
+
 /**
  * Common parameter schemas
  */

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { apiResponseSchema } from "../../common";
 
 // ==================== Schemas ====================
 
@@ -13,5 +14,7 @@ export const publicShortlistItemSchema = z.object({
 // ==================== GET /shortlists ====================
 
 export const getPublicShortlists = {
-  response: z.array(publicShortlistItemSchema),
+  response: apiResponseSchema.extend({
+    data: z.array(publicShortlistItemSchema),
+  }),
 };

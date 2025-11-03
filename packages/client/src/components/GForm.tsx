@@ -1,4 +1,5 @@
-import { Button, Drawer } from "@mantine/core";
+import { Button, Drawer, LoadingOverlay } from "@mantine/core";
+import { customZIndexes } from "@/utils/constants";
 
 export const GForm = ({
   opened,
@@ -7,6 +8,7 @@ export const GForm = ({
   primaryAction,
   onClose,
   onExitTransitionEnd,
+  loading,
 }: {
   opened: boolean;
   title: string;
@@ -14,9 +16,11 @@ export const GForm = ({
   primaryAction: {
     label: string;
     onClick: () => void;
+    loading?: boolean;
   };
   onClose: () => void;
   onExitTransitionEnd: () => void;
+  loading?: boolean;
 }) => {
   // DRAW
   return (
@@ -30,10 +34,19 @@ export const GForm = ({
     >
       <Drawer.Overlay />
       <Drawer.Content>
+        <LoadingOverlay
+          overlayProps={{ radius: "sm", blur: 0.1 }}
+          zIndex={customZIndexes.loadingOverlay_GForm}
+          visible={loading}
+        />
         <Drawer.Header>
           <Drawer.Title>{title}</Drawer.Title>
           <div className="flex items-center justify-between gap-2">
-            <Button variant="filled" onClick={primaryAction.onClick}>
+            <Button
+              variant="filled"
+              loading={primaryAction.loading}
+              onClick={primaryAction.onClick}
+            >
               {primaryAction.label}
             </Button>
             <Drawer.CloseButton />
