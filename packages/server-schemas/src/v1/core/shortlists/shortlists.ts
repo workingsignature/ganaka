@@ -29,6 +29,17 @@ export const getShortlists = {
   }),
 };
 
+// ==================== GET /shortlists/:id ====================
+
+export const getShortlist = {
+  params: z.object({
+    id: z.string(),
+  }),
+  response: apiResponseSchema.extend({
+    data: shortlistItemSchema,
+  }),
+};
+
 // ==================== POST /shortlists ====================
 
 export const createShortlist = {

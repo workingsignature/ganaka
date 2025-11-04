@@ -1,6 +1,6 @@
 import { versionFormSlice } from "@/store/forms/versionFormSlice";
 import { useAppDispatch, useAppSelector } from "@/utils/hooks/storeHooks";
-import { GForm } from "../GForm";
+import { GForm } from "@/components/GForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

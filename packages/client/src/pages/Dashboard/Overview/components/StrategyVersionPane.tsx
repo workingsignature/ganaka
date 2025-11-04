@@ -1,18 +1,16 @@
+import { GPane } from "@/components/GPane";
 import { icons } from "@/components/icons";
+import { strategiesAPI } from "@/store/api/strategies.api";
+import { versionsAPI } from "@/store/api/versions.api";
 import { strategyFormSlice } from "@/store/forms/strategyFormSlice";
 import { versionFormSlice } from "@/store/forms/versionFormSlice";
 import { useAppDispatch } from "@/utils/hooks/storeHooks";
+import type { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 import { Icon } from "@iconify/react";
-import {
-  ActionIcon,
-  Input,
-  Menu,
-  Paper,
-  Skeleton,
-  Text,
-  Title,
-  Tooltip,
-} from "@mantine/core";
+import { ActionIcon, Menu, Skeleton, Text, Tooltip } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { debounce, times } from "lodash";
 import { useCallback, useMemo, useRef } from "react";
 import {
   StaticTreeDataProvider,
@@ -23,13 +21,7 @@ import {
   type TreeItemRenderContext,
   type TreeRef,
 } from "react-complex-tree";
-import { debounce, times } from "lodash";
-import { strategiesAPI } from "@/store/api/strategies.api";
-import type { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 import type { z } from "zod";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import { versionsAPI } from "@/store/api/versions.api";
 
 // Types
 type StrategyResponse = z.infer<
@@ -198,23 +190,6 @@ const renderItem =
             >
               {item.data?.replace(/ \(.*\)/, "") || item.data}
             </Text>
-
-            {/* Badges for versions */}
-            {/* {isVersion && (
-          <Group gap="xs" className="ml-auto">
-            {isActive && (
-              <Badge size="xs" variant="filled" color="green">
-                Active
-              </Badge>
-            )}
-            {isLatest && (
-              <Badge size="xs" variant="light" color="blue">
-                Latest
-              </Badge>
-            )}
-          </Group>
-        )} */}
-
             <div className="flex items-center justify-between gap-1">
               {item.isFolder ? (
                 <Tooltip label="Create Version">
@@ -284,10 +259,9 @@ export const StrategyVersionPane = () => {
   // HOOKS
   const dispatch = useAppDispatch();
   const treeRef = useRef<TreeRef>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // API
-  const getstrategiesAPI = strategiesAPI.useGetStrategiesQuery();
+  const getAllStrategiesAPI = strategiesAPI.useGetStrategiesQuery();
   const [deleteStrategy, deleteStrategyAPI] =
     strategiesAPI.useDeleteStrategyMutation();
   const [deleteVersion, deleteVersionAPI] =
@@ -296,9 +270,9 @@ export const StrategyVersionPane = () => {
   // VARIABLES
   const dataProvider = useMemo(
     () =>
-      getstrategiesAPI.data?.data
+      getAllStrategiesAPI.data?.data
         ? new StaticTreeDataProvider(
-            compileTreeData(getstrategiesAPI.data.data),
+            compileTreeData(getAllStrategiesAPI.data.data),
             (item, data) => ({
               ...item,
               data,
@@ -318,24 +292,24 @@ export const StrategyVersionPane = () => {
               data,
             })
           ),
-    [getstrategiesAPI.data]
+    [getAllStrategiesAPI.data]
   );
 
   // Generate a stable key that changes whenever data changes
   const treeKey = useMemo(() => {
-    if (!getstrategiesAPI.data?.data) return "empty";
+    if (!getAllStrategiesAPI.data?.data) return "empty";
     // Create a lightweight key from strategy and version IDs
-    return getstrategiesAPI.data.data
+    return getAllStrategiesAPI.data.data
       .map((s) => `${s.id}:${s.versions?.map((v) => v.id).join(",") || ""}`)
       .join("|");
-  }, [getstrategiesAPI.data]);
+  }, [getAllStrategiesAPI.data]);
 
   // HANDLERS
   const handleCreateStrategy = () => {
     dispatch(strategyFormSlice.actions.setOpened(true));
   };
   const handleRefreshStrategies = () => {
-    getstrategiesAPI.refetch();
+    getAllStrategiesAPI.refetch();
   };
   const handleCreateVersion = (strategyId: string) => {
     dispatch(versionFormSlice.actions.setStrategyId(strategyId));
@@ -386,7 +360,6 @@ export const StrategyVersionPane = () => {
             message: response.data.message,
             color: "green",
           });
-          getstrategiesAPI.refetch();
         }
       },
     });
@@ -459,7 +432,6 @@ export const StrategyVersionPane = () => {
             message: response.data.message,
             color: "green",
           });
-          getstrategiesAPI.refetch();
         }
       },
     });
@@ -467,15 +439,11 @@ export const StrategyVersionPane = () => {
 
   // DRAW
   return (
-    <Paper
-      withBorder
-      p="md"
-      className="h-full w-full !grid grid-rows-[32px_36px_1fr] gap-2 overflow-hidden"
-    >
-      <div className="flex items-center justify-between">
-        <Title className="block" order={4}>
-          Strategies
-        </Title>
+    <GPane
+      title="Strategies"
+      onSearchChange={handleSearchOnChange}
+      searchPlaceholder="Search Strategies"
+      titleActions={
         <div className="flex items-center justify-end">
           <Tooltip label="Refresh Strategies">
             <ActionIcon
@@ -518,26 +486,16 @@ export const StrategyVersionPane = () => {
             </ActionIcon>
           </Tooltip>
         </div>
-      </div>
-      <div className="w-full">
-        <Input
-          ref={searchInputRef}
-          placeholder="Search Strategies"
-          className="w-full"
-          leftSection={<Icon icon={icons.search} />}
-          onChange={handleSearchOnChange}
-          onFocus={(e) => {
-            e.target.select();
-          }}
-        />
-      </div>
-      {getstrategiesAPI.isLoading ? (
+      }
+    >
+      {getAllStrategiesAPI.isLoading ? (
         <div className="h-full w-full flex flex-col gap-2">
           {times(10, (index) => (
             <Skeleton animate key={index} height={28} radius="sm" />
           ))}
         </div>
-      ) : getstrategiesAPI.data && getstrategiesAPI.data.data.length > 0 ? (
+      ) : getAllStrategiesAPI.data &&
+        getAllStrategiesAPI.data.data.length > 0 ? (
         <div className="h-full w-full">
           <UncontrolledTreeEnvironment
             key={treeKey}
@@ -577,6 +535,6 @@ export const StrategyVersionPane = () => {
           </Text>
         </div>
       )}
-    </Paper>
+    </GPane>
   );
 };

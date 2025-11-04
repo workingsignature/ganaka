@@ -21,3 +21,9 @@ export const apiErrorResponseSchema = z.object({
 export const idParamSchema = z.object({
   id: z.string(),
 });
+
+export const paginationInfoSchema = z.object({
+  count: z.number(),
+  pageno: z.number(),
+  pagesize: z.number(),
+});
