@@ -24,22 +24,22 @@ The package supports both namespace and modular imports for optimal tree-shaking
 
 ```typescript
 // Import from specific modules (recommended for tree-shaking)
-import { 
-  createStrategyBodySchema, 
-  type CreateStrategyBody 
-} from '@ganaka/types/strategies';
+import {
+  createStrategyBodySchema,
+  type CreateStrategyBody,
+} from "@ganaka/types/strategies";
 
-import { 
+import {
   getKeysResponseSchema,
-  type GetKeysResponse 
-} from '@ganaka/types/keys';
+  type GetKeysResponse,
+} from "@ganaka/types/keys";
 
 // Or import from main entry
-import { 
+import {
   createStrategyBodySchema,
   getKeysResponseSchema,
-  type ApiResponse 
-} from '@ganaka/types';
+  type ApiResponse,
+} from "@ganaka/types";
 ```
 
 ### Server-Side Usage
@@ -47,15 +47,15 @@ import {
 Use schemas for request validation:
 
 ```typescript
-import { createStrategyBodySchema } from '@ganaka/types/strategies';
+import { createStrategyBodySchema } from "@ganaka/types/strategies";
 
-fastify.post('/strategies', async (request, reply) => {
+fastify.post("/strategies", async (request, reply) => {
   // Validate request body
   const validatedBody = createStrategyBodySchema.parse(request.body);
-  
+
   // TypeScript knows the exact shape of validatedBody
   const strategy = await createStrategy(validatedBody);
-  
+
   return reply.send(strategy);
 });
 ```
@@ -65,22 +65,22 @@ fastify.post('/strategies', async (request, reply) => {
 Use types for type-safe API calls:
 
 ```typescript
-import { 
+import {
   createStrategyBodySchema,
   type CreateStrategyBody,
-  type CreateStrategyResponse 
-} from '@ganaka/types/strategies';
+  type CreateStrategyResponse,
+} from "@ganaka/types/strategies";
 
 // RTK Query example
-export const strategiesApi = createApi({
+export const strategiesAPI = createApi({
   endpoints: (builder) => ({
     createStrategy: builder.mutation<
       CreateStrategyResponse,
       CreateStrategyBody
     >({
       query: (body) => ({
-        url: '/strategies',
-        method: 'POST',
+        url: "/strategies",
+        method: "POST",
         body,
       }),
     }),
@@ -88,9 +88,11 @@ export const strategiesApi = createApi({
 });
 
 // Or with fetch
-async function createStrategy(data: CreateStrategyBody): Promise<CreateStrategyResponse> {
-  const response = await fetch('/api/strategies', {
-    method: 'POST',
+async function createStrategy(
+  data: CreateStrategyBody
+): Promise<CreateStrategyResponse> {
+  const response = await fetch("/api/strategies", {
+    method: "POST",
     body: JSON.stringify(data),
   });
   return response.json();
@@ -100,11 +102,13 @@ async function createStrategy(data: CreateStrategyBody): Promise<CreateStrategyR
 ## Available Modules
 
 ### Common (`@ganaka/types/common`)
+
 - `apiResponseSchema` - Standard API response wrapper
 - `idParamSchema` - Common ID parameter
 - `DeveloperKeyStatus` - Enum for key statuses
 
 ### Strategies (`@ganaka/types/strategies`)
+
 - GET `/strategies` - List all strategies
 - GET `/strategies/:id` - Get single strategy
 - POST `/strategies` - Create strategy
@@ -112,6 +116,7 @@ async function createStrategy(data: CreateStrategyBody): Promise<CreateStrategyR
 - DELETE `/strategies/:id` - Delete strategy
 
 ### Versions (`@ganaka/types/versions`)
+
 - GET `/strategies/:strategyid/versions` - List versions
 - GET `/strategies/:strategyid/versions/:id` - Get single version
 - POST `/strategies/:strategyid/versions` - Create version
@@ -119,12 +124,14 @@ async function createStrategy(data: CreateStrategyBody): Promise<CreateStrategyR
 - DELETE `/strategies/:strategyid/versions/:id` - Delete version
 
 ### Shortlists (`@ganaka/types/shortlists`)
+
 - GET `/shortlists` - List shortlists
 - POST `/shortlists` - Create shortlist
 - PUT `/shortlists/:id` - Update shortlist
 - DELETE `/shortlists/:id` - Delete shortlist
 
 ### Keys (`@ganaka/types/keys`)
+
 - GET `/keys` - List developer keys
 - POST `/keys` - Create developer key
 - PATCH `/keys/:id/deactivate` - Deactivate key
@@ -159,4 +166,3 @@ pnpm lint
 ## License
 
 MIT
-

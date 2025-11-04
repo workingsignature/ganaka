@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ganaka/server-schemas": "workspace:*",
     "@clerk/clerk-react": "^5.49.0",
+    "@ganaka/server-schemas": "workspace:*",
     "@hookform/resolvers": "^5.2.2",
     "@mantine/charts": "^8.3.2",
     "@mantine/core": "^8.3.2",
@@ -21,6 +21,7 @@
     "@mantine/notifications": "^8.3.2",
     "@reduxjs/toolkit": "^2.9.0",
     "@tailwindcss/vite": "^4.1.13",
+    "@types/semver": "^7.7.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
@@ -33,6 +34,7 @@
     "react-resizable-panels": "^3.0.6",
     "react-router-dom": "^7.9.3",
     "recharts": "^3.2.1",
+    "semver": "^7.7.3",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
     "zod": "^4.1.11"

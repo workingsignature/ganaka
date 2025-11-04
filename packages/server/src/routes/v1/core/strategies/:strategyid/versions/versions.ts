@@ -199,11 +199,11 @@ const versionsRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // check if version is incremented over the latest version
-      const latestVersion = strategy.versions[0].version;
+      const latestVersion = strategy?.versions?.[0]?.version;
       if (latestVersion) {
         if (!semver.gt(validatedBody.version, latestVersion)) {
           return reply.badRequest(
-            "Version must be greater than the latest version"
+            `Version must be greater than the latest version: ${latestVersion}`
           );
         }
       }
