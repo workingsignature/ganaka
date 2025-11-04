@@ -22,10 +22,10 @@ export const getInstruments = {
     pagesize: z.number().optional(),
   }),
   response: apiResponseSchema.extend({
-    data: {
+    data: z.object({
       instruments: z.array(instrumentItemSchema),
       paginationInfo: paginationInfoSchema,
-    },
+    }),
   }),
 };
 

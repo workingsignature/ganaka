@@ -22,4 +22,5 @@ export const icons = {
   strategy_active: "tabler:bulb-filled",
   version: "qlementine-icons:version-control-16",
   create_version: "mdi:source-branch-plus",
+  shortlist_item: "fluent:list-16-regular",
 };

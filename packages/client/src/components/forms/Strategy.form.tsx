@@ -92,10 +92,10 @@ export const StrategyForm = () => {
   }, [form, getStrategy, strategyId]);
 
   useEffect(() => {
-    if (strategyId) {
+    if (strategyId && opened) {
       handleGetStrategy();
     }
-  }, [handleGetStrategy, strategyId]);
+  }, [handleGetStrategy, strategyId, opened]);
 
   // DRAW
   return (

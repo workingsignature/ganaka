@@ -3,85 +3,113 @@ import { icons } from "@/components/icons";
 import { shortlistsAPI } from "@/store/api/shortlists.api";
 import { shortlistFormSlice } from "@/store/forms/shortlistFormSlice";
 import { useAppDispatch } from "@/utils/hooks/storeHooks";
+import type { v1_core_shortlists_schemas } from "@ganaka/server-schemas";
 import { Icon } from "@iconify/react";
-import { ActionIcon, Skeleton, Text, Tooltip } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  Menu,
+  Paper,
+  Skeleton,
+  Text,
+  Tooltip,
+} from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 import { debounce, times } from "lodash";
 import { useRef } from "react";
+import type z from "zod";
 
-// const ShortlistItem = ({
-//   shortlist,
-// }: {
-//   shortlist: z.infer<typeof v1_core_shortlists_schemas.shortlistItemSchema>;
-// }) => {
-//   const maxPreviewInstruments = 5;
-//   const previewInstruments = shortlist.instruments.slice(
-//     0,
-//     maxPreviewInstruments
-//   );
-//   const remainingCount = Math.max(
-//     0,
-//     shortlist.instruments.length - maxPreviewInstruments
-//   );
+const ShortlistItem = ({
+  shortlist,
+}: {
+  shortlist: z.infer<typeof v1_core_shortlists_schemas.shortlistItemSchema>;
+}) => {
+  // HOOKS
+  const dispatch = useAppDispatch();
 
-//   return (
-//     <Card
-//       shadow="sm"
-//       padding="lg"
-//       radius="md"
-//       withBorder
-//       className="hover:shadow-md transition-shadow cursor-pointer"
-//     >
-//       <Stack gap="md">
-//         {/* Header */}
-//         <Group justify="space-between" align="center">
-//           <Group gap="xs">
-//             <Icon
-//               icon={icons.shortlist}
-//               className="text-blue-600"
-//               width={20}
-//               height={20}
-//             />
-//             <Text fw={600} size="lg">
-//               {shortlist.name}
-//             </Text>
-//           </Group>
-//           <Badge color="blue" variant="light">
-//             {shortlist.instruments.length}{" "}
-//             {shortlist.instruments.length === 1 ? "instrument" : "instruments"}
-//           </Badge>
-//         </Group>
+  // API
+  const [deleteShortlist, deleteShortlistAPI] =
+    shortlistsAPI.useDeleteShortlistMutation();
 
-//         {/* Instruments Preview */}
-//         {shortlist.instruments.length > 0 && (
-//           <div>
-//             <Text size="xs" c="dimmed" mb={8}>
-//               Instruments
-//             </Text>
-//             <Group gap="xs">
-//               {previewInstruments.map((instrument) => (
-//                 <Badge key={instrument.id} variant="dot" color="gray" size="sm">
-//                   {instrument.name}
-//                 </Badge>
-//               ))}
-//               {remainingCount > 0 && (
-//                 <Badge variant="filled" color="gray" size="sm">
-//                   +{remainingCount} more
-//                 </Badge>
-//               )}
-//             </Group>
-//           </div>
-//         )}
+  // HANDLERS
+  const handleEdit = () => {
+    dispatch(shortlistFormSlice.actions.setIsCreateMode(false));
+    dispatch(shortlistFormSlice.actions.setShortlistId(shortlist.id));
+    dispatch(shortlistFormSlice.actions.setOpened(true));
+  };
+  const handleDelete = () => {
+    modals.openConfirmModal({
+      title: `Delete Shortlist "${shortlist.name}"`,
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete this shortlist? This action cannot be
+          undone.
+        </Text>
+      ),
+      labels: { confirm: "Delete Shortlist", cancel: "No, don't delete it" },
+      confirmProps: { color: "red", loading: deleteShortlistAPI.isLoading },
+      onConfirm: async () => {
+        const response = await deleteShortlist({
+          id: shortlist.id,
+        });
+        if (response.data) {
+          notifications.show({
+            title: "Success",
+            message: response.data.message,
+            color: "green",
+          });
+        }
+      },
+    });
+  };
 
-//         {/* Empty state */}
-//         {shortlist.instruments.length === 0 && (
-//           <Text size="sm" c="dimmed" fs="italic">
-//             No instruments added yet
-//           </Text>
-//         )}
-//       </Stack>
-//     </Card>
-//   );
-// };
+  // DRAW
+  return (
+    <Paper>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Icon className="mt-0.5" icon={icons.shortlist_item} height={16} />
+          <Text fw={600} size="sm" className="block max-w-40" truncate="end">
+            {shortlist.name}
+          </Text>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="light">{shortlist.instruments.length}</Badge>
+          <Menu shadow="md" width={150} position="bottom-end">
+            <Menu.Target>
+              <ActionIcon
+                onClick={(e) => e.stopPropagation()}
+                variant="subtle"
+                size="xs"
+                color="dark"
+                aria-label="Settings"
+              >
+                <Icon className="cursor-pointer" icon={icons.menu} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item
+                leftSection={<Icon icon={icons.edit} />}
+                onClick={() => handleEdit()}
+              >
+                Edit Shortlist
+              </Menu.Item>
+              <Menu.Item
+                color="red"
+                leftSection={<Icon icon={icons.delete} />}
+                onClick={() => handleDelete()}
+              >
+                Delete
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </div>
+      </div>
+    </Paper>
+  );
+};
 
 export const ShortlistsPane = () => {
   // HOOKS
@@ -167,7 +195,11 @@ export const ShortlistsPane = () => {
         </div>
       ) : getAllShortlistsAPI.data &&
         getAllShortlistsAPI.data.data.length > 0 ? (
-        <div className="h-full w-full"></div>
+        <div className="h-full w-full flex flex-col gap-2">
+          {getAllShortlistsAPI.data.data.map((shortlist) => (
+            <ShortlistItem key={shortlist.id} shortlist={shortlist} />
+          ))}
+        </div>
       ) : (
         <div className="h-full w-full flex flex-col items-center justify-center gap-5">
           <Icon icon={icons.empty} height={60} />

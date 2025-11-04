@@ -25,16 +25,19 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
             {
               name: {
                 contains: validatedQuery.query ?? "",
+                mode: "insensitive",
               },
             },
             {
               trading_symbol: {
                 contains: validatedQuery.query ?? "",
+                mode: "insensitive",
               },
             },
             {
               groww_symbol: {
                 contains: validatedQuery.query ?? "",
+                mode: "insensitive",
               },
             },
           ],
@@ -54,16 +57,19 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
             {
               name: {
                 contains: validatedQuery.query ?? "",
+                mode: "insensitive",
               },
             },
             {
               groww_symbol: {
                 contains: validatedQuery.query ?? "",
+                mode: "insensitive",
               },
             },
             {
               trading_symbol: {
                 contains: validatedQuery.query ?? "",
+                mode: "insensitive",
               },
             },
           ],
