@@ -1,10 +1,10 @@
-import { Paper, Title } from "@mantine/core";
+import { GPane } from "@/components/GPane";
 
 export const DataPane = () => {
   // DRAW
   return (
-    <Paper withBorder p="md" className="h-full w-full">
-      <Title order={4}>Data</Title>
-    </Paper>
+    <GPane title="Data" titleActions={<div></div>}>
+      <span />
+    </GPane>
   );
 };

@@ -6,6 +6,7 @@ import { ShortlistsPage } from "@/pages/Dashboard/Shortlists/Shortlists.page";
 import { RunForm } from "@/components/forms/Run.form";
 import { StrategyForm } from "@/components/forms/Strategy.form";
 import { VersionForm } from "@/components/forms/Version.form";
+import { ShortlistForm } from "@/components/forms/Shortlist.form";
 
 export const Dashboard = () => {
   // DRAW
@@ -21,6 +22,7 @@ export const Dashboard = () => {
       <RunForm />
       <VersionForm />
       <StrategyForm />
+      <ShortlistForm />
     </div>
   );
 };

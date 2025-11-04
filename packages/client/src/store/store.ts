@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import appSlice from "./appSlice";
 import strategyFormSlice from "./forms/strategyFormSlice";
+import shortlistFormSlice from "./forms/shortlistFormSlice";
 import { shortlistsAPI } from "./api/shortlists.api";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { versionsAPI } from "./api/versions.api";
@@ -12,6 +13,7 @@ export const store = configureStore({
   reducer: {
     app: appSlice,
     strategyForm: strategyFormSlice,
+    shortlistForm: shortlistFormSlice,
     versionForm: versionFormSlice,
     runForm: runFormSlice,
     [shortlistsAPI.reducerPath]: shortlistsAPI.reducer,

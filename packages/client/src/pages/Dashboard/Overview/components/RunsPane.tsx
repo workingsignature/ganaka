@@ -1,3 +1,4 @@
+import { GPane } from "@/components/GPane";
 import { icons } from "@/components/icons";
 import { runFormSlice } from "@/store/forms/runFormSlice";
 import { useAppDispatch } from "@/utils/hooks/storeHooks";
@@ -11,9 +12,9 @@ import {
   Menu,
   Paper,
   Text,
-  Title,
 } from "@mantine/core";
 import { formatRelative } from "date-fns";
+import { debounce } from "lodash";
 
 const RunCard = ({
   name,
@@ -208,18 +209,20 @@ export const RunsPane = () => {
   const handleCreateRun = () => {
     dispatch(runFormSlice.actions.setOpened(true));
   };
+  const handleSearchOnChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      event.preventDefault();
+    },
+    600
+  );
 
   // DRAW
   return (
-    <Paper
-      withBorder
-      p="md"
-      className="h-full w-full !grid grid-rows-[32px_1fr] gap-2"
-    >
-      <div className="flex items-center justify-between">
-        <Title className="block" order={4}>
-          Runs
-        </Title>
+    <GPane
+      title="Runs"
+      onSearchChange={handleSearchOnChange}
+      searchPlaceholder="Search Runs"
+      titleActions={
         <Button
           variant="light"
           size="xs"
@@ -228,7 +231,8 @@ export const RunsPane = () => {
         >
           Schedule Run
         </Button>
-      </div>
+      }
+    >
       <div>
         <RunCard
           name="Run 1"
@@ -241,6 +245,6 @@ export const RunsPane = () => {
           runType="Backtest"
         />
       </div>
-    </Paper>
+    </GPane>
   );
 };

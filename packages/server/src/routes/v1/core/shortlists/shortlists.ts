@@ -50,6 +50,62 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
   // ---------------------------------------------------------------
+  fastify.get("/:id", async (request, reply) => {
+    try {
+      // get user
+      const user = request.user;
+
+      // validate request
+      const validatedParams = validateRequest(
+        request.params,
+        reply,
+        v1_core_shortlists_schemas.getShortlist.params
+      );
+      if (!validatedParams) {
+        return;
+      }
+
+      // check if shortlist exists
+      const shortlist = await prisma.shortlist.findUnique({
+        where: {
+          id: validatedParams.id,
+          createdBy: {
+            id: user.id,
+          },
+        },
+        include: {
+          instruments: true,
+        },
+      });
+      if (!shortlist) {
+        return reply.notFound(
+          "Shortlist not found or you are not authorized to view this shortlist"
+        );
+      }
+
+      // return
+      return reply.send(
+        sendResponse<
+          z.infer<typeof v1_core_shortlists_schemas.getShortlist.response>
+        >({
+          statusCode: 200,
+          message: "Shortlist fetched successfully",
+          data: {
+            id: shortlist.id,
+            name: shortlist.name,
+            instruments: shortlist.instruments.map((instrument) => ({
+              id: instrument.id,
+              name: instrument.name,
+            })),
+          },
+        })
+      );
+    } catch (e) {
+      fastify.log.error(e);
+      return reply.internalServerError("An unexpected error occurred.");
+    }
+  });
+  // ---------------------------------------------------------------
   fastify.post("/", async (request, reply) => {
     try {
       // get user

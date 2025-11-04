@@ -1,18 +1,16 @@
+import { GPane } from "@/components/GPane";
 import { icons } from "@/components/icons";
+import { strategiesAPI } from "@/store/api/strategies.api";
+import { versionsAPI } from "@/store/api/versions.api";
 import { strategyFormSlice } from "@/store/forms/strategyFormSlice";
 import { versionFormSlice } from "@/store/forms/versionFormSlice";
 import { useAppDispatch } from "@/utils/hooks/storeHooks";
+import type { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 import { Icon } from "@iconify/react";
-import {
-  ActionIcon,
-  Input,
-  Menu,
-  Paper,
-  Skeleton,
-  Text,
-  Title,
-  Tooltip,
-} from "@mantine/core";
+import { ActionIcon, Menu, Skeleton, Text, Tooltip } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { debounce, times } from "lodash";
 import { useCallback, useMemo, useRef } from "react";
 import {
   StaticTreeDataProvider,
@@ -23,13 +21,7 @@ import {
   type TreeItemRenderContext,
   type TreeRef,
 } from "react-complex-tree";
-import { debounce, times } from "lodash";
-import { strategiesAPI } from "@/store/api/strategies.api";
-import type { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 import type { z } from "zod";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import { versionsAPI } from "@/store/api/versions.api";
 
 // Types
 type StrategyResponse = z.infer<
@@ -284,7 +276,6 @@ export const StrategyVersionPane = () => {
   // HOOKS
   const dispatch = useAppDispatch();
   const treeRef = useRef<TreeRef>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // API
   const getstrategiesAPI = strategiesAPI.useGetStrategiesQuery();
@@ -467,15 +458,11 @@ export const StrategyVersionPane = () => {
 
   // DRAW
   return (
-    <Paper
-      withBorder
-      p="md"
-      className="h-full w-full !grid grid-rows-[32px_36px_1fr] gap-2 overflow-hidden"
-    >
-      <div className="flex items-center justify-between">
-        <Title className="block" order={4}>
-          Strategies
-        </Title>
+    <GPane
+      title="Strategies"
+      onSearchChange={handleSearchOnChange}
+      searchPlaceholder="Search Strategies"
+      titleActions={
         <div className="flex items-center justify-end">
           <Tooltip label="Refresh Strategies">
             <ActionIcon
@@ -518,19 +505,8 @@ export const StrategyVersionPane = () => {
             </ActionIcon>
           </Tooltip>
         </div>
-      </div>
-      <div className="w-full">
-        <Input
-          ref={searchInputRef}
-          placeholder="Search Strategies"
-          className="w-full"
-          leftSection={<Icon icon={icons.search} />}
-          onChange={handleSearchOnChange}
-          onFocus={(e) => {
-            e.target.select();
-          }}
-        />
-      </div>
+      }
+    >
       {getstrategiesAPI.isLoading ? (
         <div className="h-full w-full flex flex-col gap-2">
           {times(10, (index) => (
@@ -577,6 +553,6 @@ export const StrategyVersionPane = () => {
           </Text>
         </div>
       )}
-    </Paper>
+    </GPane>
   );
 };

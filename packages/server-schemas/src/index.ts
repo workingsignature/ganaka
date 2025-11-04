@@ -19,3 +19,4 @@ export * as v1_core_strategies_schemas from "./v1/core/strategies/strategies";
 export * as v1_core_strategies_versions_schemas from "./v1/core/strategies/:strategyid/versions/versions";
 export * as v1_core_shortlists_schemas from "./v1/core/shortlists/shortlists";
 export * as v1_core_keys_schemas from "./v1/core/keys/keys";
+export * as v1_core_instruments_schemas from "./v1/core/instruments/instruments";
