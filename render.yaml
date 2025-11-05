@@ -8,6 +8,7 @@ projects:
             name: server-development
             runtime: node
             repo: https://github.com/workingsignature/ganaka
+            branch: 19-shortlist-ui-revamp
             plan: free
             envVars:
               - fromGroup: Development
@@ -18,6 +19,8 @@ projects:
               run build
             startCommand: pnpm run start
             healthCheckPath: /health
+            domains:
+              - dev.api.ganaka.live
             autoDeployTrigger: commit
             buildFilter:
               paths:
@@ -27,12 +30,15 @@ projects:
             name: client-development
             runtime: static
             repo: https://github.com/workingsignature/ganaka
+            branch: 19-shortlist-ui-revamp
             envVars:
               - fromGroup: Development
             buildCommand:
               pnpm install && cd ../../ && pnpm run build:server-schemas &&
               cd packages/client && pnpm run build
             staticPublishPath: dist
+            domains:
+              - dev.ganaka.live
             autoDeployTrigger: commit
             buildFilter:
               paths:
