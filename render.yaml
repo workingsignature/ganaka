@@ -1,0 +1,115 @@
+# Exported from Render on 2025-11-05T07:34:12Z
+version: "1"
+projects:
+  - name: Ganaka
+    environments:
+      - name: Staging
+        services:
+          - type: web
+            name: server-staging
+            runtime: node
+            repo: https://github.com/workingsignature/ganaka
+            plan: free
+            envVars:
+              - fromGroup: Staging
+            region: singapore
+            buildCommand:
+              pnpm install && pnpm run prisma:migrate:deploy && pnpm run prisma:generate
+              && cd ../../ && pnpm run build:server-schemas && cd packages/server && pnpm
+              run build
+            startCommand: pnpm run start
+            healthCheckPath: /health
+            domains:
+              - staging.api.ganaka.live
+            autoDeployTrigger: commit
+            buildFilter:
+              paths:
+                - packages/server
+            rootDir: packages/server
+            previews:
+              generation: automatic
+          - type: web
+            name: client-staging
+            runtime: static
+            repo: https://github.com/workingsignature/ganaka
+            envVars:
+              - fromGroup: Staging
+            buildCommand:
+              pnpm install && cd ../../ && pnpm run build:server-schemas &&
+              cd packages/client && pnpm run build
+            staticPublishPath: dist
+            domains:
+              - staging.ganaka.live
+            autoDeployTrigger: commit
+            buildFilter:
+              paths:
+                - packages/client
+            rootDir: packages/client
+            previews:
+              generation: automatic
+      - name: Production
+        services:
+          - type: web
+            name: groww-access-token-generator
+            runtime: python
+            repo: https://github.com/workingsignature/ganaka
+            plan: free
+            envVars:
+              - fromGroup: Production
+            region: singapore
+            buildCommand: uv sync
+            startCommand: uv run python -m uvicorn main:app --host 0.0.0.0 --port 10000
+            autoDeployTrigger: commit
+            buildFilter:
+              paths:
+                - packages/groww_access_token_generator
+            rootDir: packages/groww_access_token_generator
+          - type: web
+            name: client
+            runtime: static
+            repo: https://github.com/workingsignature/ganaka
+            branch: release
+            envVars:
+              - fromGroup: Production
+            buildCommand:
+              pnpm install && cd ../../ && pnpm run build:server-schemas &&
+              cd packages/client && pnpm run build
+            staticPublishPath: dist
+            domains:
+              - ganaka.live
+              - www.ganaka.live
+            autoDeployTrigger: commit
+            buildFilter:
+              paths:
+                - packages/client
+            rootDir: packages/client
+          - type: web
+            name: server
+            runtime: node
+            repo: https://github.com/workingsignature/ganaka
+            branch: release
+            plan: free
+            envVars:
+              - fromGroup: Production
+            region: singapore
+            buildCommand:
+              pnpm install && pnpm run prisma:migrate:deploy && pnpm run prisma:generate
+              && cd ../../ && pnpm run build:server-schemas && cd packages/server && pnpm
+              run build
+            startCommand: pnpm run start
+            healthCheckPath: /health
+            domains:
+              - api.ganaka.live
+            autoDeployTrigger: commit
+            buildFilter:
+              paths:
+                - packages/server
+            rootDir: packages/server
+          - type: keyvalue
+            name: redis
+            plan: free
+            region: singapore
+            maxmemoryPolicy: volatile-ttl
+            ipAllowList:
+              - source: 58.84.60.88/32
+                description: Rohit Raj (rohitrajnovember@gmail.com)
