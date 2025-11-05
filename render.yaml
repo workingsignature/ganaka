@@ -5,6 +5,25 @@ projects:
       - name: Staging
         services:
           - type: web
+            name: client-staging
+            runtime: static
+            repo: https://github.com/workingsignature/ganaka
+            envVars:
+              - fromGroup: Staging
+            buildCommand:
+              pnpm install && cd ../../ && pnpm run build:server-schemas &&
+              cd packages/client && pnpm run build
+            staticPublishPath: dist
+            domains:
+              - staging.ganaka.live
+            autoDeployTrigger: commit
+            buildFilter:
+              paths:
+                - packages/client
+            rootDir: packages/client
+            previews:
+              generation: automatic
+          - type: web
             name: server-staging
             runtime: node
             repo: https://github.com/workingsignature/ganaka
@@ -27,25 +46,6 @@ projects:
             previews:
               generation: automatic
           - type: web
-            name: client-staging
-            runtime: static
-            repo: https://github.com/workingsignature/ganaka
-            envVars:
-              - fromGroup: Staging
-            buildCommand:
-              pnpm install && cd ../../ && pnpm run build:server-schemas &&
-              cd packages/client && pnpm run build
-            staticPublishPath: dist
-            domains:
-              - staging.ganaka.live
-            autoDeployTrigger: commit
-            buildFilter:
-              paths:
-                - packages/client
-            rootDir: packages/client
-            previews:
-              generation: automatic
-          - type: web
             name: server-development
             runtime: node
             repo: https://github.com/workingsignature/ganaka
@@ -59,7 +59,9 @@ projects:
               && cd ../../ && pnpm run build:server-schemas && cd packages/server && pnpm
               run build
             startCommand: pnpm run start
-            autoDeployTrigger: commit
+            domains:
+              - dev.api.ganaka.live
+            autoDeployTrigger: "off"
             buildFilter:
               paths:
                 - packages/server
@@ -75,7 +77,9 @@ projects:
               pnpm install && cd ../../ && pnpm run build:server-schemas &&
               cd packages/client && pnpm run build
             staticPublishPath: dist
-            autoDeployTrigger: commit
+            domains:
+              - dev.ganaka.live
+            autoDeployTrigger: "off"
             buildFilter:
               paths:
                 - packages/client
