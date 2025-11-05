@@ -9,8 +9,6 @@ projects:
             runtime: node
             repo: https://github.com/workingsignature/ganaka
             plan: free
-            envVars:
-              - fromGroup: Development
             region: singapore
             buildCommand:
               pnpm install && pnpm run prisma:migrate:deploy && pnpm run prisma:generate
@@ -27,8 +25,6 @@ projects:
             name: client-development
             runtime: static
             repo: https://github.com/workingsignature/ganaka
-            envVars:
-              - fromGroup: Development
             buildCommand:
               pnpm install && cd ../../ && pnpm run build:server-schemas &&
               cd packages/client && pnpm run build
