@@ -1,8 +1,43 @@
-# Exported from Render on 2025-11-05T07:34:12Z
 version: "1"
 projects:
   - name: Ganaka
     environments:
+      - name: Development
+        services:
+          - type: web
+            name: server-development
+            runtime: node
+            repo: https://github.com/workingsignature/ganaka
+            plan: free
+            envVars:
+              - fromGroup: Development
+            region: singapore
+            buildCommand:
+              pnpm install && pnpm run prisma:migrate:deploy && pnpm run prisma:generate
+              && cd ../../ && pnpm run build:server-schemas && cd packages/server && pnpm
+              run build
+            startCommand: pnpm run start
+            healthCheckPath: /health
+            autoDeployTrigger: commit
+            buildFilter:
+              paths:
+                - packages/server
+            rootDir: packages/server
+          - type: web
+            name: client-development
+            runtime: static
+            repo: https://github.com/workingsignature/ganaka
+            envVars:
+              - fromGroup: Development
+            buildCommand:
+              pnpm install && cd ../../ && pnpm run build:server-schemas &&
+              cd packages/client && pnpm run build
+            staticPublishPath: dist
+            autoDeployTrigger: commit
+            buildFilter:
+              paths:
+                - packages/client
+            rootDir: packages/client
       - name: Staging
         services:
           - type: web
