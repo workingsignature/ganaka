@@ -17,7 +17,6 @@ projects:
               && cd ../../ && pnpm run build:server-schemas && cd packages/server && pnpm
               run build
             startCommand: pnpm run start
-            healthCheckPath: /health
             domains:
               - staging.api.ganaka.live
             autoDeployTrigger: commit
@@ -60,7 +59,6 @@ projects:
               && cd ../../ && pnpm run build:server-schemas && cd packages/server && pnpm
               run build
             startCommand: pnpm run start
-            healthCheckPath: /health
             autoDeployTrigger: commit
             buildFilter:
               paths:
@@ -132,7 +130,6 @@ projects:
               && cd ../../ && pnpm run build:server-schemas && cd packages/server && pnpm
               run build
             startCommand: pnpm run start
-            healthCheckPath: /health
             domains:
               - api.ganaka.live
             autoDeployTrigger: commit
