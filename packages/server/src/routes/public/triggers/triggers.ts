@@ -207,10 +207,6 @@ const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
           `Fetching sector information for instrument ${currentCount}/${totalCount} (${instrument.trading_symbol})`
         );
 
-        if (currentCount > 10) {
-          break;
-        }
-
         try {
           const sectorInformation = (await axios.get(
             `https://www.nseindia.com/api/quote-equity?symbol=${instrument.trading_symbol}`,
@@ -262,104 +258,105 @@ const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
         `Clearing ${await prisma.instrument.count()} instruments.`
       );
       await prisma.instrument.deleteMany({});
+      await prisma.instrumentBroadSector.deleteMany({});
+      await prisma.instrumentSector.deleteMany({});
+      await prisma.instrumentBroadIndustry.deleteMany({});
+      await prisma.instrumentIndustry.deleteMany({});
 
       // inserting new instruments
       fastify.log.info(
         `Inserting ${deDuplicatedInstruments.length} instruments.`
       );
-      const insertOperations = await Promise.all(
-        deDuplicatedInstruments.map(async (instrument) => {
-          return await new Promise<boolean>(async (resolve, reject) => {
-            try {
-              await prisma.instrument.create({
-                data: {
-                  exchange: instrument.exchange,
-                  exchangeToken: instrument.exchange_token,
-                  tradingSymbol: instrument.trading_symbol,
-                  growwSymbol: instrument.groww_symbol,
-                  name: instrument.name,
-                  internalTradingSymbol: instrument.internal_trading_symbol,
-                  broadSector: {
-                    connectOrCreate: {
-                      where: {
-                        name: instrument.broad_sector,
-                      },
-                      create: {
-                        name: instrument.broad_sector,
-                      },
-                    },
+      for await (const instrument of deDuplicatedInstruments) {
+        try {
+          await prisma.instrument.create({
+            data: {
+              exchange: instrument.exchange,
+              exchangeToken: instrument.exchange_token,
+              tradingSymbol: instrument.trading_symbol,
+              growwSymbol: instrument.groww_symbol,
+              name: instrument.name,
+              internalTradingSymbol: instrument.internal_trading_symbol,
+              broadSector: {
+                connectOrCreate: {
+                  where: {
+                    name: instrument.broad_sector,
                   },
-                  sector: {
-                    connectOrCreate: {
-                      where: {
-                        name: instrument.sector,
-                      },
-                      create: {
-                        name: instrument.sector,
-                        broadSector: {
-                          connectOrCreate: {
-                            where: {
-                              name: instrument.broad_sector,
-                            },
-                            create: {
-                              name: instrument.broad_sector,
-                            },
-                          },
+                  create: {
+                    name: instrument.broad_sector,
+                  },
+                },
+              },
+              sector: {
+                connectOrCreate: {
+                  where: {
+                    name: instrument.sector,
+                  },
+                  create: {
+                    name: instrument.sector,
+                    broadSector: {
+                      connectOrCreate: {
+                        where: {
+                          name: instrument.broad_sector,
                         },
-                      },
-                    },
-                  },
-                  broadIndustry: {
-                    connectOrCreate: {
-                      where: {
-                        name: instrument.broad_industry,
-                      },
-                      create: {
-                        name: instrument.broad_industry,
-                      },
-                    },
-                  },
-                  industry: {
-                    connectOrCreate: {
-                      where: {
-                        name: instrument.industry,
-                      },
-                      create: {
-                        name: instrument.industry,
-                        broadIndustry: {
-                          connectOrCreate: {
-                            where: {
-                              name: instrument.broad_industry,
-                            },
-                            create: {
-                              name: instrument.broad_industry,
-                            },
-                          },
+                        create: {
+                          name: instrument.broad_sector,
                         },
                       },
                     },
                   },
                 },
-              });
-              resolve(true);
-            } catch (error) {
-              fastify.log.error(
-                `Error inserting instrument ${instrument.trading_symbol}: ${error}`
-              );
-              reject(false);
-            }
+              },
+              broadIndustry: {
+                connectOrCreate: {
+                  where: {
+                    name: instrument.broad_industry,
+                  },
+                  create: {
+                    name: instrument.broad_industry,
+                  },
+                },
+              },
+              industry: {
+                connectOrCreate: {
+                  where: {
+                    name: instrument.industry,
+                  },
+                  create: {
+                    name: instrument.industry,
+                    broadIndustry: {
+                      connectOrCreate: {
+                        where: {
+                          name: instrument.broad_industry,
+                        },
+                        create: {
+                          name: instrument.broad_industry,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           });
-        })
-      );
+        } catch (error) {
+          fastify.log.error(
+            `Error inserting instrument ${instrument.trading_symbol}: ${error}`
+          );
+          fastify.log.error(
+            "Unable to insert all instruments successfully. Clearing all inserted values."
+          );
+          await prisma.instrument.deleteMany({});
+          await prisma.instrumentBroadSector.deleteMany({});
+          await prisma.instrumentSector.deleteMany({});
+          await prisma.instrumentBroadIndustry.deleteMany({});
+          await prisma.instrumentIndustry.deleteMany({});
 
-      if (insertOperations.some((operation) => operation === false)) {
-        fastify.log.error(
-          "All instruments were not inserted successfully. Clearing all inserted values."
-        );
-        await prisma.instrument.deleteMany({});
-        return reply.internalServerError(
-          "All instruments were not inserted successfully. Cleared all inserted values. Please try again."
-        );
+          // sending response
+          return reply.internalServerError(
+            "All instruments were not inserted successfully. Cleared all inserted values. Please try again."
+          );
+        }
       }
 
       // sending response

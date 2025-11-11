@@ -9,10 +9,10 @@ model Instrument {
     name                  String
     internalTradingSymbol String
 
-    broadSector   InstrumentBroadSector   @relation(fields: [broadSectorId], references: [id])
-    sector        InstrumentSector        @relation(fields: [sectorId], references: [id])
-    broadIndustry InstrumentBroadIndustry @relation(fields: [broadIndustryId], references: [id])
-    industry      InstrumentIndustry      @relation(fields: [industryId], references: [id])
+    broadSector   InstrumentBroadSector   @relation(fields: [broadSectorId], references: [id], onDelete: Cascade)
+    sector        InstrumentSector        @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+    broadIndustry InstrumentBroadIndustry @relation(fields: [broadIndustryId], references: [id], onDelete: Cascade)
+    industry      InstrumentIndustry      @relation(fields: [industryId], references: [id], onDelete: Cascade)
 
     broadSectorId   String
     sectorId        String

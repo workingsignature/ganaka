@@ -1,4 +1,4 @@
-import { CompaniesPane } from "./components/CompaniesPane";
+import { CompaniesPane } from "./components/CompaniesPane/CompaniesPane";
 import { ShortlistsPane } from "./components/ShortlistsPane";
 
 export const ShortlistsPage = () => {
