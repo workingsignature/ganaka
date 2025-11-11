@@ -22,12 +22,12 @@ export const App = () => {
       theme={{
         primaryColor: "pink",
         components: {
-          Tabs: Tabs.Tab.extend({
+          Tabs: Tabs.extend({
             defaultProps: {
-              styles: {
-                tab: {
-                  border: "1px solid var(--mantine-color-gray-3)",
-                },
+              radius: "lg",
+              classNames: {
+                root: "h-full",
+                panel: "h-full",
               },
             },
           }),

@@ -29,13 +29,13 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
               },
             },
             {
-              trading_symbol: {
+              tradingSymbol: {
                 contains: validatedQuery.query ?? "",
                 mode: "insensitive",
               },
             },
             {
-              groww_symbol: {
+              growwSymbol: {
                 contains: validatedQuery.query ?? "",
                 mode: "insensitive",
               },
@@ -61,13 +61,13 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
               },
             },
             {
-              groww_symbol: {
+              growwSymbol: {
                 contains: validatedQuery.query ?? "",
                 mode: "insensitive",
               },
             },
             {
-              trading_symbol: {
+              tradingSymbol: {
                 contains: validatedQuery.query ?? "",
                 mode: "insensitive",
               },
@@ -87,7 +87,7 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
             instruments: instruments.map((instrument) => ({
               id: instrument.id,
               name: instrument.name,
-              symbol: instrument.trading_symbol,
+              symbol: instrument.tradingSymbol,
               exchange: instrument.exchange,
             })),
             paginationInfo: {

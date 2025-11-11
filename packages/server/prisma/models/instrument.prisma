@@ -2,15 +2,78 @@ model Instrument {
     id         String      @id @default(uuid())
     includedIn Shortlist[]
 
-    exchange                String
-    exchange_token          String
-    trading_symbol          String
-    groww_symbol            String @unique
-    name                    String
-    internal_trading_symbol String
+    exchange              String
+    exchangeToken         String
+    tradingSymbol         String
+    growwSymbol           String @unique
+    name                  String
+    internalTradingSymbol String
+
+    broadSector   InstrumentBroadSector   @relation(fields: [broadSectorId], references: [id])
+    sector        InstrumentSector        @relation(fields: [sectorId], references: [id])
+    broadIndustry InstrumentBroadIndustry @relation(fields: [broadIndustryId], references: [id])
+    industry      InstrumentIndustry      @relation(fields: [industryId], references: [id])
+
+    broadSectorId   String
+    sectorId        String
+    broadIndustryId String
+    industryId      String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    @@index([tradingSymbol, growwSymbol, name, broadSectorId, sectorId, broadIndustryId, industryId])
+}
+
+model InstrumentBroadSector {
+    id String @id @default(uuid())
+
+    name        String             @unique
+    instruments Instrument[]
+    sectors     InstrumentSector[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([trading_symbol, groww_symbol, name])
+    @@index([name])
+}
+
+model InstrumentSector {
+    id String @id @default(uuid())
+
+    name        String                @unique
+    instruments Instrument[]
+    broadSector InstrumentBroadSector @relation(fields: [broadSectorId], references: [id], onDelete: Cascade)
+
+    broadSectorId String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    @@index([name, broadSectorId])
+}
+
+model InstrumentBroadIndustry {
+    id String @id @default(uuid())
+
+    name        String               @unique
+    instruments Instrument[]
+    industries  InstrumentIndustry[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([name])
+}
+
+model InstrumentIndustry {
+    id String @id @default(uuid())
+
+    name          String                  @unique
+    instruments   Instrument[]
+    broadIndustry InstrumentBroadIndustry @relation(fields: [broadIndustryId], references: [id], onDelete: Cascade)
+
+    broadIndustryId String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    @@index([name, broadIndustryId])
 }
