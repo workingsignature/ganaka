@@ -319,48 +319,39 @@ export const CompaniesTab = () => {
     return getFilterTreeAPI.data?.data?.tree || [];
   }, [getFilterTreeAPI.data]);
 
-  // HANDLERS
-  const handleClearFilters = () => {
-    setSelectedCategories([]);
-  };
-
   // DRAW
   return (
-    <div className="h-full w-full grid grid-rows-[40px_1fr] mt-2 gap-2 overflow-hidden">
-      <div className="w-full h-full grid grid-cols-[1fr_auto] gap-1">
+    <div className="h-full w-full grid grid-rows-[40px_1fr] gap-2 overflow-hidden">
+      <div className="w-full h-full flex justify-between gap-1 overflow-hidden">
         <div className="w-full h-full flex items-center justify-start">
           <TextInput
             placeholder="Search companies..."
             leftSection={<Icon icon={icons.search} />}
             className="w-full"
-            radius="xl"
             classNames={{
               wrapper: "!mb-0",
             }}
           />
         </div>
-        <div className="flex items-center justify-end gap-2">
-          {selectedCategories.length > 0 && (
-            <Tooltip label="Clear Filters">
-              <ActionIcon
-                className="mt-auto mb-auto"
-                variant="subtle"
-                size="sm"
-                color="red"
-                onClick={handleClearFilters}
-              >
-                <Icon icon={icons.close} height={16} />
-              </ActionIcon>
-            </Tooltip>
-          )}
+        <div className="flex items-center justify-end gap-1">
+          <Tooltip label="Filter by Sector/Industry">
+            <ActionIcon
+              className="mt-auto mb-auto"
+              variant="subtle"
+              size="lg"
+              color="dark"
+            >
+              <Icon icon={icons.sort} height={20} />
+            </ActionIcon>
+          </Tooltip>
           <Popover width={350} position="right-start">
             <Popover.Target>
               <Tooltip label="Filter by Sector/Industry">
                 <ActionIcon
                   className="mt-auto mb-auto"
-                  variant="light"
+                  variant="subtle"
+                  color="dark"
                   size="lg"
-                  radius="xl"
                 >
                   <Icon icon={icons.filter} height={20} />
                 </ActionIcon>
