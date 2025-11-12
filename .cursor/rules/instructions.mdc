@@ -4,3 +4,6 @@ alwaysApply: true
 
 This project uses MantineUI along with TailwindCSS for layouts and components.
 This project also uses pnpm instead of npm.
+Try to avoid using "any" as much as possible. Strict typesafety is required everywhere.
+Always follow existing standards when creating any part of the application. For example, if creating an API, follow standards followed by existing APIs.
+Always use divs instead of Stacks and Group elements from MantineUI

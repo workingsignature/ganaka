@@ -26,8 +26,8 @@ export const App = () => {
             defaultProps: {
               radius: "lg",
               classNames: {
-                root: "h-full",
-                panel: "h-full",
+                root: "h-full max-h-full",
+                panel: "h-full max-h-full",
               },
             },
           }),
@@ -45,7 +45,7 @@ export const App = () => {
               description: "mb-2",
               // reserving space for error message
               error: "mt-1",
-              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+              wrapper: ref.error ? "mb-0" : "mb-[19.5px]",
             }),
           }),
           Textarea: Textarea.extend({

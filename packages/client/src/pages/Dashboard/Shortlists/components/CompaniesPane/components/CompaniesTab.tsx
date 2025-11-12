@@ -1,20 +1,29 @@
 import { icons } from "@/components/icons";
+import {
+  useGetInstrumentsFilterTreeQuery,
+  useGetInstrumentsQuery,
+} from "@/store/api/instruments.api";
 import { Icon } from "@iconify/react";
 import {
-  Breadcrumbs,
-  Tooltip,
-  Anchor,
-  Popover,
   ActionIcon,
-  Badge,
-  Text,
+  Avatar,
+  Center,
+  Checkbox,
+  Loader,
   Paper,
+  Popover,
+  Skeleton,
+  Stack,
+  Text,
+  TextInput,
+  Tooltip,
   Tree,
   type TreeNodeData,
 } from "@mantine/core";
+import { times } from "lodash";
+import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 
 const CompanyCard = ({
-  exchange,
   name,
   symbol,
 }: {
@@ -22,154 +31,387 @@ const CompanyCard = ({
   symbol: string;
   exchange: string;
 }) => {
+  // DRAW
   return (
     <Paper
-      withBorder
       p="sm"
+      withBorder
+      shadow="xs"
       className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <Text fw={500} size="sm" className="truncate">
-            {name}
-          </Text>
-          <Text size="xs" c="dimmed" className="mt-1">
-            {symbol}
-          </Text>
+      <div className="w-full h-full grid grid-cols-[20px_auto] gap-5 px-2">
+        <div className="w-full h-full flex items-center justify-center">
+          <Avatar
+            src={`https://images.dhan.co/symbol/${symbol}.png`}
+            size="md"
+            name={name}
+            color="initials"
+            className="object-contain"
+          />
         </div>
-        <Badge size="xs" variant="light" color="blue">
-          {exchange}
-        </Badge>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <Text fw={500} size="sm" className="truncate">
+              {name}
+            </Text>
+            <Text size="xs" c="dimmed" className="mt-1">
+              {symbol}
+            </Text>
+          </div>
+        </div>
       </div>
     </Paper>
   );
 };
 
-export const CompaniesTab = () => {
+const FilterTree = ({
+  selectedCategories,
+  filterTreeNodes,
+  isLoading,
+  setSelectedCategories,
+}: {
+  selectedCategories: string[];
+  setSelectedCategories: Dispatch<SetStateAction<string[]>>;
+  filterTreeNodes: TreeNodeData[];
+  isLoading: boolean;
+}) => {
   // VARIABLES
-  const data: TreeNodeData[] = [
-    {
-      label: "src",
-      value: "src",
-      children: [
-        {
-          label: "components",
-          value: "src/components",
-          children: [
-            { label: "Accordion.tsx", value: "src/components/Accordion.tsx" },
-            { label: "Tree.tsx", value: "src/components/Tree.tsx" },
-            { label: "Button.tsx", value: "src/components/Button.tsx" },
-          ],
-        },
-      ],
-    },
-    {
-      label: "node_modules",
-      value: "node_modules",
-      children: [
-        {
-          label: "react",
-          value: "node_modules/react",
-          children: [
-            { label: "index.d.ts", value: "node_modules/react/index.d.ts" },
-            { label: "package.json", value: "node_modules/react/package.json" },
-          ],
-        },
-        {
-          label: "@mantine",
-          value: "node_modules/@mantine",
-          children: [
-            {
-              label: "core",
-              value: "node_modules/@mantine/core",
-              children: [
-                {
-                  label: "index.d.ts",
-                  value: "node_modules/@mantine/core/index.d.ts",
-                },
-                {
-                  label: "package.json",
-                  value: "node_modules/@mantine/core/package.json",
-                },
-              ],
-            },
-            {
-              label: "hooks",
-              value: "node_modules/@mantine/hooks",
-              children: [
-                {
-                  label: "index.d.ts",
-                  value: "node_modules/@mantine/hooks/index.d.ts",
-                },
-                {
-                  label: "package.json",
-                  value: "node_modules/@mantine/hooks/package.json",
-                },
-              ],
-            },
-            {
-              label: "form",
-              value: "node_modules/@mantine/form",
-              children: [
-                {
-                  label: "index.d.ts",
-                  value: "node_modules/@mantine/form/index.d.ts",
-                },
-                {
-                  label: "package.json",
-                  value: "node_modules/@mantine/form/package.json",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      label: "package.json",
-      value: "package.json",
-    },
-    {
-      label: "tsconfig.json",
-      value: "tsconfig.json",
-    },
-  ];
+  const treeIndentationInPx = 10;
+
+  // Build a map of node values to their parent and all nodes for quick lookup
+  const nodeMap = useMemo(() => {
+    const map = new Map<
+      string,
+      { node: TreeNodeData; parent: TreeNodeData | null }
+    >();
+
+    const buildMap = (
+      nodes: TreeNodeData[],
+      parent: TreeNodeData | null = null
+    ) => {
+      for (const node of nodes) {
+        map.set(String(node.value), { node, parent });
+        if (node.children && node.children.length > 0) {
+          buildMap(node.children, node);
+        }
+      }
+    };
+
+    buildMap(filterTreeNodes);
+    return map;
+  }, [filterTreeNodes]);
+
+  // HELPERS
+  const getAllDescendantValues = (node: TreeNodeData): string[] => {
+    const values: string[] = [];
+
+    const collectValues = (children: TreeNodeData[]) => {
+      for (const child of children) {
+        values.push(String(child.value));
+        if (child.children && child.children.length > 0) {
+          collectValues(child.children);
+        }
+      }
+    };
+
+    if (node.children && node.children.length > 0) {
+      collectValues(node.children);
+    }
+
+    return values;
+  };
+
+  const areAllChildrenSelected = (
+    node: TreeNodeData,
+    categories: string[]
+  ): boolean => {
+    if (!node.children || node.children.length === 0) {
+      return false;
+    }
+
+    return node.children.every((child) =>
+      categories.includes(String(child.value))
+    );
+  };
+
+  const updateParentSelections = (categories: string[]): string[] => {
+    const result = new Set(categories);
+
+    // Get all unique parent nodes
+    const parentNodes = new Set<TreeNodeData>();
+    for (const [, { parent }] of nodeMap.entries()) {
+      if (parent) {
+        parentNodes.add(parent);
+      }
+    }
+
+    // Update each parent's selection based on its children
+    // Parent should ONLY be selected if ALL children are selected
+    for (const parent of parentNodes) {
+      const parentValue = String(parent.value);
+      const allChildrenSelected = areAllChildrenSelected(
+        parent,
+        Array.from(result)
+      );
+
+      if (allChildrenSelected) {
+        // All children are selected, so select the parent
+        result.add(parentValue);
+      } else {
+        // Not all children are selected, so remove parent from selection
+        // (it will show as indeterminate if some children are selected)
+        result.delete(parentValue);
+      }
+    }
+
+    return Array.from(result);
+  };
+
+  const isNodeIndeterminate = (node: TreeNodeData): boolean => {
+    // If node has no children, it can't be indeterminate
+    if (!node.children || node.children.length === 0) {
+      return false;
+    }
+
+    // Check how many children (direct and indirect) are selected
+    const checkSelectionStatus = (
+      children: TreeNodeData[]
+    ): { hasSelected: boolean; hasUnselected: boolean } => {
+      let hasSelected = false;
+      let hasUnselected = false;
+
+      for (const child of children) {
+        const isSelected = selectedCategories.includes(String(child.value));
+
+        if (child.children && child.children.length > 0) {
+          const childStatus = checkSelectionStatus(child.children);
+          hasSelected = hasSelected || isSelected || childStatus.hasSelected;
+          hasUnselected =
+            hasUnselected || !isSelected || childStatus.hasUnselected;
+        } else {
+          hasSelected = hasSelected || isSelected;
+          hasUnselected = hasUnselected || !isSelected;
+        }
+
+        if (hasSelected && hasUnselected) {
+          break; // Early exit if we already found both states
+        }
+      }
+
+      return { hasSelected, hasUnselected };
+    };
+
+    const status = checkSelectionStatus(node.children);
+    // Indeterminate if some but not all descendants are selected
+    return status.hasSelected && status.hasUnselected;
+  };
 
   // DRAW
   return (
-    <div className="h-full w-full grid grid-rows-[30px_1fr] mt-1 gap-1">
-      <div className="w-full h-full grid grid-cols-[1fr_20px]">
-        <div className="w-full h-full flex items-center">
-          <Breadcrumbs separatorMargin="xs">
-            <Tooltip label="All Companies">
-              <Anchor truncate="end" maw={100} size="xs">
-                All Companies
-              </Anchor>
-            </Tooltip>
-          </Breadcrumbs>
+    <div className="overflow-y-auto" style={{ maxHeight: "380px" }}>
+      {isLoading ? (
+        <div className="flex justify-center flex-col items-center gap-2">
+          {times(10, (index) => (
+            <div key={index} className="w-full flex items-center gap-1">
+              <Skeleton circle height={18} />
+              <Icon icon={icons.chevronRight} height={14} />
+              <Skeleton height={18} radius="xl" />
+            </div>
+          ))}
         </div>
-        <Popover width={200} position="bottom-start" shadow="md">
-          <Popover.Target>
-            <Tooltip label="Filter Companies">
+      ) : (
+        <Tree
+          data={filterTreeNodes}
+          levelOffset={20}
+          renderNode={({
+            node,
+            expanded,
+            hasChildren,
+            elementProps,
+            level,
+          }) => {
+            // VARIABLES
+            // The level is 1-based, so we need to normalize it to 0-based
+            const normalizedLevel = level - 1;
+
+            // DRAW
+            return (
+              <div
+                {...elementProps}
+                className="hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-1"
+                style={{
+                  paddingLeft: `${normalizedLevel * treeIndentationInPx}px`,
+                }}
+              >
+                <Checkbox
+                  checked={selectedCategories.includes(String(node.value))}
+                  indeterminate={isNodeIndeterminate(node)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onChange={(event) => {
+                    event.stopPropagation();
+                    const nodeValue = String(node.value);
+                    const isCurrentlySelected =
+                      selectedCategories.includes(nodeValue);
+
+                    setSelectedCategories((prev) => {
+                      let newCategories: string[];
+
+                      if (isCurrentlySelected) {
+                        // Deselect: Remove this node and all its descendants
+                        const descendantValues = getAllDescendantValues(node);
+                        newCategories = prev.filter(
+                          (category) =>
+                            category !== nodeValue &&
+                            !descendantValues.includes(category)
+                        );
+                      } else {
+                        // Select: Add this node and all its descendants
+                        const descendantValues = getAllDescendantValues(node);
+                        const allValues = [nodeValue, ...descendantValues];
+                        // Use Set to avoid duplicates
+                        newCategories = [...new Set([...prev, ...allValues])];
+                      }
+
+                      // Update parent selections based on children states
+                      return updateParentSelections(newCategories);
+                    });
+                  }}
+                  size="xs"
+                  radius="xl"
+                  classNames={{
+                    input: "!cursor-pointer",
+                  }}
+                />
+                {hasChildren && (
+                  <Icon
+                    icon={expanded ? icons.chevronDown : icons.chevronRight}
+                    height={14}
+                  />
+                )}
+                <Text size="sm">{node.label}</Text>
+              </div>
+            );
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export const CompaniesTab = () => {
+  // STATE
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  // API
+  // API
+  const getFilterTreeAPI = useGetInstrumentsFilterTreeQuery();
+  const getInstrumentsAPI = useGetInstrumentsQuery({
+    categories:
+      selectedCategories.length > 0 ? selectedCategories.join(",") : undefined,
+    pageno: 1,
+    pagesize: 50,
+  });
+
+  // VARIABLES
+  const filterTreeNodes = useMemo(() => {
+    return getFilterTreeAPI.data?.data?.tree || [];
+  }, [getFilterTreeAPI.data]);
+
+  // HANDLERS
+  const handleClearFilters = () => {
+    setSelectedCategories([]);
+  };
+
+  // DRAW
+  return (
+    <div className="h-full w-full grid grid-rows-[40px_1fr] mt-2 gap-2 overflow-hidden">
+      <div className="w-full h-full grid grid-cols-[1fr_auto] gap-1">
+        <div className="w-full h-full flex items-center justify-start">
+          <TextInput
+            placeholder="Search companies..."
+            leftSection={<Icon icon={icons.search} />}
+            className="w-full"
+            radius="xl"
+            classNames={{
+              wrapper: "!mb-0",
+            }}
+          />
+        </div>
+        <div className="flex items-center justify-end gap-2">
+          {selectedCategories.length > 0 && (
+            <Tooltip label="Clear Filters">
               <ActionIcon
                 className="mt-auto mb-auto"
                 variant="subtle"
                 size="sm"
+                color="red"
+                onClick={handleClearFilters}
               >
-                <Icon icon={icons.filter} height={20} />
+                <Icon icon={icons.close} height={16} />
               </ActionIcon>
             </Tooltip>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <Tree data={data} />
-          </Popover.Dropdown>
-        </Popover>
+          )}
+          <Popover width={350} position="right-start">
+            <Popover.Target>
+              <Tooltip label="Filter by Sector/Industry">
+                <ActionIcon
+                  className="mt-auto mb-auto"
+                  variant="light"
+                  size="lg"
+                  radius="xl"
+                >
+                  <Icon icon={icons.filter} height={20} />
+                </ActionIcon>
+              </Tooltip>
+            </Popover.Target>
+            <Popover.Dropdown mah={500} className="overflow-hidden">
+              <FilterTree
+                selectedCategories={selectedCategories}
+                setSelectedCategories={setSelectedCategories}
+                filterTreeNodes={filterTreeNodes}
+                isLoading={getFilterTreeAPI.isLoading}
+              />
+            </Popover.Dropdown>
+          </Popover>
+        </div>
       </div>
-      <div className="flex flex-col gap-2">
-        <CompanyCard name="Company 1" symbol="COMP1" exchange="NSE" />
-        <CompanyCard name="Company 2" symbol="COMP2" exchange="BSE" />
-        <CompanyCard name="Company 3" symbol="COMP3" exchange="NSE" />
-      </div>
+      {getInstrumentsAPI.isLoading ? (
+        <Center className="h-full">
+          <Stack align="center" gap="sm">
+            <Loader size="lg" />
+            <Text size="sm" c="dimmed">
+              Loading companies...
+            </Text>
+          </Stack>
+        </Center>
+      ) : getInstrumentsAPI.data?.data?.instruments.length === 0 ? (
+        <Center className="h-full">
+          <Stack align="center" gap="sm">
+            <Icon icon={icons.empty} height={64} className="opacity-30" />
+            <Text size="sm" c="dimmed">
+              No companies found
+            </Text>
+            {selectedCategories.length > 0 && (
+              <Text size="xs" c="dimmed">
+                Try adjusting your filters
+              </Text>
+            )}
+          </Stack>
+        </Center>
+      ) : (
+        <div className="h-full flex flex-col gap-2 overflow-auto">
+          {getInstrumentsAPI.data?.data?.instruments.map((instrument) => (
+            <CompanyCard
+              key={instrument.id}
+              name={instrument.name}
+              symbol={instrument.symbol}
+              exchange={instrument.exchange}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

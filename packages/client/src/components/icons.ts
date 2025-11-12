@@ -15,6 +15,9 @@ export const icons = {
   search: "iconamoon:search-light",
   empty: "qlementine-icons:empty-slot-24",
   refresh: "ic:twotone-refresh",
+  close: "mdi:close",
+  chevronDown: "mdi:chevron-down",
+  chevronRight: "mdi:chevron-right",
   // ----------------------------------------
   timeline: "mdi:timeline-outline",
   shortlist: "tabler:list-details",

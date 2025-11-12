@@ -50,7 +50,7 @@ export const GPane = ({
           />
         </div>
       ) : null}
-      <div className="w-full h-full">{children}</div>
+      <div className="w-full h-full overflow-hidden">{children}</div>
     </Paper>
   );
 };

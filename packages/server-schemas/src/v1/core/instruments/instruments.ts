@@ -18,8 +18,8 @@ export const instrumentItemSchema = z.object({
 export const getInstruments = {
   query: z.object({
     query: z.string().optional(),
-    pageno: z.number().optional(),
-    pagesize: z.number().optional(),
+    pageno: z.coerce.number().optional(),
+    pagesize: z.coerce.number().optional(),
     categories: z
       .string()
       .optional()
@@ -67,8 +67,7 @@ export const treeNodeSchema: z.ZodType<{
 export const getInstrumentsFilterTree = {
   response: apiResponseSchema.extend({
     data: z.object({
-      sectors: z.array(treeNodeSchema),
-      industries: z.array(treeNodeSchema),
+      tree: z.array(treeNodeSchema),
     }),
   }),
 };

@@ -9,19 +9,19 @@ model Instrument {
     name                  String
     internalTradingSymbol String
 
-    broadSector   InstrumentBroadSector   @relation(fields: [broadSectorId], references: [id], onDelete: Cascade)
-    sector        InstrumentSector        @relation(fields: [sectorId], references: [id], onDelete: Cascade)
-    broadIndustry InstrumentBroadIndustry @relation(fields: [broadIndustryId], references: [id], onDelete: Cascade)
-    industry      InstrumentIndustry      @relation(fields: [industryId], references: [id], onDelete: Cascade)
+    broadSector   InstrumentBroadSector   @relation(fields: [broadSectorName], references: [name], onDelete: Cascade)
+    sector        InstrumentSector        @relation(fields: [sectorName], references: [name], onDelete: Cascade)
+    broadIndustry InstrumentBroadIndustry @relation(fields: [broadIndustryName], references: [name], onDelete: Cascade)
+    industry      InstrumentIndustry      @relation(fields: [industryName], references: [name], onDelete: Cascade)
 
-    broadSectorId   String
-    sectorId        String
-    broadIndustryId String
-    industryId      String
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
+    broadSectorName   String
+    sectorName        String
+    broadIndustryName String
+    industryName      String
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
 
-    @@index([tradingSymbol, growwSymbol, name, broadSectorId, sectorId, broadIndustryId, industryId])
+    @@index([tradingSymbol, growwSymbol, name, broadSectorName, sectorName, broadIndustryName, industryName])
 }
 
 model InstrumentBroadSector {
@@ -40,15 +40,16 @@ model InstrumentBroadSector {
 model InstrumentSector {
     id String @id @default(uuid())
 
-    name        String                @unique
-    instruments Instrument[]
-    broadSector InstrumentBroadSector @relation(fields: [broadSectorId], references: [id], onDelete: Cascade)
+    name            String                    @unique
+    instruments     Instrument[]
+    broadSector     InstrumentBroadSector     @relation(fields: [broadSectorName], references: [name], onDelete: Cascade)
+    broadIndustries InstrumentBroadIndustry[]
 
-    broadSectorId String
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    broadSectorName String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
 
-    @@index([name, broadSectorId])
+    @@index([name, broadSectorName])
 }
 
 model InstrumentBroadIndustry {
@@ -56,10 +57,12 @@ model InstrumentBroadIndustry {
 
     name        String               @unique
     instruments Instrument[]
+    sector      InstrumentSector?    @relation(fields: [sectorName], references: [name], onDelete: Cascade)
     industries  InstrumentIndustry[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    sectorName String?
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
     @@index([name])
 }
@@ -69,11 +72,11 @@ model InstrumentIndustry {
 
     name          String                  @unique
     instruments   Instrument[]
-    broadIndustry InstrumentBroadIndustry @relation(fields: [broadIndustryId], references: [id], onDelete: Cascade)
+    broadIndustry InstrumentBroadIndustry @relation(fields: [broadIndustryName], references: [name], onDelete: Cascade)
 
-    broadIndustryId String
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
+    broadIndustryName String
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
 
-    @@index([name, broadIndustryId])
+    @@index([name, broadIndustryName])
 }

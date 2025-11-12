@@ -9,15 +9,19 @@ export const CompaniesPane = () => {
   // DRAW
   return (
     <GPane title="Companies">
-      <Tabs variant="pills" defaultValue="companies">
-        <Tabs.List>
+      <Tabs
+        variant="pills"
+        defaultValue="companies"
+        className="h-full overflow-hidden"
+      >
+        <Tabs.List className="shrink-0">
           <Tabs.Tab value="companies">Companies</Tabs.Tab>
           <Tabs.Tab value="lists">Lists</Tabs.Tab>
         </Tabs.List>
-        <Tabs.Panel value="companies">
+        <Tabs.Panel className="h-full overflow-hidden" value="companies">
           <CompaniesTab />
         </Tabs.Panel>
-        <Tabs.Panel value="lists">
+        <Tabs.Panel className="flex-1 overflow-hidden" value="lists">
           <ListsTab />
         </Tabs.Panel>
       </Tabs>

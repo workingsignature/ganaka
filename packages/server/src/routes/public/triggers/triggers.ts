@@ -140,6 +140,48 @@ interface ProcessedInstrumentData extends InstrumentData {
   industry: string;
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function fetchWithRateLimit(
+  url: string,
+  headers: Record<string, string>,
+  retries = 3,
+  delay = 200
+): Promise<AxiosResponse<NSEStockQuoteResponse> | null> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await sleep(delay);
+      const response = await axios.get(url, { headers, timeout: 10000 });
+      return response as AxiosResponse<NSEStockQuoteResponse>;
+    } catch (error: any) {
+      if (attempt === retries) return null;
+
+      if (error.response?.status === 429 || error.response?.status >= 500) {
+        await sleep(delay * Math.pow(2, attempt));
+      }
+    }
+  }
+  return null;
+}
+
+async function processBatchWithConcurrency<T, R>(
+  items: T[],
+  processor: (item: T, index: number) => Promise<R>,
+  concurrency: number
+): Promise<R[]> {
+  const results: R[] = [];
+
+  for (let i = 0; i < items.length; i += concurrency) {
+    const batch = items.slice(i, i + concurrency);
+    const batchResults = await Promise.all(
+      batch.map((item, idx) => processor(item, i + idx))
+    );
+    results.push(...batchResults);
+  }
+
+  return results;
+}
+
 const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
   fastify.post("/instruments", async (_, reply) => {
     try {
@@ -198,41 +240,53 @@ const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
         });
       });
 
-      // fetch sector information for each instrument
+      // fetch sector information for each instrument with controlled concurrency
       const totalCount = instrumentsArray.length;
-      let currentCount = 0;
-      for await (const instrument of instrumentsArray) {
-        currentCount++;
-        fastify.log.info(
-          `Fetching sector information for instrument ${currentCount}/${totalCount} (${instrument.trading_symbol})`
-        );
+      const CONCURRENCY = 5;
+      const DELAY_MS = 200;
 
-        try {
-          const sectorInformation = (await axios.get(
+      fastify.log.info(
+        `Fetching sector information for ${totalCount} instruments with concurrency ${CONCURRENCY}...`
+      );
+
+      const headers = {
+        "User-Agent": "PostmanRuntime/7.50.0",
+        Accept: "*/*",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.9",
+        Connection: "keep-alive",
+      };
+
+      await processBatchWithConcurrency(
+        instrumentsArray,
+        async (instrument, index) => {
+          fastify.log.info(
+            `Fetching sector information for instrument ${
+              index + 1
+            }/${totalCount} (${instrument.trading_symbol})`
+          );
+
+          const sectorInformation = await fetchWithRateLimit(
             `https://www.nseindia.com/api/quote-equity?symbol=${instrument.trading_symbol}`,
-            {
-              headers: {
-                "User-Agent": "PostmanRuntime/7.50.0",
-                Accept: "*/*",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Accept-Language": "en-US,en;q=0.9",
-                Connection: "keep-alive",
-              },
-            }
-          )) as AxiosResponse<NSEStockQuoteResponse>;
-          if (sectorInformation.data && sectorInformation.data.industryInfo) {
+            headers,
+            3,
+            DELAY_MS
+          );
+
+          if (sectorInformation?.data?.industryInfo) {
+            const info = sectorInformation.data.industryInfo;
             if (
-              sectorInformation.data.industryInfo.sector &&
-              sectorInformation.data.industryInfo.macro &&
-              sectorInformation.data.industryInfo.industry &&
-              sectorInformation.data.industryInfo.basicIndustry
+              info.sector &&
+              info.macro &&
+              info.industry &&
+              info.basicIndustry
             ) {
               processedInstruments.push({
                 ...instrument,
-                sector: sectorInformation.data.industryInfo.sector,
-                broad_sector: sectorInformation.data.industryInfo.macro,
-                broad_industry: sectorInformation.data.industryInfo.industry,
-                industry: sectorInformation.data.industryInfo.basicIndustry,
+                sector: info.sector,
+                broad_sector: info.macro,
+                broad_industry: info.industry,
+                industry: info.basicIndustry,
               });
             }
           } else {
@@ -240,12 +294,9 @@ const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
               `No industry information found for instrument ${instrument.trading_symbol} (${instrument.groww_symbol})`
             );
           }
-        } catch (error) {
-          fastify.log.error(
-            `Error fetching sector information for instrument ${instrument.trading_symbol}: ${error}`
-          );
-        }
-      }
+        },
+        CONCURRENCY
+      );
 
       // ensuring no duplicate instruments
       const deDuplicatedInstruments = uniqWith(
@@ -263,13 +314,93 @@ const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
       await prisma.instrumentBroadIndustry.deleteMany({});
       await prisma.instrumentIndustry.deleteMany({});
 
-      // inserting new instruments
+      // Phase 1: Extract unique values and create hierarchy
+      const uniqueBroadSectors = [
+        ...new Set(deDuplicatedInstruments.map((i) => i.broad_sector)),
+      ];
+      const uniqueSectors = [
+        ...new Set(
+          deDuplicatedInstruments.map((i) =>
+            JSON.stringify({
+              sector: i.sector,
+              broadSector: i.broad_sector,
+            })
+          )
+        ),
+      ].map((s) => JSON.parse(s));
+      const uniqueBroadIndustries = [
+        ...new Set(
+          deDuplicatedInstruments.map((i) =>
+            JSON.stringify({
+              broadIndustry: i.broad_industry,
+              sector: i.sector,
+            })
+          )
+        ),
+      ].map((s) => JSON.parse(s));
+      const uniqueIndustries = [
+        ...new Set(
+          deDuplicatedInstruments.map((i) =>
+            JSON.stringify({
+              industry: i.industry,
+              broadIndustry: i.broad_industry,
+            })
+          )
+        ),
+      ].map((s) => JSON.parse(s));
+
+      fastify.log.info(
+        `Creating ${uniqueBroadSectors.length} broad sectors...`
+      );
+      await prisma.instrumentBroadSector.createMany({
+        data: uniqueBroadSectors.map((name) => ({ name })),
+        skipDuplicates: true,
+      });
+
+      fastify.log.info(`Creating ${uniqueSectors.length} sectors...`);
+      for (const { sector, broadSector } of uniqueSectors) {
+        await prisma.instrumentSector.upsert({
+          where: { name: sector },
+          create: {
+            name: sector,
+            broadSector: { connect: { name: broadSector } },
+          },
+          update: {},
+        });
+      }
+
+      fastify.log.info(
+        `Creating ${uniqueBroadIndustries.length} broad industries...`
+      );
+      for (const { broadIndustry, sector } of uniqueBroadIndustries) {
+        await prisma.instrumentBroadIndustry.upsert({
+          where: { name: broadIndustry },
+          create: {
+            name: broadIndustry,
+            sector: { connect: { name: sector } },
+          },
+          update: {},
+        });
+      }
+
+      fastify.log.info(`Creating ${uniqueIndustries.length} industries...`);
+      for (const { industry, broadIndustry } of uniqueIndustries) {
+        await prisma.instrumentIndustry.upsert({
+          where: { name: industry },
+          create: {
+            name: industry,
+            broadIndustry: { connect: { name: broadIndustry } },
+          },
+          update: {},
+        });
+      }
+
       fastify.log.info(
         `Inserting ${deDuplicatedInstruments.length} instruments.`
       );
       for await (const instrument of deDuplicatedInstruments) {
         try {
-          await prisma.instrument.create({
+          await prisma.instrument.createMany({
             data: {
               exchange: instrument.exchange,
               exchangeToken: instrument.exchange_token,
@@ -277,66 +408,10 @@ const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
               growwSymbol: instrument.groww_symbol,
               name: instrument.name,
               internalTradingSymbol: instrument.internal_trading_symbol,
-              broadSector: {
-                connectOrCreate: {
-                  where: {
-                    name: instrument.broad_sector,
-                  },
-                  create: {
-                    name: instrument.broad_sector,
-                  },
-                },
-              },
-              sector: {
-                connectOrCreate: {
-                  where: {
-                    name: instrument.sector,
-                  },
-                  create: {
-                    name: instrument.sector,
-                    broadSector: {
-                      connectOrCreate: {
-                        where: {
-                          name: instrument.broad_sector,
-                        },
-                        create: {
-                          name: instrument.broad_sector,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              broadIndustry: {
-                connectOrCreate: {
-                  where: {
-                    name: instrument.broad_industry,
-                  },
-                  create: {
-                    name: instrument.broad_industry,
-                  },
-                },
-              },
-              industry: {
-                connectOrCreate: {
-                  where: {
-                    name: instrument.industry,
-                  },
-                  create: {
-                    name: instrument.industry,
-                    broadIndustry: {
-                      connectOrCreate: {
-                        where: {
-                          name: instrument.broad_industry,
-                        },
-                        create: {
-                          name: instrument.broad_industry,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
+              broadIndustryName: instrument.broad_industry,
+              industryName: instrument.industry,
+              sectorName: instrument.sector,
+              broadSectorName: instrument.broad_sector,
             },
           });
         } catch (error) {
