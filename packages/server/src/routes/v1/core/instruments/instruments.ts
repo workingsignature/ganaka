@@ -153,50 +153,34 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
         },
       });
 
-      // Fetch broad industries that are not associated with any sector
-      const orphanBroadIndustries =
-        await prisma.instrumentBroadIndustry.findMany({
-          where: {
-            sectorName: null,
-          },
-          include: {
-            industries: {
-              orderBy: {
-                name: "asc",
-              },
-            },
-          },
-          orderBy: {
-            name: "asc",
-          },
-        });
-
       // Transform to combined tree structure: BroadSector → Sector → BroadIndustry → Industry
       const tree = broadSectors.map((broadSector) => ({
         label: startCase(lowerCase(broadSector.name)),
         value: `broad-sector:${broadSector.name}`,
-        children: broadSector.sectors.map((sector) => ({
-          label: startCase(lowerCase(sector.name)),
-          value: `sector:${sector.name}`,
-          children: sector.broadIndustries.map((broadIndustry) => ({
-            label: startCase(lowerCase(broadIndustry.name)),
-            value: `broad-industry:${broadIndustry.name}`,
-            children: broadIndustry.industries.map((industry) => ({
-              label: startCase(lowerCase(industry.name)),
-              value: `industry:${industry.name}`,
-            })),
-          })),
-        })),
-      }));
-
-      // Add orphan broad industries as top-level nodes
-      const orphanNodes = orphanBroadIndustries.map((broadIndustry) => ({
-        label: startCase(lowerCase(broadIndustry.name)),
-        value: `broad-industry:${broadIndustry.name}`,
-        children: broadIndustry.industries.map((industry) => ({
-          label: startCase(lowerCase(industry.name)),
-          value: `industry:${industry.name}`,
-        })),
+        children:
+          broadSector.sectors.length === 1
+            ? broadSector.sectors[0].broadIndustries.map((broadIndustry) => ({
+                label: startCase(lowerCase(broadIndustry.name)),
+                value: `broad-industry:${broadIndustry.name}`,
+                children: broadIndustry.industries.map((industry) => ({
+                  label: startCase(lowerCase(industry.name)),
+                  value: `industry:${industry.name}`,
+                })),
+              }))
+            : broadSector.sectors.map((sector) => {
+                return {
+                  label: startCase(lowerCase(sector.name)),
+                  value: `sector:${sector.name}`,
+                  children: sector.broadIndustries.map((broadIndustry) => ({
+                    label: startCase(lowerCase(broadIndustry.name)),
+                    value: `broad-industry:${broadIndustry.name}`,
+                    children: broadIndustry.industries.map((industry) => ({
+                      label: startCase(lowerCase(industry.name)),
+                      value: `industry:${industry.name}`,
+                    })),
+                  })),
+                };
+              }),
       }));
 
       // send response
@@ -209,7 +193,7 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
           statusCode: 200,
           message: "Filter tree fetched successfully",
           data: {
-            tree: [...tree, ...orphanNodes],
+            tree,
           },
         })
       );

@@ -48,15 +48,13 @@ export const getInstrument = {
 
 // ==================== GET /instruments/filter-tree ====================
 
-export const treeNodeSchema: z.ZodType<{
+export interface TreeNode {
   label: string;
   value: string;
-  children?: Array<{
-    label: string;
-    value: string;
-    children?: any[];
-  }>;
-}> = z.lazy(() =>
+  children?: TreeNode[];
+}
+
+export const treeNodeSchema: z.ZodType<TreeNode> = z.lazy(() =>
   z.object({
     label: z.string(),
     value: z.string(),
