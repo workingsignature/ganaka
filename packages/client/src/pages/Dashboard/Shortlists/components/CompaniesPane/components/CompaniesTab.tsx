@@ -32,12 +32,7 @@ const CompanyCard = ({
 }) => {
   // DRAW
   return (
-    <Paper
-      p="sm"
-      withBorder
-      shadow="xs"
-      className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-    >
+    <Paper p="sm" withBorder shadow="xs" className="cursor-pointer">
       <div className="w-full h-full grid grid-cols-[20px_auto] gap-5 px-2">
         <div className="w-full h-full flex items-center justify-center">
           <Avatar
@@ -237,7 +232,7 @@ const FilterTree = ({
             return (
               <div
                 {...elementProps}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-1"
+                className="flex items-center gap-1"
                 style={{
                   paddingLeft: `${normalizedLevel * treeIndentationInPx}px`,
                 }}

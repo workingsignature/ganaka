@@ -67,11 +67,11 @@ const ShortlistItem = ({
 
   // DRAW
   return (
-    <Paper>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Icon className="mt-0.5" icon={icons.shortlist_item} height={16} />
-          <Text fw={600} size="sm" className="block max-w-40" truncate="end">
+    <Paper p="sm" withBorder shadow="xs" className="cursor-pointer">
+      <div className="flex items-center justify-between gap-4 px-2">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <Icon icon={icons.shortlist_item} height={18} />
+          <Text fw={500} size="sm" className="truncate">
             {shortlist.name}
           </Text>
         </div>
