@@ -24,7 +24,7 @@ export const getInstruments = {
       .string()
       .optional()
       .describe(
-        "Comma-separated category values in format: 'broad-sector:id,sector:id,broad-industry:id,industry:id'"
+        "Comma-separated category values in format: 'broad-sector:name,sector:name,broad-industry:name,industry:name'"
       ),
   }),
   response: apiResponseSchema.extend({

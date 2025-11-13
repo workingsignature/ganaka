@@ -29,21 +29,21 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
           .filter((c: string) => c.length > 0);
 
         for (const category of categories) {
-          const [type, id] = category.split(":");
-          if (!type || !id) continue;
+          const [type, name] = category.split(":");
+          if (!type || !name) continue;
 
           switch (type) {
             case "broad-sector":
-              categoryFilters.push({ broadSector: { id } });
+              categoryFilters.push({ broadSector: { name } });
               break;
             case "sector":
-              categoryFilters.push({ sector: { id } });
+              categoryFilters.push({ sector: { name } });
               break;
             case "broad-industry":
-              categoryFilters.push({ broadIndustry: { id } });
+              categoryFilters.push({ broadIndustry: { name } });
               break;
             case "industry":
-              categoryFilters.push({ industry: { id } });
+              categoryFilters.push({ industry: { name } });
               break;
           }
         }
@@ -156,16 +156,16 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
       // Transform to combined tree structure: BroadSector → Sector → BroadIndustry → Industry
       const tree = broadSectors.map((broadSector) => ({
         label: startCase(lowerCase(broadSector.name)),
-        value: `broad-sector:${broadSector.id}`,
+        value: `broad-sector:${broadSector.name}`,
         children: broadSector.sectors.map((sector) => ({
           label: startCase(lowerCase(sector.name)),
-          value: `sector:${sector.id}`,
+          value: `sector:${sector.name}`,
           children: sector.broadIndustries.map((broadIndustry) => ({
             label: startCase(lowerCase(broadIndustry.name)),
-            value: `broad-industry:${broadIndustry.id}`,
+            value: `broad-industry:${broadIndustry.name}`,
             children: broadIndustry.industries.map((industry) => ({
               label: startCase(lowerCase(industry.name)),
-              value: `industry:${industry.id}`,
+              value: `industry:${industry.name}`,
             })),
           })),
         })),
