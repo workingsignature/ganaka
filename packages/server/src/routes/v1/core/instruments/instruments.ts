@@ -153,7 +153,7 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
         },
       });
 
-      // Transform to combined tree structure: BroadSector → Sector → BroadIndustry → Industry
+      // Transform to combined tree structure: BroadSector → Sector → BroadIndustry → Industry or Sector → BroadIndustry → Industry
       const tree = broadSectors.map((broadSector) => ({
         label: startCase(lowerCase(broadSector.name)),
         value: `broad-sector:${broadSector.name}`,
