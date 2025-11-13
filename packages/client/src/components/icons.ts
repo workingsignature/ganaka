@@ -27,4 +27,5 @@ export const icons = {
   version: "qlementine-icons:version-control-16",
   create_version: "mdi:source-branch-plus",
   shortlist_item: "fluent:list-16-regular",
+  add_to_shortlist: "ci:list-add",
 };

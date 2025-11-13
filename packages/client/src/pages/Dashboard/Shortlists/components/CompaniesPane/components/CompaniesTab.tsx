@@ -38,7 +38,7 @@ export const CompanyCardContent = ({
 }) => {
   // DRAW
   return (
-    <div className="w-full h-full grid grid-cols-[20px_38px_1fr] gap-2">
+    <div className="w-full h-full grid grid-cols-[20px_38px_1fr_22px] gap-2">
       <div
         className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
         {...(attributes ? attributes : {})}
@@ -64,6 +64,13 @@ export const CompanyCardContent = ({
             {symbol}
           </Text>
         </div>
+      </div>
+      <div className="w-full h-full flex items-center flex-col justify-center">
+        <Tooltip label="Add to shortlist">
+          <ActionIcon variant="subtle" size="sm">
+            <Icon icon={icons.add_to_shortlist} height={22} />
+          </ActionIcon>
+        </Tooltip>
       </div>
     </div>
   );
@@ -103,7 +110,7 @@ const CompanyCard = ({
       p="sm"
       withBorder
       shadow="xs"
-      className="cursor-grab active:cursor-grabbing"
+      className="cursor-pointer"
       style={{ ...style, touchAction: "none" }}
     >
       <CompanyCardContent
