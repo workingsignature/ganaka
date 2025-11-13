@@ -42,7 +42,7 @@ export const App = () => {
               label: ref.description ? undefined : "mb-1",
               // reserving space for error message
               error: "mt-1",
-              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+              wrapper: ref.error ? "mb-0" : "mb-[19.5px]",
             }),
           }),
           TextInput: TextInput.extend({
@@ -60,7 +60,7 @@ export const App = () => {
               description: "mb-2",
               // reserving space for error message
               error: "mt-1",
-              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+              wrapper: ref.error ? "mb-0" : "mb-[19.5px]",
             }),
           }),
           NumberInput: NumberInput.extend({
@@ -68,7 +68,7 @@ export const App = () => {
               label: ref.description ? undefined : "mb-1",
               // reserving space for error message
               error: "mt-1",
-              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+              wrapper: ref.error ? "mb-0" : "mb-[19.5px]",
             }),
           }),
           Notification: Notification.extend({

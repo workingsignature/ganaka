@@ -13,7 +13,7 @@ export const CompaniesPane = () => {
     <GPane
       title={tab === "Companies" ? "Companies" : "Lists"}
       titleActions={
-        <div className="h-full w-50">
+        <div className="h-full w-48">
           <SegmentedControl
             size="xs"
             fullWidth
