@@ -8,6 +8,7 @@ import {
   TagsInput,
   TextInput,
   Notification,
+  Loader,
 } from "@mantine/core";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Auth } from "./layouts/Auth/Auth.layout";
@@ -22,6 +23,11 @@ export const App = () => {
       theme={{
         primaryColor: "pink",
         components: {
+          Loader: Loader.extend({
+            defaultProps: {
+              type: "bars",
+            },
+          }),
           Tabs: Tabs.extend({
             defaultProps: {
               radius: "lg",

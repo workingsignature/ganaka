@@ -7,13 +7,11 @@ import { Icon } from "@iconify/react";
 import {
   ActionIcon,
   Avatar,
-  Center,
   Checkbox,
   Loader,
   Paper,
   Popover,
   Skeleton,
-  Stack,
   Text,
   TextInput,
   Tooltip,
@@ -22,6 +20,7 @@ import {
 } from "@mantine/core";
 import { times } from "lodash";
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import { useDebouncedValue } from "@mantine/hooks";
 
 const CompanyCard = ({
   name,
@@ -303,11 +302,13 @@ const FilterTree = ({
 export const CompaniesTab = () => {
   // STATE
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 300);
 
-  // API
   // API
   const getFilterTreeAPI = useGetInstrumentsFilterTreeQuery();
   const getInstrumentsAPI = useGetInstrumentsQuery({
+    query: debouncedSearchQuery || undefined,
     categories:
       selectedCategories.length > 0 ? selectedCategories.join(",") : undefined,
     pageno: 1,
@@ -327,10 +328,15 @@ export const CompaniesTab = () => {
           <TextInput
             placeholder="Search companies..."
             leftSection={<Icon icon={icons.search} />}
+            rightSection={
+              getInstrumentsAPI.isFetching ? <Loader size="xs" /> : undefined
+            }
             className="w-full"
             classNames={{
               wrapper: "!mb-0",
             }}
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.currentTarget.value)}
           />
         </div>
         <div className="flex items-center justify-end gap-1">
@@ -369,28 +375,32 @@ export const CompaniesTab = () => {
         </div>
       </div>
       {getInstrumentsAPI.isLoading ? (
-        <Center className="h-full">
-          <Stack align="center" gap="sm">
+        <div className="h-full flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
             <Loader size="lg" />
             <Text size="sm" c="dimmed">
               Loading companies...
             </Text>
-          </Stack>
-        </Center>
+          </div>
+        </div>
       ) : getInstrumentsAPI.data?.data?.instruments.length === 0 ? (
-        <Center className="h-full">
-          <Stack align="center" gap="sm">
+        <div className="h-full flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
             <Icon icon={icons.empty} height={64} className="opacity-30" />
             <Text size="sm" c="dimmed">
               No companies found
             </Text>
-            {selectedCategories.length > 0 && (
+            {(selectedCategories.length > 0 || debouncedSearchQuery) && (
               <Text size="xs" c="dimmed">
-                Try adjusting your filters
+                Try adjusting your {selectedCategories.length > 0 && "filters"}
+                {selectedCategories.length > 0 &&
+                  debouncedSearchQuery &&
+                  " or "}
+                {debouncedSearchQuery && "search query"}
               </Text>
             )}
-          </Stack>
-        </Center>
+          </div>
+        </div>
       ) : (
         <div className="h-full flex flex-col gap-2 overflow-auto">
           {getInstrumentsAPI.data?.data?.instruments.map((instrument) => (
