@@ -57,10 +57,10 @@ export const CompanyCardContent = ({
       </div>
       <div className="flex items-start justify-between gap-2 ml-2">
         <div className="flex-1 min-w-0">
-          <Text fw={500} size="sm" className="truncate">
+          <Text truncate="end" maw={150} fw={500} size="sm">
             {name}
           </Text>
-          <Text size="xs" c="dimmed" className="mt-1">
+          <Text maw={150} truncate="end" size="xs" c="dimmed" className="mt-1">
             {symbol}
           </Text>
         </div>
@@ -100,7 +100,7 @@ const CompanyCard = ({
 
   const style = {
     transform: CSS.Translate.toString(transform),
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0 : 1,
   };
 
   // DRAW
@@ -462,7 +462,7 @@ export const CompaniesTab = () => {
           </div>
         </div>
       ) : (
-        <div className="h-full flex flex-col gap-2 overflow-y-auto overflow-x-hidden">
+        <div className="h-full flex flex-col gap-2 overflow-auto">
           {getInstrumentsAPI.data?.data?.instruments.map((instrument) => (
             <CompanyCard
               key={instrument.id}
