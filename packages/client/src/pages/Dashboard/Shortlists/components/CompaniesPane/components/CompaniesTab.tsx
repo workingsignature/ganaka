@@ -4,6 +4,7 @@ import {
   useGetInstrumentsFilterTreeQuery,
   useGetInstrumentsQuery,
 } from "@/store/api/instruments.api";
+import { useAppSelector } from "@/utils/hooks/storeHooks";
 import { useDraggable, type DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { CSS } from "@dnd-kit/utilities";
@@ -37,6 +38,14 @@ export const CompanyCardContent = ({
   attributes?: DraggableAttributes;
   listeners?: SyntheticListenerMap | undefined;
 }) => {
+  // HOOKS
+  const { selectedShortlistsIds } = useAppSelector(
+    (state) => state.shortlistsPage
+  );
+
+  // VARIABLES
+  const isAddToShortlistDisabled = selectedShortlistsIds.length === 0;
+
   // DRAW
   return (
     <div className="w-full h-full grid grid-cols-[20px_38px_1fr_22px] gap-2">
@@ -68,8 +77,13 @@ export const CompanyCardContent = ({
       </div>
       <div className="w-full h-full flex items-center flex-col justify-center">
         <Tooltip label="Add to shortlist">
-          <ActionIcon variant="subtle" size="sm">
-            <Icon icon={icons.add_to_shortlist} height={22} />
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            radius="xs"
+            disabled={isAddToShortlistDisabled}
+          >
+            <Icon icon={icons.add_to_shortlist} height={18} />
           </ActionIcon>
         </Tooltip>
       </div>

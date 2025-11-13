@@ -1,19 +1,31 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface ShortlistsPageState {
-  currentShortlistId: string | null;
+  selectedShortlistsIds: string[];
 }
 
 const initialState: ShortlistsPageState = {
-  currentShortlistId: null,
+  selectedShortlistsIds: [],
 };
 
 export const shortlistsPageSlice = createSlice({
   name: "shortlistsPage",
   initialState,
   reducers: {
-    setCurrentShortlistId: (state, action: PayloadAction<string | null>) => {
-      state.currentShortlistId = action.payload;
+    toggleSelectedShortlistId: (state, action: PayloadAction<string>) => {
+      if (state.selectedShortlistsIds.includes(action.payload)) {
+        state.selectedShortlistsIds = state.selectedShortlistsIds.filter(
+          (id) => id !== action.payload
+        );
+      } else {
+        state.selectedShortlistsIds = [
+          ...state.selectedShortlistsIds,
+          action.payload,
+        ];
+      }
+    },
+    clearSelectedShortlistsIds: (state) => {
+      state.selectedShortlistsIds = [];
     },
   },
 });

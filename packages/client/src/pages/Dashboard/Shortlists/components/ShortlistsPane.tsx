@@ -41,7 +41,7 @@ const ShortlistItem = ({
   });
 
   // STATE
-  const { currentShortlistId } = useAppSelector(
+  const { selectedShortlistsIds } = useAppSelector(
     (state) => state.shortlistsPage
   );
 
@@ -50,7 +50,7 @@ const ShortlistItem = ({
     shortlistsAPI.useDeleteShortlistMutation();
 
   // VARIABLES
-  const isCurrentShortlist = currentShortlistId === shortlist.id;
+  const isCurrentShortlist = selectedShortlistsIds.includes(shortlist.id);
 
   // HANDLERS
   const handleEdit = () => {
@@ -86,9 +86,7 @@ const ShortlistItem = ({
   };
   const handleClick = () => {
     dispatch(
-      shortlistsPageSlice.actions.setCurrentShortlistId(
-        isCurrentShortlist ? null : shortlist.id
-      )
+      shortlistsPageSlice.actions.toggleSelectedShortlistId(shortlist.id)
     );
   };
 
