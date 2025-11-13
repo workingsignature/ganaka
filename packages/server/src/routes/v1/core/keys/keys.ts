@@ -95,7 +95,7 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
 
       // get developer key
       const developerKeyToUpdate = await prisma.developerKey.findUnique({
-        where: { id: validatedParams.id, user: { id: user.id } },
+        where: { id: validatedParams.id, user: { clerkId: user.clerkId } },
       });
       if (!developerKeyToUpdate) {
         return reply.notFound(
