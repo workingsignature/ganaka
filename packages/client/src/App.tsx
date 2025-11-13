@@ -1,20 +1,20 @@
 import { Protect } from "@clerk/clerk-react";
-import { Notifications } from "@mantine/notifications";
 import {
+  Loader,
   MantineProvider,
+  Notification,
   NumberInput,
   Tabs,
-  Textarea,
   TagsInput,
+  Textarea,
   TextInput,
-  Notification,
-  Loader,
 } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import { Notifications } from "@mantine/notifications";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Auth } from "./layouts/Auth/Auth.layout";
 import { Dashboard } from "./layouts/Dashboard/Dashboard.layout";
 import { NotFound } from "./layouts/NotFound/NotFound";
-import { ModalsProvider } from "@mantine/modals";
 
 export const App = () => {
   // DRAW

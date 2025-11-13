@@ -1,4 +1,5 @@
 import { GPane } from "@/components/GPane";
+import { GText } from "@/components/GText";
 import { icons } from "@/components/icons";
 import { shortlistsAPI } from "@/store/api/shortlists.api";
 import { shortlistFormSlice } from "@/store/forms/shortlistFormSlice";
@@ -30,7 +31,7 @@ const ShortlistItem = ({
 }) => {
   // HOOKS
   const dispatch = useAppDispatch();
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: `shortlist-${shortlist.id}`,
     data: {
       type: "shortlist",
@@ -83,6 +84,13 @@ const ShortlistItem = ({
       },
     });
   };
+  const handleClick = () => {
+    dispatch(
+      shortlistsPageSlice.actions.setCurrentShortlistId(
+        isCurrentShortlist ? null : shortlist.id
+      )
+    );
+  };
 
   // DRAW
   return (
@@ -91,11 +99,8 @@ const ShortlistItem = ({
       p="sm"
       withBorder
       shadow="xs"
+      onClick={handleClick}
       className="cursor-pointer"
-      style={{
-        backgroundColor: isOver ? "var(--mantine-color-blue-0)" : undefined,
-        borderColor: isOver ? "var(--mantine-color-blue-3)" : undefined,
-      }}
     >
       <div className="grid grid-cols-[20px_1fr_auto] gap-4">
         <Checkbox
@@ -103,18 +108,11 @@ const ShortlistItem = ({
           radius="xl"
           checked={isCurrentShortlist}
           className="mt-auto mb-auto"
-          onChange={() =>
-            dispatch(
-              shortlistsPageSlice.actions.setCurrentShortlistId(
-                isCurrentShortlist ? null : shortlist.id
-              )
-            )
-          }
         />
         <div className="mt-auto mb-auto">
-          <Text fw={500} size="sm" className="truncate">
+          <GText fw={500} size="sm">
             {shortlist.name}
-          </Text>
+          </GText>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="light">{shortlist.instruments.length}</Badge>

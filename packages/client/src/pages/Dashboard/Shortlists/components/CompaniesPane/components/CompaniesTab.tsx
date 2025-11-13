@@ -1,3 +1,4 @@
+import { GText } from "@/components/GText";
 import { icons } from "@/components/icons";
 import {
   useGetInstrumentsFilterTreeQuery,
@@ -57,12 +58,12 @@ export const CompanyCardContent = ({
       </div>
       <div className="flex items-start justify-between gap-2 ml-2">
         <div className="flex-1 min-w-0">
-          <Text truncate="end" maw={150} fw={500} size="sm">
+          <GText truncate="end" maw={150} fw={500} size="sm">
             {name}
-          </Text>
-          <Text maw={150} truncate="end" size="xs" c="dimmed" className="mt-1">
+          </GText>
+          <GText maw={150} truncate="end" size="xs" c="dimmed" className="mt-1">
             {symbol}
-          </Text>
+          </GText>
         </div>
       </div>
       <div className="w-full h-full flex items-center flex-col justify-center">
@@ -349,7 +350,7 @@ const FilterTree = ({
                     height={14}
                   />
                 )}
-                <Text size="sm">{node.label}</Text>
+                <GText size="sm">{node.label}</GText>
               </div>
             );
           }}
