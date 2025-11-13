@@ -400,7 +400,7 @@ const triggersRoutes: FastifyPluginAsync = async (fastify, opts) => {
       );
       for await (const instrument of deDuplicatedInstruments) {
         try {
-          await prisma.instrument.createMany({
+          await prisma.instrument.create({
             data: {
               exchange: instrument.exchange,
               exchangeToken: instrument.exchange_token,
