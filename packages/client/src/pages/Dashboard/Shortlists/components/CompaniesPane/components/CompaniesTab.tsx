@@ -3,6 +3,9 @@ import {
   useGetInstrumentsFilterTreeQuery,
   useGetInstrumentsQuery,
 } from "@/store/api/instruments.api";
+import { useDraggable, type DraggableAttributes } from "@dnd-kit/core";
+import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+import { CSS } from "@dnd-kit/utilities";
 import { Icon } from "@iconify/react";
 import {
   ActionIcon,
@@ -18,12 +21,9 @@ import {
   Tree,
   type TreeNodeData,
 } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import { times } from "lodash";
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
-import { useDebouncedValue } from "@mantine/hooks";
-import { useDraggable, type DraggableAttributes } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 
 export const CompanyCardContent = ({
   name,

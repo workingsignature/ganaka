@@ -2,12 +2,15 @@ import { GPane } from "@/components/GPane";
 import { icons } from "@/components/icons";
 import { shortlistsAPI } from "@/store/api/shortlists.api";
 import { shortlistFormSlice } from "@/store/forms/shortlistFormSlice";
-import { useAppDispatch } from "@/utils/hooks/storeHooks";
+import { shortlistsPageSlice } from "@/store/pages/shortlistsPageSlice";
+import { useAppDispatch, useAppSelector } from "@/utils/hooks/storeHooks";
+import { useDroppable } from "@dnd-kit/core";
 import type { v1_core_shortlists_schemas } from "@ganaka/server-schemas";
 import { Icon } from "@iconify/react";
 import {
   ActionIcon,
   Badge,
+  Checkbox,
   Menu,
   Paper,
   Skeleton,
@@ -19,7 +22,6 @@ import { notifications } from "@mantine/notifications";
 import { debounce, times } from "lodash";
 import { useRef } from "react";
 import type z from "zod";
-import { useDroppable } from "@dnd-kit/core";
 
 const ShortlistItem = ({
   shortlist,
@@ -37,9 +39,17 @@ const ShortlistItem = ({
     },
   });
 
+  // STATE
+  const { currentShortlistId } = useAppSelector(
+    (state) => state.shortlistsPage
+  );
+
   // API
   const [deleteShortlist, deleteShortlistAPI] =
     shortlistsAPI.useDeleteShortlistMutation();
+
+  // VARIABLES
+  const isCurrentShortlist = currentShortlistId === shortlist.id;
 
   // HANDLERS
   const handleEdit = () => {
@@ -81,15 +91,27 @@ const ShortlistItem = ({
       p="sm"
       withBorder
       shadow="xs"
-      className="cursor-pointer transition-colors"
+      className="cursor-pointer"
       style={{
         backgroundColor: isOver ? "var(--mantine-color-blue-0)" : undefined,
         borderColor: isOver ? "var(--mantine-color-blue-3)" : undefined,
       }}
     >
-      <div className="flex items-center justify-between gap-4 px-2">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <Icon icon={icons.shortlist_item} height={18} />
+      <div className="grid grid-cols-[20px_1fr_auto] gap-4">
+        <Checkbox
+          size="xs"
+          radius="xl"
+          checked={isCurrentShortlist}
+          className="mt-auto mb-auto"
+          onChange={() =>
+            dispatch(
+              shortlistsPageSlice.actions.setCurrentShortlistId(
+                isCurrentShortlist ? null : shortlist.id
+              )
+            )
+          }
+        />
+        <div className="mt-auto mb-auto">
           <Text fw={500} size="sm" className="truncate">
             {shortlist.name}
           </Text>

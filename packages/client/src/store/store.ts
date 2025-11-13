@@ -9,10 +9,12 @@ import { strategiesAPI } from "./api/strategies.api";
 import { instrumentsAPI } from "./api/instruments.api";
 import versionFormSlice from "./forms/versionFormSlice";
 import runFormSlice from "./forms/runFormSlice";
+import shortlistsPageSlice from "./pages/shortlistsPageSlice";
 
 export const store = configureStore({
   reducer: {
     app: appSlice,
+    shortlistsPage: shortlistsPageSlice,
     strategyForm: strategyFormSlice,
     shortlistForm: shortlistFormSlice,
     versionForm: versionFormSlice,
