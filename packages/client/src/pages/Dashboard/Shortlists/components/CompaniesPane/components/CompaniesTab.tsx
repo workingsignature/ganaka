@@ -76,16 +76,21 @@ export const CompanyCardContent = ({
         </div>
       </div>
       <div className="w-full h-full flex items-center flex-col justify-center">
-        <Tooltip label="Add to shortlist">
-          <ActionIcon
-            variant="subtle"
-            size="sm"
-            radius="xs"
-            disabled={isAddToShortlistDisabled}
-          >
-            <Icon icon={icons.add_to_shortlist} height={18} />
-          </ActionIcon>
-        </Tooltip>
+        <Popover>
+          <Popover.Target>
+            <Tooltip label="Add to shortlist">
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                radius="xs"
+                disabled={isAddToShortlistDisabled}
+              >
+                <Icon icon={icons.add_to_shortlist} height={18} />
+              </ActionIcon>
+            </Tooltip>
+          </Popover.Target>
+          <Popover.Dropdown w={200} mah={200}></Popover.Dropdown>
+        </Popover>
       </div>
     </div>
   );
@@ -126,7 +131,9 @@ const CompanyCard = ({
       withBorder
       shadow="xs"
       className="cursor-pointer"
-      style={{ ...style, touchAction: "none" }}
+      // overriding transform helps avoid pushing existing items
+      // when dragging beyond the border of the current list
+      style={{ ...style, touchAction: "none", transform: "none" }}
     >
       <CompanyCardContent
         name={name}
