@@ -19,6 +19,7 @@ import { notifications } from "@mantine/notifications";
 import { debounce, times } from "lodash";
 import { useRef } from "react";
 import type z from "zod";
+import { useDroppable } from "@dnd-kit/core";
 
 const ShortlistItem = ({
   shortlist,
@@ -27,6 +28,14 @@ const ShortlistItem = ({
 }) => {
   // HOOKS
   const dispatch = useAppDispatch();
+  const { setNodeRef, isOver } = useDroppable({
+    id: `shortlist-${shortlist.id}`,
+    data: {
+      type: "shortlist",
+      shortlistId: shortlist.id,
+      shortlist,
+    },
+  });
 
   // API
   const [deleteShortlist, deleteShortlistAPI] =
@@ -67,7 +76,17 @@ const ShortlistItem = ({
 
   // DRAW
   return (
-    <Paper p="sm" withBorder shadow="xs" className="cursor-pointer">
+    <Paper
+      ref={setNodeRef}
+      p="sm"
+      withBorder
+      shadow="xs"
+      className="cursor-pointer transition-colors"
+      style={{
+        backgroundColor: isOver ? "var(--mantine-color-blue-0)" : undefined,
+        borderColor: isOver ? "var(--mantine-color-blue-3)" : undefined,
+      }}
+    >
       <div className="flex items-center justify-between gap-4 px-2">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <Icon icon={icons.shortlist_item} height={18} />

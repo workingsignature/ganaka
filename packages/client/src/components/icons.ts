@@ -18,6 +18,7 @@ export const icons = {
   close: "mdi:close",
   chevronDown: "mdi:chevron-down",
   chevronRight: "mdi:chevron-right",
+  drag: "si:drag-indicator-fill",
   // ----------------------------------------
   timeline: "mdi:timeline-outline",
   shortlist: "tabler:list-details",

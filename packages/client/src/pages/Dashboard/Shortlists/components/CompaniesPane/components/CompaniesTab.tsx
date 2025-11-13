@@ -21,39 +21,97 @@ import {
 import { times } from "lodash";
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import { useDebouncedValue } from "@mantine/hooks";
+import { useDraggable, type DraggableAttributes } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+
+export const CompanyCardContent = ({
+  name,
+  symbol,
+  attributes,
+  listeners,
+}: {
+  name: string;
+  symbol: string;
+  attributes?: DraggableAttributes;
+  listeners?: SyntheticListenerMap | undefined;
+}) => {
+  // DRAW
+  return (
+    <div className="w-full h-full grid grid-cols-[20px_38px_1fr] gap-2">
+      <div
+        className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
+        {...(attributes ? attributes : {})}
+        {...(listeners ? listeners : {})}
+      >
+        <Icon icon={icons.drag} height={18} />
+      </div>
+      <div className="w-full h-full flex items-center justify-center">
+        <Avatar
+          src={`https://images.dhan.co/symbol/${symbol}.png`}
+          size="md"
+          name={name}
+          color="initials"
+          className="object-contain"
+        />
+      </div>
+      <div className="flex items-start justify-between gap-2 ml-2">
+        <div className="flex-1 min-w-0">
+          <Text fw={500} size="sm" className="truncate">
+            {name}
+          </Text>
+          <Text size="xs" c="dimmed" className="mt-1">
+            {symbol}
+          </Text>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const CompanyCard = ({
+  id,
   name,
   symbol,
 }: {
+  id: string;
   name: string;
   symbol: string;
   exchange: string;
 }) => {
+  // HOOKS
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: `company-${id}`,
+      data: {
+        type: "company",
+        instrumentId: id,
+        name,
+        symbol,
+      },
+    });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.5 : 1,
+  };
+
   // DRAW
   return (
-    <Paper p="sm" withBorder shadow="xs" className="cursor-pointer">
-      <div className="w-full h-full grid grid-cols-[20px_auto] gap-5 px-2">
-        <div className="w-full h-full flex items-center justify-center">
-          <Avatar
-            src={`https://images.dhan.co/symbol/${symbol}.png`}
-            size="md"
-            name={name}
-            color="initials"
-            className="object-contain"
-          />
-        </div>
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <Text fw={500} size="sm" className="truncate">
-              {name}
-            </Text>
-            <Text size="xs" c="dimmed" className="mt-1">
-              {symbol}
-            </Text>
-          </div>
-        </div>
-      </div>
+    <Paper
+      ref={setNodeRef}
+      p="sm"
+      withBorder
+      shadow="xs"
+      className="cursor-grab active:cursor-grabbing"
+      style={{ ...style, touchAction: "none" }}
+    >
+      <CompanyCardContent
+        name={name}
+        symbol={symbol}
+        attributes={attributes}
+        listeners={listeners}
+      />
     </Paper>
   );
 };
@@ -397,10 +455,11 @@ export const CompaniesTab = () => {
           </div>
         </div>
       ) : (
-        <div className="h-full flex flex-col gap-2 overflow-auto">
+        <div className="h-full flex flex-col gap-2 overflow-y-auto overflow-x-hidden">
           {getInstrumentsAPI.data?.data?.instruments.map((instrument) => (
             <CompanyCard
               key={instrument.id}
+              id={instrument.id}
               name={instrument.name}
               symbol={instrument.symbol}
               exchange={instrument.exchange}
