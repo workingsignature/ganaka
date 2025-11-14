@@ -33,11 +33,15 @@ export const CompanyCardContent = ({
   symbol,
   attributes,
   listeners,
+  hideDragHandler = false,
+  hideAddToShortlist = false,
 }: {
   name: string;
   symbol: string;
   attributes?: DraggableAttributes;
   listeners?: SyntheticListenerMap | undefined;
+  hideDragHandler?: boolean;
+  hideAddToShortlist?: boolean;
 }) => {
   // HOOKS
   const { selectedShortlists } = useAppSelector(
@@ -47,16 +51,32 @@ export const CompanyCardContent = ({
   // VARIABLES
   const isAddToShortlistDisabled = selectedShortlists.length === 0;
 
+  // Determine grid columns based on what's hidden
+  const getGridCols = () => {
+    if (hideDragHandler && hideAddToShortlist) {
+      return "grid-cols-[38px_1fr]";
+    }
+    if (hideDragHandler) {
+      return "grid-cols-[38px_1fr_22px]";
+    }
+    if (hideAddToShortlist) {
+      return "grid-cols-[20px_38px_1fr]";
+    }
+    return "grid-cols-[20px_38px_1fr_22px]";
+  };
+
   // DRAW
   return (
-    <div className="w-full h-full grid grid-cols-[20px_38px_1fr_22px] gap-2">
-      <div
-        className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
-        {...(attributes ? attributes : {})}
-        {...(listeners ? listeners : {})}
-      >
-        <Icon icon={icons.drag} height={18} />
-      </div>
+    <div className={`w-full h-full grid gap-2 ${getGridCols()}`}>
+      {!hideDragHandler && (
+        <div
+          className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
+          {...(attributes ? attributes : {})}
+          {...(listeners ? listeners : {})}
+        >
+          <Icon icon={icons.drag} height={18} />
+        </div>
+      )}
       <div className="w-full h-full flex items-center justify-center">
         <Avatar
           src={`https://images.dhan.co/symbol/${symbol}.png`}
@@ -76,25 +96,27 @@ export const CompanyCardContent = ({
           </GText>
         </div>
       </div>
-      <div className="w-full h-full flex items-center flex-col justify-center">
-        <Popover>
-          <Popover.Target>
-            <Tooltip label="Add to shortlist">
-              <ActionIcon
-                variant="subtle"
-                size="sm"
-                radius="xs"
-                disabled={isAddToShortlistDisabled}
-              >
-                <Icon icon={icons.add_to_shortlist} height={18} />
-              </ActionIcon>
-            </Tooltip>
-          </Popover.Target>
-          <Popover.Dropdown w={200} mah={200}>
-            <div className="w-full h-full grid grid-rows"></div>
-          </Popover.Dropdown>
-        </Popover>
-      </div>
+      {!hideAddToShortlist && (
+        <div className="w-full h-full flex items-center flex-col justify-center">
+          <Popover>
+            <Popover.Target>
+              <Tooltip label="Add to shortlist">
+                <ActionIcon
+                  variant="subtle"
+                  size="sm"
+                  radius="xs"
+                  disabled={isAddToShortlistDisabled}
+                >
+                  <Icon icon={icons.add_to_shortlist} height={18} />
+                </ActionIcon>
+              </Tooltip>
+            </Popover.Target>
+            <Popover.Dropdown w={200} mah={200}>
+              <div className="w-full h-full grid grid-rows"></div>
+            </Popover.Dropdown>
+          </Popover>
+        </div>
+      )}
     </div>
   );
 };

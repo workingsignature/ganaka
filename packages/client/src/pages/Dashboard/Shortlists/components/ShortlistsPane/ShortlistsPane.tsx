@@ -1,6 +1,7 @@
 import { GPane } from "@/components/GPane";
 import { GText } from "@/components/GText";
 import { icons } from "@/components/icons";
+import { CompanyCardContent } from "@/pages/Dashboard/Shortlists/components/CompaniesPane/components/CompaniesTab";
 import { shortlistsAPI } from "@/store/api/shortlists.api";
 import { shortlistFormSlice } from "@/store/forms/shortlistFormSlice";
 import { shortlistsPageSlice } from "@/store/pages/shortlistsPageSlice";
@@ -12,6 +13,7 @@ import {
   ActionIcon,
   Badge,
   Checkbox,
+  HoverCard,
   Menu,
   Paper,
   Skeleton,
@@ -118,7 +120,49 @@ const ShortlistItem = ({
           </GText>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="light">{shortlist.instruments.length}</Badge>
+          <HoverCard
+            width={280}
+            shadow="md"
+            openDelay={200}
+            closeDelay={100}
+            withArrow
+          >
+            <HoverCard.Target>
+              <Badge
+                variant="light"
+                className="cursor-pointer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {shortlist.instruments.length}
+              </Badge>
+            </HoverCard.Target>
+            <HoverCard.Dropdown onClick={(e) => e.stopPropagation()} p="xs">
+              {shortlist.instruments.length > 0 ? (
+                <div className="flex flex-col gap-1">
+                  {shortlist.instruments.map((instrument) => (
+                    <Paper
+                      key={instrument.id}
+                      p="xs"
+                      withBorder
+                      shadow="xs"
+                      className="w-full"
+                    >
+                      <CompanyCardContent
+                        name={instrument.name}
+                        symbol={instrument.symbol}
+                        hideDragHandler={true}
+                        hideAddToShortlist={true}
+                      />
+                    </Paper>
+                  ))}
+                </div>
+              ) : (
+                <Text size="sm" c="dimmed">
+                  No companies in this shortlist
+                </Text>
+              )}
+            </HoverCard.Dropdown>
+          </HoverCard>
           <Menu shadow="md" width={150} position="bottom-end">
             <Menu.Target>
               <ActionIcon
