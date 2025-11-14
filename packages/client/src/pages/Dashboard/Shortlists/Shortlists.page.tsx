@@ -3,6 +3,7 @@ import {
   DndContext,
   DragOverlay,
   type DragEndEvent,
+  type DragOverEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { Paper } from "@mantine/core";
@@ -18,6 +19,10 @@ export const ShortlistsPage = () => {
     name: string;
     symbol: string;
   } | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+  const [updatingShortlistId, setUpdatingShortlistId] = useState<string | null>(
+    null
+  );
 
   // API
   const [updateShortlist] = shortlistsAPI.useUpdateShortlistMutation();
@@ -32,8 +37,22 @@ export const ShortlistsPage = () => {
       });
     }
   };
+  const handleDragOver = (event: DragOverEvent) => {
+    const { over } = event;
+    if (over) {
+      const dropData = over.data.current;
+      if (dropData?.type === "shortlist") {
+        setOverId(over.id as string);
+      } else {
+        setOverId(null);
+      }
+    } else {
+      setOverId(null);
+    }
+  };
   const handleDragEnd = async (event: DragEndEvent) => {
     setActiveCompany(null);
+    setOverId(null);
     const { active, over } = event;
 
     if (!over) return;
@@ -61,6 +80,7 @@ export const ShortlistsPage = () => {
       }
 
       // Add instrument to shortlist
+      setUpdatingShortlistId(shortlistId);
       try {
         const response = await updateShortlist({
           params: { id: shortlistId },
@@ -84,16 +104,25 @@ export const ShortlistsPage = () => {
           message: "Failed to add instrument to shortlist",
           color: "red",
         });
+      } finally {
+        setUpdatingShortlistId(null);
       }
     }
   };
 
   // DRAW
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
       <div className="w-full h-full overflow-hidden grid grid-cols-[350px_400px_1fr] gap-2">
         <CompaniesPane />
-        <ShortlistsPane />
+        <ShortlistsPane
+          overId={overId}
+          updatingShortlistId={updatingShortlistId}
+        />
       </div>
       <DragOverlay>
         {activeCompany ? (
