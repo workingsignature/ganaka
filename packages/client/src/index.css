@@ -185,7 +185,7 @@
   height: 100%;
 }
 
-button {
+button.mantine-ActionIcon-root {
   &:disabled,
   &[data-disabled] {
     border-color: transparent;

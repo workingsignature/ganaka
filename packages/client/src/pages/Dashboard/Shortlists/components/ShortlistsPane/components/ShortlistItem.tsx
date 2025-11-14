@@ -10,7 +10,7 @@ import type { v1_core_shortlists_schemas } from "@ganaka/server-schemas";
 import { Icon } from "@iconify/react";
 import {
   ActionIcon,
-  Badge,
+  Avatar,
   Checkbox,
   HoverCard,
   Loader,
@@ -121,61 +121,87 @@ export const ShortlistItem = ({
           size="xs"
           radius="xl"
           checked={isSelected}
-          className="mt-auto mb-auto"
+          className="mt-0.5 mb-auto"
         />
-        <div className="mt-auto mb-auto flex items-center gap-2">
+        <div className="flex flex-col gap-2">
           <GText fw={500} size="sm">
             {shortlist.name}
           </GText>
-        </div>
-        <div className="flex items-center gap-2">
-          <HoverCard
-            width={280}
-            shadow="md"
-            openDelay={200}
-            closeDelay={100}
-            withArrow
-          >
-            <HoverCard.Target>
-              {showLoading ? (
-                <Loader size="xs" />
-              ) : (
-                <Badge
-                  variant="light"
-                  className="cursor-pointer"
+          {showLoading ? (
+            <Loader size="xs" />
+          ) : shortlist.instruments.length > 0 ? (
+            <HoverCard
+              width={280}
+              shadow="md"
+              openDelay={200}
+              closeDelay={100}
+              position="right-start"
+            >
+              <HoverCard.Target>
+                <Avatar.Group
+                  spacing="sm"
                   onClick={(e) => e.stopPropagation()}
+                  className="cursor-pointer w-fit"
                 >
-                  {shortlist.instruments.length}
-                </Badge>
-              )}
-            </HoverCard.Target>
-            <HoverCard.Dropdown onClick={(e) => e.stopPropagation()} p="xs">
-              {shortlist.instruments.length > 0 ? (
-                <div className="flex flex-col gap-1">
-                  {shortlist.instruments.map((instrument) => (
-                    <Paper
+                  {shortlist.instruments.slice(0, 5).map((instrument) => (
+                    <Avatar
                       key={instrument.id}
-                      p="xs"
-                      withBorder
-                      shadow="xs"
-                      className="w-full"
+                      src={`https://images.dhan.co/symbol/${instrument.symbol}.png`}
+                      size="sm"
+                      radius="xl"
+                      alt={instrument.name}
+                      color="initials"
+                      className="!border !border-gray-200"
                     >
-                      <CompanyCardContent
-                        name={instrument.name}
-                        symbol={instrument.symbol}
-                        hideDragHandler={true}
-                        hideAddToShortlist={true}
-                      />
-                    </Paper>
+                      {instrument.name.charAt(0).toUpperCase()}
+                    </Avatar>
                   ))}
-                </div>
-              ) : (
-                <Text size="sm" c="dimmed">
-                  No companies in this shortlist
-                </Text>
-              )}
-            </HoverCard.Dropdown>
-          </HoverCard>
+                  {shortlist.instruments.length > 5 && (
+                    <Avatar
+                      size="sm"
+                      radius="xl"
+                      color="gray"
+                      className="!border !border-gray-200"
+                    >
+                      +{shortlist.instruments.length - 5}
+                    </Avatar>
+                  )}
+                </Avatar.Group>
+              </HoverCard.Target>
+              <HoverCard.Dropdown onClick={(e) => e.stopPropagation()} p="xs">
+                {shortlist.instruments.length > 0 ? (
+                  <div className="flex flex-col gap-1">
+                    {shortlist.instruments.map((instrument) => (
+                      <Paper
+                        key={instrument.id}
+                        p="xs"
+                        withBorder
+                        shadow="xs"
+                        className="w-full"
+                      >
+                        <CompanyCardContent
+                          name={instrument.name}
+                          symbol={instrument.symbol}
+                          hideDragHandler={true}
+                          hideAddToShortlist={true}
+                        />
+                      </Paper>
+                    ))}
+                  </div>
+                ) : (
+                  <Text size="sm" c="dimmed">
+                    No companies in this shortlist
+                  </Text>
+                )}
+              </HoverCard.Dropdown>
+            </HoverCard>
+          ) : (
+            <Text size="xs" c="dimmed">
+              No companies
+            </Text>
+          )}
+        </div>
+        <div className="flex items-start gap-2">
           <Menu shadow="md" width={150} position="bottom-end">
             <Menu.Target>
               <ActionIcon
