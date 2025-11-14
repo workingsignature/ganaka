@@ -74,8 +74,9 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Runs fetched successfully",
           data: runs.map((run) => ({
             id: run.id,
-            startTime: run.startTime.toISOString(),
-            endTime: run.endTime.toISOString(),
+            schedule: run.schedule as z.infer<
+              typeof v1_core_strategies_versions_runs_schemas.scheduleSchema
+            >,
             currentBalance: run.currentBalance,
             startingBalance: run.startingBalance,
             endingBalance: run.endingBalance,
@@ -167,8 +168,9 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Run fetched successfully",
           data: {
             id: run.id,
-            startTime: run.startTime.toISOString(),
-            endTime: run.endTime.toISOString(),
+            schedule: run.schedule as z.infer<
+              typeof v1_core_strategies_versions_runs_schemas.scheduleSchema
+            >,
             currentBalance: run.currentBalance,
             startingBalance: run.startingBalance,
             endingBalance: run.endingBalance,
@@ -245,8 +247,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       // create run
       const run = await prisma.strategyVersionRun.create({
         data: {
-          startTime: new Date(validatedBody.startTime),
-          endTime: new Date(validatedBody.endTime),
+          schedule: validatedBody.schedule as InputJsonValue,
           currentBalance: validatedBody.currentBalance,
           startingBalance: validatedBody.startingBalance,
           endingBalance: validatedBody.endingBalance,
@@ -272,8 +273,9 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Run created successfully",
           data: {
             id: run.id,
-            startTime: run.startTime.toISOString(),
-            endTime: run.endTime.toISOString(),
+            schedule: run.schedule as z.infer<
+              typeof v1_core_strategies_versions_runs_schemas.scheduleSchema
+            >,
             currentBalance: run.currentBalance,
             startingBalance: run.startingBalance,
             endingBalance: run.endingBalance,
@@ -449,12 +451,10 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       const run = await prisma.strategyVersionRun.update({
         where: { id: validatedParams.id },
         data: {
-          startTime: validatedBody.startTime
-            ? new Date(validatedBody.startTime)
-            : existingRun.startTime,
-          endTime: validatedBody.endTime
-            ? new Date(validatedBody.endTime)
-            : existingRun.endTime,
+          schedule:
+            validatedBody.schedule !== undefined
+              ? (validatedBody.schedule as InputJsonValue)
+              : (existingRun.schedule as InputJsonValue),
           currentBalance:
             validatedBody.currentBalance ?? existingRun.currentBalance,
           startingBalance:
@@ -485,8 +485,9 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Run updated successfully",
           data: {
             id: run.id,
-            startTime: run.startTime.toISOString(),
-            endTime: run.endTime.toISOString(),
+            schedule: run.schedule as z.infer<
+              typeof v1_core_strategies_versions_runs_schemas.scheduleSchema
+            >,
             currentBalance: run.currentBalance,
             startingBalance: run.startingBalance,
             endingBalance: run.endingBalance,

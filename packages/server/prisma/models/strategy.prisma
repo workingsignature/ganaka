@@ -32,14 +32,13 @@ model StrategyVersion {
 model StrategyVersionRun {
     id String @id @default(uuid())
 
-    startTime        DateTime
-    endTime          DateTime
-    currentBalance   Float    @default(0)
-    startingBalance  Float    @default(0)
-    endingBalance    Float    @default(0)
+    schedule         Json
+    currentBalance   Float   @default(0)
+    startingBalance  Float   @default(0)
+    endingBalance    Float   @default(0)
     runType          RunType
     errorLog         String?
-    customAttributes Json?    @default("{}")
+    customAttributes Json?   @default("{}")
 
     status  RunStatus       @default(PENDING)
     version StrategyVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
