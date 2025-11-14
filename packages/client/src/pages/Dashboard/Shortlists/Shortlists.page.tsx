@@ -10,7 +10,7 @@ import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import { CompaniesPane } from "./components/CompaniesPane/CompaniesPane";
 import { CompanyCardContent } from "./components/CompaniesPane/components/CompaniesTab";
-import { ShortlistsPane } from "./components/ShortlistsPane";
+import { ShortlistsPane } from "./components/ShortlistsPane/ShortlistsPane";
 
 export const ShortlistsPage = () => {
   // STATE
