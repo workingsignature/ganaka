@@ -12,6 +12,7 @@ import { Icon } from "@iconify/react";
 import {
   ActionIcon,
   Avatar,
+  Button,
   Checkbox,
   Loader,
   Paper,
@@ -159,7 +160,7 @@ const FilterTree = ({
   isLoading: boolean;
 }) => {
   // VARIABLES
-  const treeIndentationInPx = 10;
+  const treeIndentationInPx = 20;
 
   // Build a map of node values to their parent and all nodes for quick lookup
   const nodeMap = useMemo(() => {
@@ -291,94 +292,108 @@ const FilterTree = ({
 
   // DRAW
   return (
-    <div className="overflow-y-auto" style={{ maxHeight: "380px" }}>
-      {isLoading ? (
-        <div className="flex justify-center flex-col items-center gap-2">
-          {times(10, (index) => (
-            <div key={index} className="w-full flex items-center gap-1">
-              <Skeleton circle height={18} />
-              <Icon icon={icons.chevronRight} height={14} />
-              <Skeleton height={18} radius="xl" />
-            </div>
-          ))}
+    <div className="relative h-full">
+      {selectedCategories.length > 0 && (
+        <div className="absolute top-[-10px] right-[-10px] z-10">
+          <Button
+            variant="light"
+            size="compact-xs"
+            onClick={() => setSelectedCategories([])}
+            leftSection={<Icon icon={icons.close} height={14} />}
+          >
+            Clear filters
+          </Button>
         </div>
-      ) : (
-        <Tree
-          data={filterTreeNodes}
-          levelOffset={20}
-          renderNode={({
-            node,
-            expanded,
-            hasChildren,
-            elementProps,
-            level,
-          }) => {
-            // VARIABLES
-            // The level is 1-based, so we need to normalize it to 0-based
-            const normalizedLevel = level - 1;
-
-            // DRAW
-            return (
-              <div
-                {...elementProps}
-                className="flex items-center gap-1"
-                style={{
-                  paddingLeft: `${normalizedLevel * treeIndentationInPx}px`,
-                }}
-              >
-                <Checkbox
-                  checked={selectedCategories.includes(String(node.value))}
-                  indeterminate={isNodeIndeterminate(node)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onChange={(event) => {
-                    event.stopPropagation();
-                    const nodeValue = String(node.value);
-                    const isCurrentlySelected =
-                      selectedCategories.includes(nodeValue);
-
-                    setSelectedCategories((prev) => {
-                      let newCategories: string[];
-
-                      if (isCurrentlySelected) {
-                        // Deselect: Remove this node and all its descendants
-                        const descendantValues = getAllDescendantValues(node);
-                        newCategories = prev.filter(
-                          (category) =>
-                            category !== nodeValue &&
-                            !descendantValues.includes(category)
-                        );
-                      } else {
-                        // Select: Add this node and all its descendants
-                        const descendantValues = getAllDescendantValues(node);
-                        const allValues = [nodeValue, ...descendantValues];
-                        // Use Set to avoid duplicates
-                        newCategories = [...new Set([...prev, ...allValues])];
-                      }
-
-                      // Update parent selections based on children states
-                      return updateParentSelections(newCategories);
-                    });
-                  }}
-                  size="xs"
-                  radius="xl"
-                  classNames={{
-                    input: "!cursor-pointer",
-                  }}
-                />
-                {hasChildren && (
-                  <Icon
-                    icon={expanded ? icons.chevronDown : icons.chevronRight}
-                    height={14}
-                  />
-                )}
-                <GText size="sm">{node.label}</GText>
-              </div>
-            );
-          }}
-        />
       )}
+      <div className="overflow-y-auto h-full" style={{ maxHeight: "380px" }}>
+        {isLoading ? (
+          <div className="flex justify-center flex-col items-center gap-2">
+            {times(10, (index) => (
+              <div key={index} className="w-full flex items-center gap-1">
+                <Skeleton circle height={18} />
+                <Icon icon={icons.chevronRight} height={14} />
+                <Skeleton height={18} radius="xl" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Tree
+            data={filterTreeNodes}
+            levelOffset={20}
+            renderNode={({
+              node,
+              expanded,
+              hasChildren,
+              elementProps,
+              level,
+            }) => {
+              // VARIABLES
+              // The level is 1-based, so we need to normalize it to 0-based
+              const normalizedLevel = level - 1;
+
+              // DRAW
+              return (
+                <div
+                  {...elementProps}
+                  className="flex items-center gap-1"
+                  style={{
+                    paddingLeft: `${normalizedLevel * treeIndentationInPx}px`,
+                  }}
+                >
+                  <Checkbox
+                    checked={selectedCategories.includes(String(node.value))}
+                    indeterminate={isNodeIndeterminate(node)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onChange={(event) => {
+                      event.stopPropagation();
+                      const nodeValue = String(node.value);
+                      const isCurrentlySelected =
+                        selectedCategories.includes(nodeValue);
+
+                      setSelectedCategories((prev) => {
+                        let newCategories: string[];
+
+                        if (isCurrentlySelected) {
+                          // Deselect: Remove this node and all its descendants
+                          const descendantValues = getAllDescendantValues(node);
+                          newCategories = prev.filter(
+                            (category) =>
+                              category !== nodeValue &&
+                              !descendantValues.includes(category)
+                          );
+                        } else {
+                          // Select: Add this node and all its descendants
+                          const descendantValues = getAllDescendantValues(node);
+                          const allValues = [nodeValue, ...descendantValues];
+                          // Use Set to avoid duplicates
+                          newCategories = [...new Set([...prev, ...allValues])];
+                        }
+
+                        // Update parent selections based on children states
+                        return updateParentSelections(newCategories);
+                      });
+                    }}
+                    size="xs"
+                    radius="xl"
+                    classNames={{
+                      input: "!cursor-pointer",
+                    }}
+                  />
+                  {hasChildren && (
+                    <Icon
+                      icon={expanded ? icons.chevronDown : icons.chevronRight}
+                      height={14}
+                    />
+                  )}
+                  <GText size="sm">{node.label}</GText>
+                </div>
+              );
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };
