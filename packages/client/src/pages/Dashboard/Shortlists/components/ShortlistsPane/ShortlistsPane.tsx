@@ -3,115 +3,19 @@ import { icons } from "@/components/icons";
 import { shortlistsAPI } from "@/store/api/shortlists.api";
 import { shortlistFormSlice } from "@/store/forms/shortlistFormSlice";
 import { useAppDispatch } from "@/utils/hooks/storeHooks";
-import type { v1_core_shortlists_schemas } from "@ganaka/server-schemas";
 import { Icon } from "@iconify/react";
-import {
-  ActionIcon,
-  Badge,
-  Menu,
-  Paper,
-  Skeleton,
-  Text,
-  Tooltip,
-} from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
+import { ActionIcon, Skeleton, Text, Tooltip } from "@mantine/core";
 import { debounce, times } from "lodash";
 import { useRef } from "react";
-import type z from "zod";
+import { ShortlistItem } from "./components/ShortlistItem";
 
-const ShortlistItem = ({
-  shortlist,
+export const ShortlistsPane = ({
+  overId,
+  updatingShortlistId,
 }: {
-  shortlist: z.infer<typeof v1_core_shortlists_schemas.shortlistItemSchema>;
+  overId: string | null;
+  updatingShortlistId: string | null;
 }) => {
-  // HOOKS
-  const dispatch = useAppDispatch();
-
-  // API
-  const [deleteShortlist, deleteShortlistAPI] =
-    shortlistsAPI.useDeleteShortlistMutation();
-
-  // HANDLERS
-  const handleEdit = () => {
-    dispatch(shortlistFormSlice.actions.setIsCreateMode(false));
-    dispatch(shortlistFormSlice.actions.setShortlistId(shortlist.id));
-    dispatch(shortlistFormSlice.actions.setOpened(true));
-  };
-  const handleDelete = () => {
-    modals.openConfirmModal({
-      title: `Delete Shortlist "${shortlist.name}"`,
-      centered: true,
-      children: (
-        <Text size="sm">
-          Are you sure you want to delete this shortlist? This action cannot be
-          undone.
-        </Text>
-      ),
-      labels: { confirm: "Delete Shortlist", cancel: "No, don't delete it" },
-      confirmProps: { color: "red", loading: deleteShortlistAPI.isLoading },
-      onConfirm: async () => {
-        const response = await deleteShortlist({
-          id: shortlist.id,
-        });
-        if (response.data) {
-          notifications.show({
-            title: "Success",
-            message: response.data.message,
-            color: "green",
-          });
-        }
-      },
-    });
-  };
-
-  // DRAW
-  return (
-    <Paper>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Icon className="mt-0.5" icon={icons.shortlist_item} height={16} />
-          <Text fw={600} size="sm" className="block max-w-40" truncate="end">
-            {shortlist.name}
-          </Text>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="light">{shortlist.instruments.length}</Badge>
-          <Menu shadow="md" width={150} position="bottom-end">
-            <Menu.Target>
-              <ActionIcon
-                onClick={(e) => e.stopPropagation()}
-                variant="subtle"
-                size="xs"
-                color="dark"
-                aria-label="Settings"
-              >
-                <Icon className="cursor-pointer" icon={icons.menu} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<Icon icon={icons.edit} />}
-                onClick={() => handleEdit()}
-              >
-                Edit Shortlist
-              </Menu.Item>
-              <Menu.Item
-                color="red"
-                leftSection={<Icon icon={icons.delete} />}
-                onClick={() => handleDelete()}
-              >
-                Delete
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </div>
-      </div>
-    </Paper>
-  );
-};
-
-export const ShortlistsPane = () => {
   // HOOKS
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
@@ -197,7 +101,12 @@ export const ShortlistsPane = () => {
         getAllShortlistsAPI.data.data.length > 0 ? (
         <div className="h-full w-full flex flex-col gap-2">
           {getAllShortlistsAPI.data.data.map((shortlist) => (
-            <ShortlistItem key={shortlist.id} shortlist={shortlist} />
+            <ShortlistItem
+              key={shortlist.id}
+              shortlist={shortlist}
+              overId={overId}
+              isUpdating={updatingShortlistId === shortlist.id}
+            />
           ))}
         </div>
       ) : (

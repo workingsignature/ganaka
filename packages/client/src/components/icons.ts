@@ -15,6 +15,10 @@ export const icons = {
   search: "iconamoon:search-light",
   empty: "qlementine-icons:empty-slot-24",
   refresh: "ic:twotone-refresh",
+  close: "mdi:close",
+  chevronDown: "mdi:chevron-down",
+  chevronRight: "mdi:chevron-right",
+  drag: "si:drag-indicator-fill",
   // ----------------------------------------
   timeline: "mdi:timeline-outline",
   shortlist: "tabler:list-details",
@@ -23,4 +27,5 @@ export const icons = {
   version: "qlementine-icons:version-control-16",
   create_version: "mdi:source-branch-plus",
   shortlist_item: "fluent:list-16-regular",
+  add_to_shortlist: "ci:list-add",
 };

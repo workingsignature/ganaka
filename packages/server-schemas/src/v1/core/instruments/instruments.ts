@@ -18,8 +18,14 @@ export const instrumentItemSchema = z.object({
 export const getInstruments = {
   query: z.object({
     query: z.string().optional(),
-    pageno: z.number().optional(),
-    pagesize: z.number().optional(),
+    pageno: z.coerce.number().optional(),
+    pagesize: z.coerce.number().optional(),
+    categories: z
+      .string()
+      .optional()
+      .describe(
+        "Comma-separated category values in format: 'broad-sector:name,sector:name,broad-industry:name,industry:name'"
+      ),
   }),
   response: apiResponseSchema.extend({
     data: z.object({
@@ -37,5 +43,29 @@ export const getInstrument = {
   }),
   response: apiResponseSchema.extend({
     data: instrumentItemSchema,
+  }),
+};
+
+// ==================== GET /instruments/filter-tree ====================
+
+export interface TreeNode {
+  label: string;
+  value: string;
+  children?: TreeNode[];
+}
+
+export const treeNodeSchema: z.ZodType<TreeNode> = z.lazy(() =>
+  z.object({
+    label: z.string(),
+    value: z.string(),
+    children: z.array(treeNodeSchema).optional(),
+  })
+);
+
+export const getInstrumentsFilterTree = {
+  response: apiResponseSchema.extend({
+    data: z.object({
+      tree: z.array(treeNodeSchema),
+    }),
   }),
 };

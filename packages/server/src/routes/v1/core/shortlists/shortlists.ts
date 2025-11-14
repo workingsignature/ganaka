@@ -39,6 +39,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
               instruments: shortlist.instruments.map((instrument) => ({
                 id: instrument.id,
                 name: instrument.name,
+                symbol: instrument.tradingSymbol,
               })),
             };
           }),
@@ -96,6 +97,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
             instruments: shortlist.instruments.map((instrument) => ({
               id: instrument.id,
               name: instrument.name,
+              symbol: instrument.tradingSymbol,
             })),
           },
         })
@@ -164,6 +166,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
             instruments: shortlist.instruments.map((instrument) => ({
               id: instrument.id,
               name: instrument.name,
+              symbol: instrument.tradingSymbol,
             })),
           },
         })
@@ -284,6 +287,7 @@ const shortlistsRoutes: FastifyPluginAsync = async (fastify) => {
             instruments: shortlist.instruments.map((instrument) => ({
               id: instrument.id,
               name: instrument.name,
+              symbol: instrument.tradingSymbol,
             })),
           },
         })

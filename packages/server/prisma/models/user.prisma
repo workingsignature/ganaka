@@ -7,7 +7,7 @@ model User {
 
     strategies    Strategy[]
     shortlists    Shortlist[]
-    developerKeys DeveloperKeys[]
+    developerKeys DeveloperKey[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -15,7 +15,7 @@ model User {
     @@index([clerkId])
 }
 
-model DeveloperKeys {
+model DeveloperKey {
     id   String @id @default(uuid())
     user User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 

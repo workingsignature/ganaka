@@ -13,7 +13,7 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
       const user = request.user;
 
       // get developer key
-      const developerKeys = await prisma.developerKeys.findMany({
+      const developerKeys = await prisma.developerKey.findMany({
         where: {
           user: {
             id: user.id,
@@ -47,7 +47,7 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
       const user = request.user;
 
       // create developer key
-      const developerKey = await prisma.developerKeys.create({
+      const developerKey = await prisma.developerKey.create({
         data: {
           key: crypto.randomUUID(),
           user: {
@@ -94,8 +94,8 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // get developer key
-      const developerKeyToUpdate = await prisma.developerKeys.findUnique({
-        where: { id: validatedParams.id, user: { id: user.id } },
+      const developerKeyToUpdate = await prisma.developerKey.findUnique({
+        where: { id: validatedParams.id, user: { clerkId: user.clerkId } },
       });
       if (!developerKeyToUpdate) {
         return reply.notFound(
@@ -107,7 +107,7 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // deactivate developer key
-      const developerKey = await prisma.developerKeys.update({
+      const developerKey = await prisma.developerKey.update({
         where: { id: validatedParams.id, user: { clerkId: user.clerkId } },
         data: { status: DeveloperKeyStatus.INACTIVE },
       });

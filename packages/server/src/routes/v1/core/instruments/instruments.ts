@@ -4,6 +4,8 @@ import { sendResponse } from "../../../../helpers/sendResponse";
 import { v1_core_instruments_schemas } from "@ganaka/server-schemas";
 import z from "zod";
 import { validateRequest } from "../../../../helpers/validator";
+import { Prisma } from "../../../../../generated/prisma";
+import { lowerCase, startCase } from "lodash";
 
 const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {
@@ -18,32 +20,71 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
         return;
       }
 
+      // Parse category filters from comma-separated string
+      const categoryFilters: Prisma.InstrumentWhereInput[] = [];
+      if (validatedQuery.categories) {
+        const categories = validatedQuery.categories
+          .split(",")
+          .map((c: string) => c.trim())
+          .filter((c: string) => c.length > 0);
+
+        for (const category of categories) {
+          const [type, name] = category.split(":");
+          if (!type || !name) continue;
+
+          switch (type) {
+            case "broad-sector":
+              categoryFilters.push({ broadSector: { name } });
+              break;
+            case "sector":
+              categoryFilters.push({ sector: { name } });
+              break;
+            case "broad-industry":
+              categoryFilters.push({ broadIndustry: { name } });
+              break;
+            case "industry":
+              categoryFilters.push({ industry: { name } });
+              break;
+          }
+        }
+      }
+      // where clause
+      const searchConditions: Prisma.InstrumentWhereInput = validatedQuery.query
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: validatedQuery.query,
+                  mode: "insensitive" as const,
+                },
+              },
+              {
+                tradingSymbol: {
+                  contains: validatedQuery.query,
+                  mode: "insensitive" as const,
+                },
+              },
+              {
+                growwSymbol: {
+                  contains: validatedQuery.query,
+                  mode: "insensitive" as const,
+                },
+              },
+            ],
+          }
+        : {};
+      const whereClause: Prisma.InstrumentWhereInput =
+        categoryFilters.length > 0
+          ? {
+              AND: [searchConditions, { OR: categoryFilters }],
+            }
+          : searchConditions;
+
       // get instruments
       const instruments = await prisma.instrument.findMany({
-        where: {
-          OR: [
-            {
-              name: {
-                contains: validatedQuery.query ?? "",
-                mode: "insensitive",
-              },
-            },
-            {
-              trading_symbol: {
-                contains: validatedQuery.query ?? "",
-                mode: "insensitive",
-              },
-            },
-            {
-              groww_symbol: {
-                contains: validatedQuery.query ?? "",
-                mode: "insensitive",
-              },
-            },
-          ],
-        },
+        where: whereClause,
         skip:
-          (validatedQuery.pageno ?? 1 - 1) * (validatedQuery.pagesize ?? 10),
+          ((validatedQuery.pageno ?? 1) - 1) * (validatedQuery.pagesize ?? 25),
         take: validatedQuery.pagesize ?? 25,
         orderBy: {
           name: "asc",
@@ -52,28 +93,7 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
 
       // get total count
       const total = await prisma.instrument.count({
-        where: {
-          OR: [
-            {
-              name: {
-                contains: validatedQuery.query ?? "",
-                mode: "insensitive",
-              },
-            },
-            {
-              groww_symbol: {
-                contains: validatedQuery.query ?? "",
-                mode: "insensitive",
-              },
-            },
-            {
-              trading_symbol: {
-                contains: validatedQuery.query ?? "",
-                mode: "insensitive",
-              },
-            },
-          ],
-        },
+        where: whereClause,
       });
 
       // send response
@@ -87,7 +107,7 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
             instruments: instruments.map((instrument) => ({
               id: instrument.id,
               name: instrument.name,
-              symbol: instrument.trading_symbol,
+              symbol: instrument.tradingSymbol,
               exchange: instrument.exchange,
             })),
             paginationInfo: {
@@ -95,6 +115,85 @@ const instrumentsRoutes: FastifyPluginAsync = async (fastify) => {
               pageno: validatedQuery.pageno ?? 1,
               pagesize: validatedQuery.pagesize ?? 25,
             },
+          },
+        })
+      );
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.internalServerError("An unexpected error occurred.");
+    }
+  });
+  fastify.get("/filter-tree", async (_, reply) => {
+    try {
+      // Fetch all broad sectors with their nested relationships
+      const broadSectors = await prisma.instrumentBroadSector.findMany({
+        include: {
+          sectors: {
+            include: {
+              broadIndustries: {
+                include: {
+                  industries: {
+                    orderBy: {
+                      name: "asc",
+                    },
+                  },
+                },
+                orderBy: {
+                  name: "asc",
+                },
+              },
+            },
+            orderBy: {
+              name: "asc",
+            },
+          },
+        },
+        orderBy: {
+          name: "asc",
+        },
+      });
+
+      // Transform to combined tree structure: BroadSector → Sector → BroadIndustry → Industry or Sector → BroadIndustry → Industry
+      const tree = broadSectors.map((broadSector) => ({
+        label: startCase(lowerCase(broadSector.name)),
+        value: `broad-sector:${broadSector.name}`,
+        children:
+          broadSector.sectors.length === 1
+            ? broadSector.sectors[0].broadIndustries.map((broadIndustry) => ({
+                label: startCase(lowerCase(broadIndustry.name)),
+                value: `broad-industry:${broadIndustry.name}`,
+                children: broadIndustry.industries.map((industry) => ({
+                  label: startCase(lowerCase(industry.name)),
+                  value: `industry:${industry.name}`,
+                })),
+              }))
+            : broadSector.sectors.map((sector) => {
+                return {
+                  label: startCase(lowerCase(sector.name)),
+                  value: `sector:${sector.name}`,
+                  children: sector.broadIndustries.map((broadIndustry) => ({
+                    label: startCase(lowerCase(broadIndustry.name)),
+                    value: `broad-industry:${broadIndustry.name}`,
+                    children: broadIndustry.industries.map((industry) => ({
+                      label: startCase(lowerCase(industry.name)),
+                      value: `industry:${industry.name}`,
+                    })),
+                  })),
+                };
+              }),
+      }));
+
+      // send response
+      return reply.send(
+        sendResponse<
+          z.infer<
+            typeof v1_core_instruments_schemas.getInstrumentsFilterTree.response
+          >
+        >({
+          statusCode: 200,
+          message: "Filter tree fetched successfully",
+          data: {
+            tree,
           },
         })
       );

@@ -6,7 +6,7 @@ import type z from "zod";
 export const instrumentsAPI = createApi({
   reducerPath: "instrumentsAPI",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["instruments"],
+  tagTypes: ["instruments", "filter-tree"],
   endpoints: (builder) => ({
     getInstruments: builder.query<
       z.infer<typeof v1_core_instruments_schemas.getInstruments.response>,
@@ -29,5 +29,23 @@ export const instrumentsAPI = createApi({
       }),
       providesTags: ["instruments"],
     }),
+    getInstrumentsFilterTree: builder.query<
+      z.infer<
+        typeof v1_core_instruments_schemas.getInstrumentsFilterTree.response
+      >,
+      void
+    >({
+      query: () => ({
+        url: `/instruments/filter-tree`,
+        method: "GET",
+      }),
+      providesTags: ["filter-tree"],
+    }),
   }),
 });
+
+export const {
+  useGetInstrumentsQuery,
+  useGetInstrumentQuery,
+  useGetInstrumentsFilterTreeQuery,
+} = instrumentsAPI;

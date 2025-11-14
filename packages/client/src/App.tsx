@@ -1,19 +1,21 @@
 import { Protect } from "@clerk/clerk-react";
-import { Notifications } from "@mantine/notifications";
 import {
+  Checkbox,
+  Loader,
   MantineProvider,
+  Notification,
   NumberInput,
   Tabs,
-  Textarea,
   TagsInput,
+  Textarea,
   TextInput,
-  Notification,
 } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import { Notifications } from "@mantine/notifications";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Auth } from "./layouts/Auth/Auth.layout";
 import { Dashboard } from "./layouts/Dashboard/Dashboard.layout";
 import { NotFound } from "./layouts/NotFound/NotFound";
-import { ModalsProvider } from "@mantine/modals";
 
 export const App = () => {
   // DRAW
@@ -22,12 +24,17 @@ export const App = () => {
       theme={{
         primaryColor: "pink",
         components: {
-          Tabs: Tabs.Tab.extend({
+          Loader: Loader.extend({
             defaultProps: {
-              styles: {
-                tab: {
-                  border: "1px solid var(--mantine-color-gray-3)",
-                },
+              type: "bars",
+            },
+          }),
+          Tabs: Tabs.extend({
+            defaultProps: {
+              radius: "lg",
+              classNames: {
+                root: "h-full max-h-full",
+                panel: "h-full max-h-full",
               },
             },
           }),
@@ -36,7 +43,7 @@ export const App = () => {
               label: ref.description ? undefined : "mb-1",
               // reserving space for error message
               error: "mt-1",
-              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+              wrapper: ref.error ? "mb-0" : "mb-[19.5px]",
             }),
           }),
           TextInput: TextInput.extend({
@@ -45,7 +52,7 @@ export const App = () => {
               description: "mb-2",
               // reserving space for error message
               error: "mt-1",
-              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+              wrapper: ref.error ? "mb-0" : "mb-[19.5px]",
             }),
           }),
           Textarea: Textarea.extend({
@@ -54,7 +61,7 @@ export const App = () => {
               description: "mb-2",
               // reserving space for error message
               error: "mt-1",
-              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+              wrapper: ref.error ? "mb-0" : "mb-[19.5px]",
             }),
           }),
           NumberInput: NumberInput.extend({
@@ -62,13 +69,18 @@ export const App = () => {
               label: ref.description ? undefined : "mb-1",
               // reserving space for error message
               error: "mt-1",
-              wrapper: ref.error ? "mb-0" : "!mb-[19.5px]",
+              wrapper: ref.error ? "mb-0" : "mb-[19.5px]",
             }),
           }),
           Notification: Notification.extend({
             defaultProps: {
               withBorder: true,
             },
+          }),
+          Checkbox: Checkbox.extend({
+            classNames: () => ({
+              description: "!mt-1",
+            }),
           }),
         },
       }}

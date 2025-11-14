@@ -1,0 +1,35 @@
+import { GPane } from "@/components/GPane";
+import { CompaniesTab } from "./components/CompaniesTab";
+import { SegmentedControl, Tooltip } from "@mantine/core";
+import { useState } from "react";
+import { ListsTab } from "./components/ListsTab";
+
+export const CompaniesPane = () => {
+  // STATE
+  const [tab, setTab] = useState<"Companies" | "Lists">("Companies");
+
+  // DRAW
+  return (
+    <GPane
+      title={tab === "Companies" ? "Companies" : "Lists"}
+      titleActions={
+        <div className="h-full w-48">
+          <Tooltip label="Feature under development">
+            <SegmentedControl
+              size="xs"
+              fullWidth
+              radius="xl"
+              disabled
+              withItemsBorders={false}
+              value={tab}
+              onChange={(value) => setTab(value as typeof tab)}
+              data={["Companies", "Lists"]}
+            />
+          </Tooltip>
+        </div>
+      }
+    >
+      {tab === "Companies" ? <CompaniesTab /> : <ListsTab />}
+    </GPane>
+  );
+};

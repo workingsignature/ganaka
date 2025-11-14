@@ -84,7 +84,7 @@ const authPlugin =
             break;
           }
           case "developer": {
-            const developerKey = await prisma.developerKeys.findUnique({
+            const developerKey = await prisma.developerKey.findUnique({
               where: {
                 key: token,
               },

@@ -12,9 +12,9 @@ export const GPane = ({
   onSearchChange,
 }: {
   children: React.ReactNode;
-  titleActions: React.ReactNode;
   title: string;
   searchPlaceholder?: string;
+  titleActions?: React.ReactNode;
   onSearchChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
   // HOOKS
@@ -26,7 +26,7 @@ export const GPane = ({
       withBorder
       p="md"
       className={clsx(
-        "h-full w-full !grid grid-rows-[32px_36px_1fr] gap-2 overflow-hidden",
+        "h-full w-full !grid gap-2 overflow-hidden",
         onSearchChange ? "grid-rows-[32px_36px_1fr]" : "grid-rows-[32px_1fr]"
       )}
     >
@@ -50,7 +50,7 @@ export const GPane = ({
           />
         </div>
       ) : null}
-      <div className="w-full h-full">{children}</div>
+      <div className="w-full h-full overflow-hidden">{children}</div>
     </Paper>
   );
 };

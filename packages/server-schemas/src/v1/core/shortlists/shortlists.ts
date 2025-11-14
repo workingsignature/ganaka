@@ -9,6 +9,7 @@ import { apiResponseSchema } from "../../../common";
 export const instrumentSummarySchema = z.object({
   id: z.string(),
   name: z.string(),
+  symbol: z.string(),
 });
 
 /**
