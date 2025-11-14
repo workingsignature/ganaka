@@ -94,6 +94,7 @@ export const ShortlistItem = ({
       shortlistsPageSlice.actions.toggleSelectedShortlist({
         id: shortlist.id,
         name: shortlist.name,
+        instruments: shortlist.instruments.map((instrument) => instrument.id),
       })
     );
   };
@@ -111,7 +112,7 @@ export const ShortlistItem = ({
       shadow="xs"
       onClick={handleClick}
       className={cn(
-        "cursor-pointer transition-all duration-200",
+        "cursor-pointer transition-all duration-200 min-h-20",
         isHovered && "hover-primary",
         showLoading && "opacity-75"
       )}
@@ -182,6 +183,7 @@ export const ShortlistItem = ({
                         <CompanyCardContent
                           name={instrument.name}
                           symbol={instrument.symbol}
+                          instrumentId={instrument.id}
                           hideDragHandler={true}
                           hideAddToShortlist={true}
                         />

@@ -1,9 +1,11 @@
 import { GText } from "@/components/GText";
 import { icons } from "@/components/icons";
+import { cn } from "@/lib/utils";
 import {
   useGetInstrumentsFilterTreeQuery,
   useGetInstrumentsQuery,
 } from "@/store/api/instruments.api";
+import { shortlistsAPI } from "@/store/api/shortlists.api";
 import { useAppSelector } from "@/utils/hooks/storeHooks";
 import { useDraggable, type DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
@@ -25,12 +27,237 @@ import {
   type TreeNodeData,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { isEmpty, times } from "lodash";
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+
+const AddToShortlist = ({
+  instrumentId,
+}: {
+  instrumentId: string | undefined;
+}) => {
+  // API
+  const [updateShortlist, updateShortlistAPI] =
+    shortlistsAPI.useUpdateShortlistMutation();
+
+  // STATE
+  const { selectedShortlists } = useAppSelector(
+    (state) => state.shortlistsPage
+  );
+  const [popoverOpened, setPopoverOpened] = useState(false);
+  const [selectedShortlistIds, setSelectedShortlistIds] = useState<string[]>(
+    []
+  );
+
+  // VARIABLES
+  const isAddToShortlistDisabled = selectedShortlists.length === 0;
+  const isSubmitButtonDisabled =
+    isAddToShortlistDisabled || selectedShortlistIds.length === 0;
+
+  // HANDLERS
+  const handleShortlistToggle = (shortlistId: string) => {
+    setSelectedShortlistIds((prev) =>
+      prev.includes(shortlistId)
+        ? prev.filter((id) => id !== shortlistId)
+        : [...prev, shortlistId]
+    );
+  };
+  const handleOpenPopover = () => {
+    if (!isAddToShortlistDisabled && instrumentId) {
+      setSelectedShortlistIds(
+        selectedShortlists.flatMap((s) => {
+          return s.instruments.includes(instrumentId) ? [] : s.id;
+        })
+      );
+      setPopoverOpened(true);
+    }
+  };
+  const handleClosePopover = () => {
+    setPopoverOpened(false);
+  };
+  const handleAddToShortlists = async () => {
+    if (selectedShortlistIds.length === 0 || !instrumentId) return;
+
+    const results = await Promise.allSettled(
+      selectedShortlistIds.map(async (shortlistId) => {
+        const shortlist = selectedShortlists.find((s) => s.id === shortlistId);
+        if (!shortlist) {
+          return { shortlistId, success: false, alreadyExists: false };
+        }
+
+        // Check if instrument is already in the shortlist
+        const instrumentIds = shortlist.instruments.map((instId) => instId);
+        if (instrumentIds.includes(instrumentId)) {
+          return { shortlistId, success: false, alreadyExists: true };
+        }
+
+        // Add instrument to shortlist
+        const response = await updateShortlist({
+          params: { id: shortlistId },
+          body: {
+            name: shortlist.name,
+            instruments: [...instrumentIds, instrumentId],
+          },
+        });
+
+        return {
+          shortlistId,
+          success: !!response.data,
+          alreadyExists: false,
+        };
+      })
+    );
+
+    // Show notifications
+    const successful = results.filter(
+      (r) => r.status === "fulfilled" && r.value?.success
+    ).length;
+    const alreadyExists = results.filter(
+      (r) => r.status === "fulfilled" && r.value?.alreadyExists
+    ).length;
+    const failed = results.filter((r) => r.status === "rejected").length;
+
+    if (successful > 0) {
+      notifications.show({
+        title: "Success",
+        message: `Added ${name} to ${successful} shortlist${
+          successful > 1 ? "s" : ""
+        }`,
+        color: "green",
+      });
+    }
+    if (alreadyExists > 0) {
+      notifications.show({
+        title: "Already in shortlist",
+        message: `${name} is already in ${alreadyExists} shortlist${
+          alreadyExists > 1 ? "s" : ""
+        }`,
+        color: "yellow",
+      });
+    }
+    if (failed > 0) {
+      notifications.show({
+        title: "Error",
+        message: `Failed to add ${name} to ${failed} shortlist${
+          failed > 1 ? "s" : ""
+        }`,
+        color: "red",
+      });
+    }
+    handleClosePopover();
+  };
+  const handleExitTransitionEnd = () => {
+    setSelectedShortlistIds([]);
+  };
+
+  // DRAW
+  return (
+    <Popover
+      onClose={handleClosePopover}
+      opened={popoverOpened}
+      onDismiss={handleClosePopover}
+      onExitTransitionEnd={handleExitTransitionEnd}
+      position="bottom-start"
+    >
+      <Popover.Target>
+        <Tooltip
+          label={
+            isAddToShortlistDisabled
+              ? "No shortlists selected"
+              : `Add to ${
+                  selectedShortlistIds.length > 1 ? "shortlists" : "shortlist"
+                }`
+          }
+        >
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            radius="xs"
+            disabled={isAddToShortlistDisabled}
+            onClick={handleOpenPopover}
+          >
+            <Icon icon={icons.add_to_shortlist} height={18} />
+          </ActionIcon>
+        </Tooltip>
+      </Popover.Target>
+      <Popover.Dropdown w={250} mah={300} className="overflow-hidden">
+        <div className="w-full h-full flex flex-col gap-2">
+          <Text fw={500} size="sm">
+            Add to Shortlist
+          </Text>
+          {selectedShortlists.length === 0 ? (
+            <div className="flex flex-col gap-2">
+              {times(3, (index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Skeleton circle height={18} />
+                  <Skeleton height={18} radius="xl" className="flex-1" />
+                </div>
+              ))}
+            </div>
+          ) : selectedShortlists.length === 0 ? (
+            <Text size="sm" c="dimmed">
+              No shortlists available
+            </Text>
+          ) : (
+            <>
+              <div className="flex-1 overflow-y-auto">
+                <div className="flex flex-col gap-1">
+                  {selectedShortlists.map((shortlist) => {
+                    const isSelected = selectedShortlistIds.includes(
+                      shortlist.id
+                    );
+                    const isAlreadyInShortlist = instrumentId
+                      ? shortlist.instruments.some(
+                          (instId) => instId === instrumentId
+                        )
+                      : false;
+
+                    return (
+                      <div
+                        key={shortlist.id}
+                        className="flex items-center gap-2 p-1 rounded hover:bg-gray-50 cursor-pointer"
+                        onClick={() => handleShortlistToggle(shortlist.id)}
+                      >
+                        <Checkbox
+                          checked={isSelected}
+                          disabled={isAlreadyInShortlist}
+                          size="xs"
+                          radius="xl"
+                          onChange={() => handleShortlistToggle(shortlist.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          label={shortlist.name}
+                          description={
+                            isAlreadyInShortlist ? "Already present" : undefined
+                          }
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <Button
+                size="xs"
+                fullWidth
+                onClick={handleAddToShortlists}
+                disabled={isSubmitButtonDisabled}
+                loading={updateShortlistAPI.isLoading}
+              >
+                {`Add to ${
+                  selectedShortlistIds.length > 1 ? "shortlists" : "shortlist"
+                }`}
+              </Button>
+            </>
+          )}
+        </div>
+      </Popover.Dropdown>
+    </Popover>
+  );
+};
 
 export const CompanyCardContent = ({
   name,
   symbol,
+  instrumentId,
   attributes,
   listeners,
   hideDragHandler = false,
@@ -38,36 +265,25 @@ export const CompanyCardContent = ({
 }: {
   name: string;
   symbol: string;
+  instrumentId?: string;
   attributes?: DraggableAttributes;
   listeners?: SyntheticListenerMap | undefined;
   hideDragHandler?: boolean;
   hideAddToShortlist?: boolean;
 }) => {
-  // HOOKS
-  const { selectedShortlists } = useAppSelector(
-    (state) => state.shortlistsPage
-  );
-
-  // VARIABLES
-  const isAddToShortlistDisabled = selectedShortlists.length === 0;
-
-  // Determine grid columns based on what's hidden
-  const getGridCols = () => {
-    if (hideDragHandler && hideAddToShortlist) {
-      return "grid-cols-[38px_1fr]";
-    }
-    if (hideDragHandler) {
-      return "grid-cols-[38px_1fr_22px]";
-    }
-    if (hideAddToShortlist) {
-      return "grid-cols-[20px_38px_1fr]";
-    }
-    return "grid-cols-[20px_38px_1fr_22px]";
-  };
-
   // DRAW
   return (
-    <div className={`w-full h-full grid gap-2 ${getGridCols()}`}>
+    <div
+      className={cn(
+        "w-full h-full grid gap-2",
+        hideDragHandler && hideAddToShortlist && "grid-cols-[38px_1fr]",
+        hideDragHandler && !hideAddToShortlist && "grid-cols-[38px_1fr_22px]",
+        !hideDragHandler && hideAddToShortlist && "grid-cols-[20px_38px_1fr]",
+        !hideDragHandler &&
+          !hideAddToShortlist &&
+          "grid-cols-[20px_38px_1fr_22px]"
+      )}
+    >
       {!hideDragHandler && (
         <div
           className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
@@ -96,27 +312,7 @@ export const CompanyCardContent = ({
           </GText>
         </div>
       </div>
-      {!hideAddToShortlist && (
-        <div className="w-full h-full flex items-center flex-col justify-center">
-          <Popover>
-            <Popover.Target>
-              <Tooltip label="Add to shortlist">
-                <ActionIcon
-                  variant="subtle"
-                  size="sm"
-                  radius="xs"
-                  disabled={isAddToShortlistDisabled}
-                >
-                  <Icon icon={icons.add_to_shortlist} height={18} />
-                </ActionIcon>
-              </Tooltip>
-            </Popover.Target>
-            <Popover.Dropdown w={200} mah={200}>
-              <div className="w-full h-full grid grid-rows"></div>
-            </Popover.Dropdown>
-          </Popover>
-        </div>
-      )}
+      {!hideAddToShortlist && <AddToShortlist instrumentId={instrumentId} />}
     </div>
   );
 };
@@ -163,6 +359,7 @@ const CompanyCard = ({
       <CompanyCardContent
         name={name}
         symbol={symbol}
+        instrumentId={id}
         attributes={attributes}
         listeners={listeners}
       />

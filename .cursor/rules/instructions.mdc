@@ -10,3 +10,5 @@ Always use divs instead of Stacks and Group elements from MantineUI
 
 Never use colors from tailwind directly. Always use colors specified in index.css (custom CSS variables).
 If the required color isn't available, create a reusable variable in index.css for it and then use it.
+
+Only use GText when the text needs to be copied. For most normal text, use Text.

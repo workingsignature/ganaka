@@ -1,5 +1,6 @@
 import { Protect } from "@clerk/clerk-react";
 import {
+  Checkbox,
   Loader,
   MantineProvider,
   Notification,
@@ -75,6 +76,11 @@ export const App = () => {
             defaultProps: {
               withBorder: true,
             },
+          }),
+          Checkbox: Checkbox.extend({
+            classNames: () => ({
+              description: "!mt-1",
+            }),
           }),
         },
       }}

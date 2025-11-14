@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface ShortlistsPageState {
-  selectedShortlists: { id: string; name: string }[];
+  selectedShortlists: { id: string; name: string; instruments: string[] }[];
 }
 
 const initialState: ShortlistsPageState = {
@@ -14,7 +14,7 @@ export const shortlistsPageSlice = createSlice({
   reducers: {
     toggleSelectedShortlist: (
       state,
-      action: PayloadAction<{ id: string; name: string }>
+      action: PayloadAction<{ id: string; name: string; instruments: string[] }>
     ) => {
       if (
         state.selectedShortlists.some(
