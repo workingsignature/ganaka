@@ -41,7 +41,7 @@ const ShortlistItem = ({
   });
 
   // STATE
-  const { selectedShortlistsIds } = useAppSelector(
+  const { selectedShortlists } = useAppSelector(
     (state) => state.shortlistsPage
   );
 
@@ -50,7 +50,9 @@ const ShortlistItem = ({
     shortlistsAPI.useDeleteShortlistMutation();
 
   // VARIABLES
-  const isCurrentShortlist = selectedShortlistsIds.includes(shortlist.id);
+  const isSelected = selectedShortlists.some(
+    (selectedShortlist) => selectedShortlist.id === shortlist.id
+  );
 
   // HANDLERS
   const handleEdit = () => {
@@ -86,7 +88,10 @@ const ShortlistItem = ({
   };
   const handleClick = () => {
     dispatch(
-      shortlistsPageSlice.actions.toggleSelectedShortlistId(shortlist.id)
+      shortlistsPageSlice.actions.toggleSelectedShortlist({
+        id: shortlist.id,
+        name: shortlist.name,
+      })
     );
   };
 
@@ -104,7 +109,7 @@ const ShortlistItem = ({
         <Checkbox
           size="xs"
           radius="xl"
-          checked={isCurrentShortlist}
+          checked={isSelected}
           className="mt-auto mb-auto"
         />
         <div className="mt-auto mb-auto">

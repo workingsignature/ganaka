@@ -39,12 +39,12 @@ export const CompanyCardContent = ({
   listeners?: SyntheticListenerMap | undefined;
 }) => {
   // HOOKS
-  const { selectedShortlistsIds } = useAppSelector(
+  const { selectedShortlists } = useAppSelector(
     (state) => state.shortlistsPage
   );
 
   // VARIABLES
-  const isAddToShortlistDisabled = selectedShortlistsIds.length === 0;
+  const isAddToShortlistDisabled = selectedShortlists.length === 0;
 
   // DRAW
   return (
@@ -89,7 +89,9 @@ export const CompanyCardContent = ({
               </ActionIcon>
             </Tooltip>
           </Popover.Target>
-          <Popover.Dropdown w={200} mah={200}></Popover.Dropdown>
+          <Popover.Dropdown w={200} mah={200}>
+            <div className="w-full h-full grid grid-rows"></div>
+          </Popover.Dropdown>
         </Popover>
       </div>
     </div>
