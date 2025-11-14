@@ -25,7 +25,7 @@ import {
   type TreeNodeData,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { times } from "lodash";
+import { isEmpty, times } from "lodash";
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 
 export const CompanyCardContent = ({
@@ -428,7 +428,9 @@ export const CompaniesTab = () => {
             placeholder="Search companies..."
             leftSection={<Icon icon={icons.search} />}
             rightSection={
-              getInstrumentsAPI.isFetching ? <Loader size="xs" /> : undefined
+              getInstrumentsAPI.isFetching && !isEmpty(searchQuery) ? (
+                <Loader size="xs" />
+              ) : undefined
             }
             className="w-full"
             classNames={{
@@ -439,12 +441,27 @@ export const CompaniesTab = () => {
           />
         </div>
         <div className="flex items-center justify-end gap-1">
+          <Tooltip label="Refresh Companies">
+            <ActionIcon
+              className="mt-auto mb-auto"
+              variant="subtle"
+              size="input-sm"
+              color="dark"
+            >
+              {getInstrumentsAPI.isFetching ? (
+                <Loader size="xs" />
+              ) : (
+                <Icon icon={icons.refresh} height={20} />
+              )}
+            </ActionIcon>
+          </Tooltip>
           <Tooltip label="Filter by Sector/Industry">
             <ActionIcon
               className="mt-auto mb-auto"
               variant="subtle"
-              size="lg"
+              size="input-sm"
               color="dark"
+              onClick={() => getInstrumentsAPI.refetch()}
             >
               <Icon icon={icons.sort} height={20} />
             </ActionIcon>
@@ -456,7 +473,7 @@ export const CompaniesTab = () => {
                   className="mt-auto mb-auto"
                   variant="subtle"
                   color="dark"
-                  size="lg"
+                  size="input-sm"
                 >
                   <Icon icon={icons.filter} height={20} />
                 </ActionIcon>
