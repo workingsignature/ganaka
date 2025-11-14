@@ -178,6 +178,11 @@
   .dark .selected-primary {
     background-color: var(--mantine-color-pink-8) !important;
   }
+
+  /* Drop zone outline for shortlists when dragging */
+  .drop-zone-outline {
+    border: 1px dashed var(--color-primary) !important;
+  }
 }
 
 #root {

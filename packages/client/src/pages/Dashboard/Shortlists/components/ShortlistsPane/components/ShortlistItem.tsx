@@ -34,7 +34,7 @@ export const ShortlistItem = ({
 }) => {
   // HOOKS
   const dispatch = useAppDispatch();
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef, isOver, active } = useDroppable({
     id: `shortlist-${shortlist.id}`,
     data: {
       type: "shortlist",
@@ -114,7 +114,8 @@ export const ShortlistItem = ({
       className={cn(
         "cursor-pointer transition-all duration-200 min-h-20",
         isHovered && "hover-primary",
-        showLoading && "opacity-75"
+        showLoading && "opacity-75",
+        active && "drop-zone-outline"
       )}
     >
       <div className="grid grid-cols-[20px_1fr_auto] gap-4">
