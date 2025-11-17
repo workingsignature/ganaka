@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import dayjs from "dayjs";
 
 /**
  * Format a date to YYYY-MM-DD
@@ -7,5 +7,5 @@ import { format } from "date-fns";
  * @returns The formatted date
  */
 export const gFormatDate = (date?: Date) => {
-  return format(date ? date : new Date(), "yyyy-MM-dd");
+  return dayjs(date ? date : new Date()).format("YYYY-MM-DD");
 };

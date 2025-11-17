@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { addMinutes } from "date-fns";
+import dayjs from "dayjs";
 
 const getGrowwAccessToken = async () => {
   try {
@@ -44,7 +44,7 @@ const getHistoricalCandles = async ({
           segment: "CASH",
           trading_symbol: symbol,
           start_time: timestamp,
-          end_time: addMinutes(timestamp, 1).toISOString(),
+          end_time: dayjs(timestamp).add(1, "minute").toISOString(),
           interval_in_minutes: intervalInMinutes,
         },
       }

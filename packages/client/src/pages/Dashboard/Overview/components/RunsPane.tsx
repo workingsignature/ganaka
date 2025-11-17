@@ -18,9 +18,12 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { formatRelative } from "date-fns";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { debounce, times } from "lodash";
 import type { z } from "zod";
+
+dayjs.extend(relativeTime);
 
 type RunItem = z.infer<
   typeof v1_core_strategies_versions_runs_schemas.runItemSchema
@@ -118,27 +121,21 @@ const RunCard = ({
               Started At
             </Text>
             <Text size="sm">
-              {startTime
-                ? formatRelative(new Date(startTime), new Date())
-                : "—"}
+              {startTime ? dayjs(startTime).fromNow() : "—"}
             </Text>
           </div>
           <div className="flex flex-col items-start justify-end">
             <Text size="xs" c="dimmed">
               Ended At
             </Text>
-            <Text size="sm">
-              {endTime ? formatRelative(new Date(endTime), new Date()) : "—"}
-            </Text>
+            <Text size="sm">{endTime ? dayjs(endTime).fromNow() : "—"}</Text>
           </div>
           <div className="flex flex-col items-end justify-end">
             <Text size="xs" c="dimmed">
               Created At
             </Text>
             <Text size="sm">
-              {run.createdAt
-                ? formatRelative(new Date(run.createdAt), new Date())
-                : "—"}
+              {run.createdAt ? dayjs(run.createdAt).fromNow() : "—"}
             </Text>
           </div>
         </div>
