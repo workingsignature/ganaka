@@ -17,18 +17,8 @@ export const runStatusSchema = z.enum([
 export const daywiseScheduleInputSchema = z.object({
   timeslots: z.array(
     z.object({
-      startTime: z
-        .string()
-        .regex(
-          /^([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/,
-          "Time must be in HH:MM:SS format"
-        ),
-      endTime: z
-        .string()
-        .regex(
-          /^([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/,
-          "Time must be in HH:MM:SS format"
-        ),
+      startTime: z.iso.datetime(),
+      endTime: z.iso.datetime(),
       interval: z.number(),
     })
   ),
@@ -51,18 +41,8 @@ export const scheduleInputSchema = z.object({
 export const daywiseScheduleSchema = z.object({
   timeslots: z.array(
     z.object({
-      startTime: z
-        .string()
-        .regex(
-          /^([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/,
-          "Time must be in HH:MM:SS format"
-        ),
-      endTime: z
-        .string()
-        .regex(
-          /^([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/,
-          "Time must be in HH:MM:SS format"
-        ),
+      startTime: z.iso.datetime(),
+      endTime: z.iso.datetime(),
       interval: z.number(),
     })
   ),

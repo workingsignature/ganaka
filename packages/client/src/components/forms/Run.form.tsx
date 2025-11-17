@@ -32,6 +32,7 @@ import {
   useFormContext,
 } from "react-hook-form";
 import { z } from "zod";
+import dayjs from "dayjs";
 
 // Form schema matching the API input schema
 const timeslotSchema = z.object({
@@ -188,6 +189,10 @@ const DaywiseSchedule = ({ selectedDay }: { selectedDay: DayKey }) => {
       color: "green",
     });
   };
+  const handleTimePickerFormat = (value: string | null) => {
+    if (!value || value === "") return "";
+    return dayjs(value).format("HH:mm:ss");
+  };
 
   // VARIABLES
   const timeslots = getTimeslotsArray(selectedDay);
@@ -225,10 +230,20 @@ const DaywiseSchedule = ({ selectedDay }: { selectedDay: DayKey }) => {
                     description="Execution start time"
                     presets={TIME_RANGE}
                     format="12h"
-                    onChange={(value: string | null) =>
-                      field.onChange(value || "")
-                    }
-                    value={field.value}
+                    onChange={(value: string | null) => {
+                      if (!value || value === "") {
+                        return field.onChange("");
+                      }
+                      // convert HH:mm:ss to ISO datetime
+                      const split = value.split(":");
+                      const isoDatetime = dayjs()
+                        .set("hour", parseInt(split[0]))
+                        .set("minute", parseInt(split[1]))
+                        .set("second", parseInt(split[2]))
+                        .toISOString();
+                      field.onChange(isoDatetime);
+                    }}
+                    value={handleTimePickerFormat(field.value)}
                     error={fieldState.error?.message}
                   />
                 )}
@@ -244,10 +259,20 @@ const DaywiseSchedule = ({ selectedDay }: { selectedDay: DayKey }) => {
                     description="Execution stop time"
                     format="12h"
                     presets={TIME_RANGE}
-                    value={field.value}
-                    onChange={(value: string | null) =>
-                      field.onChange(value || "")
-                    }
+                    value={handleTimePickerFormat(field.value)}
+                    onChange={(value: string | null) => {
+                      if (!value || value === "") {
+                        return field.onChange("");
+                      }
+                      // convert HH:mm:ss to ISO datetime
+                      const split = value.split(":");
+                      const isoDatetime = dayjs()
+                        .set("hour", parseInt(split[0]))
+                        .set("minute", parseInt(split[1]))
+                        .set("second", parseInt(split[2]))
+                        .toISOString();
+                      field.onChange(isoDatetime);
+                    }}
                     error={fieldState.error?.message}
                   />
                 )}
@@ -625,7 +650,9 @@ export const RunForm = () => {
                     ? new Date(field.value)
                     : null
                 }
-                onChange={(value: string | null) => field.onChange(value || "")}
+                onChange={(value: string | null) =>
+                  field.onChange(dayjs(value).toISOString() || "")
+                }
                 error={fieldState.error?.message}
               />
             )}
@@ -649,7 +676,9 @@ export const RunForm = () => {
                     ? new Date(field.value)
                     : null
                 }
-                onChange={(value: string | null) => field.onChange(value || "")}
+                onChange={(value: string | null) =>
+                  field.onChange(dayjs(value).toISOString() || "")
+                }
                 error={fieldState.error?.message}
               />
             )}
