@@ -2,9 +2,71 @@ import { v1_core_strategies_versions_runs_schemas } from "@ganaka/server-schemas
 import { FastifyPluginAsync } from "fastify";
 import { z } from "zod";
 import { InputJsonValue } from "../../../../../../../../../generated/prisma/runtime/library";
+import { ShortlistType } from "../../../../../../../../../generated/prisma";
 import { prisma } from "../../../../../../../../helpers/prisma";
 import { sendResponse } from "../../../../../../../../helpers/sendResponse";
 import { validateRequest } from "../../../../../../../../helpers/validator";
+
+// Helper function to extract all shortlist IDs from a schedule
+function extractShortlistIds(
+  schedule: z.infer<
+    typeof v1_core_strategies_versions_runs_schemas.scheduleInputSchema
+  >
+): string[] {
+  const shortlistIds: string[] = [];
+  const days = [
+    schedule.daywise.monday,
+    schedule.daywise.tuesday,
+    schedule.daywise.wednesday,
+    schedule.daywise.thursday,
+    schedule.daywise.friday,
+  ];
+
+  for (const day of days) {
+    if (day.shortlist && Array.isArray(day.shortlist)) {
+      shortlistIds.push(...day.shortlist);
+    }
+  }
+
+  return [...new Set(shortlistIds)]; // Remove duplicates
+}
+
+// Helper function to validate shortlist IDs
+async function validateShortlistIds(
+  shortlistIds: string[],
+  userId: string
+): Promise<{ valid: boolean; missingIds: string[] }> {
+  if (shortlistIds.length === 0) {
+    return { valid: true, missingIds: [] };
+  }
+
+  // Find all shortlists that exist and are accessible (CURATED or USER owned by the user)
+  const shortlists = await prisma.shortlist.findMany({
+    where: {
+      id: {
+        in: shortlistIds,
+      },
+      OR: [
+        { type: ShortlistType.CURATED },
+        {
+          type: ShortlistType.USER,
+          createdById: userId,
+        },
+      ],
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const foundIds = new Set(shortlists.map((s) => s.id));
+  const missingIds = shortlistIds.filter((id) => !foundIds.has(id));
+
+  return {
+    valid: missingIds.length === 0,
+    missingIds,
+  };
+}
 
 const runsRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {
@@ -244,6 +306,20 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
         );
       }
 
+      // validate shortlist IDs
+      const shortlistIds = extractShortlistIds(validatedBody.schedule);
+      const shortlistValidation = await validateShortlistIds(
+        shortlistIds,
+        user.id
+      );
+      if (!shortlistValidation.valid) {
+        return reply.badRequest(
+          `The following shortlist IDs do not exist or you are not authorized to access them: ${shortlistValidation.missingIds.join(
+            ", "
+          )}`
+        );
+      }
+
       // create run
       const run = await prisma.strategyVersionRun.create({
         data: {
@@ -445,6 +521,22 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.notFound(
           "Run not found or you are not authorized to update this run"
         );
+      }
+
+      // validate shortlist IDs if schedule is being updated
+      if (validatedBody.schedule !== undefined) {
+        const shortlistIds = extractShortlistIds(validatedBody.schedule);
+        const shortlistValidation = await validateShortlistIds(
+          shortlistIds,
+          user.id
+        );
+        if (!shortlistValidation.valid) {
+          return reply.badRequest(
+            `The following shortlist IDs do not exist or you are not authorized to access them: ${shortlistValidation.missingIds.join(
+              ", "
+            )}`
+          );
+        }
       }
 
       // update run

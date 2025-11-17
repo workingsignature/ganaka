@@ -19,6 +19,32 @@ export const balanceSchema = z.object({
   currentBalance: z.number(),
 });
 
+// Input schemas (for create/update - uses shortlist IDs)
+export const daywiseScheduleInputSchema = z.object({
+  timeslots: z.array(
+    z.object({
+      startTime: z.iso.datetime(),
+      endTime: z.iso.datetime(),
+      interval: z.number(),
+    })
+  ),
+  shortlist: z.array(z.string()), // Array of shortlist IDs
+  balance: balanceSchema,
+});
+
+export const scheduleInputSchema = z.object({
+  startDateTime: z.iso.datetime(),
+  endDateTime: z.iso.datetime(),
+  daywise: z.object({
+    monday: daywiseScheduleInputSchema,
+    tuesday: daywiseScheduleInputSchema,
+    wednesday: daywiseScheduleInputSchema,
+    thursday: daywiseScheduleInputSchema,
+    friday: daywiseScheduleInputSchema,
+  }),
+});
+
+// Output schemas (for responses - includes full shortlist data)
 export const daywiseScheduleSchema = z.object({
   timeslots: z.array(
     z.object({
@@ -27,13 +53,13 @@ export const daywiseScheduleSchema = z.object({
       interval: z.number(),
     })
   ),
-  shortlist: z.array(shortlistItemSchema),
+  shortlist: z.array(shortlistItemSchema), // Full shortlist objects
   balance: balanceSchema,
 });
 
 export const scheduleSchema = z.object({
-  startDateTime: z.string().datetime(),
-  endDateTime: z.string().datetime(),
+  startDateTime: z.iso.datetime(),
+  endDateTime: z.iso.datetime(),
   daywise: z.object({
     monday: daywiseScheduleSchema,
     tuesday: daywiseScheduleSchema,
@@ -49,9 +75,9 @@ export const runItemSchema = z.object({
   currentBalance: z.number(),
   startingBalance: z.number(),
   endingBalance: z.number(),
-  runType: runTypeSchema,
   errorLog: z.string().nullable(),
   customAttributes: z.record(z.string(), z.unknown()).optional(),
+  runType: runTypeSchema,
   status: runStatusSchema,
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
@@ -90,7 +116,7 @@ export const createRun = {
     versionid: z.string(),
   }),
   body: z.object({
-    schedule: scheduleSchema,
+    schedule: scheduleInputSchema, // Uses input schema with shortlist IDs
     currentBalance: z.number().default(0),
     startingBalance: z.number().default(0),
     endingBalance: z.number().default(0),
@@ -113,7 +139,7 @@ export const updateRun = {
     id: z.string(),
   }),
   body: z.object({
-    schedule: scheduleSchema.optional(),
+    schedule: scheduleInputSchema.optional(), // Uses input schema with shortlist IDs
     currentBalance: z.number().optional(),
     startingBalance: z.number().optional(),
     endingBalance: z.number().optional(),
