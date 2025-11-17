@@ -13,12 +13,6 @@ export const runStatusSchema = z.enum([
   "CANCELLED",
 ]);
 
-export const balanceSchema = z.object({
-  startBalance: z.number(),
-  endBalance: z.number(),
-  currentBalance: z.number(),
-});
-
 // Input schemas (for create/update - uses shortlist IDs)
 export const daywiseScheduleInputSchema = z.object({
   timeslots: z.array(
@@ -29,7 +23,6 @@ export const daywiseScheduleInputSchema = z.object({
     })
   ),
   shortlist: z.array(z.string()), // Array of shortlist IDs
-  balance: balanceSchema,
 });
 
 export const scheduleInputSchema = z.object({
@@ -53,8 +46,7 @@ export const daywiseScheduleSchema = z.object({
       interval: z.number(),
     })
   ),
-  shortlist: z.array(shortlistItemSchema), // Full shortlist objects
-  balance: balanceSchema,
+  shortlist: z.array(shortlistItemSchema),
 });
 
 export const scheduleSchema = z.object({
@@ -117,11 +109,8 @@ export const createRun = {
   }),
   body: z.object({
     schedule: scheduleInputSchema, // Uses input schema with shortlist IDs
-    currentBalance: z.number().default(0),
-    startingBalance: z.number().default(0),
-    endingBalance: z.number().default(0),
+    startingBalance: z.number().min(0, "Starting balance must be >= 0"),
     runType: runTypeSchema,
-    errorLog: z.string().optional(),
     customAttributes: z.record(z.string(), z.unknown()).optional().default({}),
     status: runStatusSchema.optional().default("PENDING"),
   }),
@@ -140,9 +129,12 @@ export const updateRun = {
   }),
   body: z.object({
     schedule: scheduleInputSchema.optional(), // Uses input schema with shortlist IDs
-    currentBalance: z.number().optional(),
-    startingBalance: z.number().optional(),
-    endingBalance: z.number().optional(),
+    startingBalance: z
+      .number()
+      .min(0, "Starting balance must be >= 0")
+      .optional(),
+    currentBalance: z.number().optional(), // Set by platform when run completes
+    endingBalance: z.number().optional(), // Set by platform when run completes
     runType: runTypeSchema.optional(),
     errorLog: z.string().nullable().optional(),
     customAttributes: z.record(z.string(), z.unknown()).optional(),

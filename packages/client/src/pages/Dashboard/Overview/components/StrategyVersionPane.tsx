@@ -4,6 +4,7 @@ import { strategiesAPI } from "@/store/api/strategies.api";
 import { versionsAPI } from "@/store/api/versions.api";
 import { strategyFormSlice } from "@/store/forms/strategyFormSlice";
 import { versionFormSlice } from "@/store/forms/versionFormSlice";
+import { runFormSlice } from "@/store/forms/runFormSlice";
 import { useAppDispatch } from "@/utils/hooks/storeHooks";
 import type { v1_core_strategies_schemas } from "@ganaka/server-schemas";
 import { Icon } from "@iconify/react";
@@ -85,6 +86,7 @@ const renderItem =
     handleDeleteStrategy,
     handleEditVersion,
     handleDeleteVersion,
+    handleSelectVersion,
   }: {
     handleCreateVersion: (strategyId: string) => void;
     handleEditStrategy: (strategyId: string) => void;
@@ -103,6 +105,13 @@ const renderItem =
       strategyId: string;
       versionId: string;
       versionName: string;
+    }) => void;
+    handleSelectVersion: ({
+      versionId,
+      strategyId,
+    }: {
+      versionId: string;
+      strategyId: string;
     }) => void;
   }) =>
   ({
@@ -154,8 +163,9 @@ const renderItem =
         {...context.itemContainerWithChildrenProps}
         className={context.itemContainerWithChildrenProps.className}
         onClick={() => {
-          if (!item.isFolder) {
-            console.log(item.data);
+          if (!item.isFolder && versionId) {
+            // Set the selected version in runFormSlice when a version is clicked
+            handleSelectVersion({ versionId, strategyId });
           }
         }}
         style={{
@@ -364,6 +374,16 @@ export const StrategyVersionPane = () => {
       },
     });
   };
+  const handleSelectVersion = ({
+    versionId,
+    strategyId,
+  }: {
+    versionId: string;
+    strategyId: string;
+  }) => {
+    dispatch(runFormSlice.actions.setStrategyId(strategyId));
+    dispatch(runFormSlice.actions.setVersionId(versionId));
+  };
   const findItemPath = useCallback(
     async (
       search: string,
@@ -513,6 +533,7 @@ export const StrategyVersionPane = () => {
               handleDeleteStrategy,
               handleEditVersion,
               handleDeleteVersion,
+              handleSelectVersion,
             })}
             renderSearchInput={() => null}
             canSearch={false}
