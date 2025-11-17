@@ -19,11 +19,8 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { debounce, times } from "lodash";
 import type { z } from "zod";
-
-dayjs.extend(relativeTime);
 
 type RunItem = z.infer<
   typeof v1_core_strategies_versions_runs_schemas.runItemSchema
@@ -68,47 +65,126 @@ const RunCard = ({
     }
   };
 
+  // Format date range for the header
+  const formatDateRange = () => {
+    if (!startTime || !endTime) return "—";
+    const start = dayjs(startTime);
+    const end = dayjs(endTime);
+
+    // If same month, show "Jan 15 - 20, 2024"
+    if (start.month() === end.month() && start.year() === end.year()) {
+      return `${start.format("MMM D")} - ${end.format("D, YYYY")}`;
+    }
+    // If same year, show "Jan 15 - Feb 20, 2024"
+    if (start.year() === end.year()) {
+      return `${start.format("MMM D")} - ${end.format("MMM D, YYYY")}`;
+    }
+    // Otherwise show full dates
+    return `${start.format("MMM D, YYYY")} - ${end.format("MMM D, YYYY")}`;
+  };
+
+  // Format precise date/time
+  const formatDateTime = (dateTime: string | null | undefined) => {
+    if (!dateTime) return "—";
+    const date = dayjs(dateTime);
+    const now = dayjs();
+
+    // If same day, show time only
+    if (date.isSame(now, "day")) {
+      return date.format("h:mm A");
+    }
+    // If same year, show date and time
+    if (date.isSame(now, "year")) {
+      return date.format("MMM D, h:mm A");
+    }
+    // Otherwise show full date and time
+    return date.format("MMM D, YYYY, h:mm A");
+  };
+
   return (
     <Paper withBorder p="md" pb="md" className="w-full">
       <div className="flex flex-col gap-3">
-        {/* Header: ID, Status, and Run Type */}
-        <div className="flex items-center justify-between w-full gap-2">
-          <Text fw={600} size="lg" truncate="end" className="max-w-[200px]">
-            {run.id}
-          </Text>
-          <div className="flex items-center gap-2">
-            <Badge color={getStatusColor(status)} variant="light" size="sm">
-              {status}
-            </Badge>
-            <Menu shadow="md" width={150} position="bottom-end">
-              <Menu.Target>
-                <ActionIcon
-                  onClick={(e) => e.stopPropagation()}
-                  variant="subtle"
-                  size="xs"
-                  color="dark"
-                  aria-label="Settings"
-                >
-                  <Icon className="cursor-pointer" icon={icons.menu} />
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item
-                  leftSection={<Icon icon={icons.edit} />}
-                  onClick={onEdit}
-                >
-                  Edit
-                </Menu.Item>
-                <Menu.Item
-                  color="red"
-                  leftSection={<Icon icon={icons.delete} />}
-                  onClick={onDelete}
-                  disabled={isDeleting}
-                >
-                  Delete
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
+        {/* Header: Date Range, Run Type, Status, and Menu */}
+        <div className="flex items-start w-full gap-3">
+          <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <Badge color="blue" variant="light" size="sm">
+                {runType}
+              </Badge>
+              <Badge color={getStatusColor(status)} variant="light" size="sm">
+                {status}
+              </Badge>
+              <div className="flex-1" />
+              <Menu shadow="md" width={150} position="bottom-end">
+                <Menu.Target>
+                  <ActionIcon
+                    onClick={(e) => e.stopPropagation()}
+                    variant="subtle"
+                    size="xs"
+                    color="dark"
+                    aria-label="Settings"
+                  >
+                    <Icon className="cursor-pointer" icon={icons.menu} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    leftSection={<Icon icon={icons.edit} />}
+                    onClick={onEdit}
+                  >
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item
+                    color="red"
+                    leftSection={<Icon icon={icons.delete} />}
+                    onClick={onDelete}
+                    disabled={isDeleting}
+                  >
+                    Delete
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                <Text fw={600} size="sm" truncate="end">
+                  {formatDateRange()}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  Created {formatDateTime(run.createdAt)}
+                </Text>
+              </div>
+              <ActionIcon.Group>
+                <HoverCard width={280} shadow="md" position="right">
+                  <HoverCard.Target>
+                    <ActionIcon color="dark" variant="outline" size="md">
+                      <Icon icon={icons.timeline} />
+                    </ActionIcon>
+                  </HoverCard.Target>
+                  <HoverCard.Dropdown>
+                    <Text size="sm">
+                      Hover card is revealed when user hovers over target
+                      element, it will be hidden once mouse is not over both
+                      target and dropdown elements
+                    </Text>
+                  </HoverCard.Dropdown>
+                </HoverCard>
+                <HoverCard width={280} shadow="md" position="right">
+                  <HoverCard.Target>
+                    <ActionIcon color="dark" variant="outline" size="md">
+                      <Icon icon={icons.shortlist} />
+                    </ActionIcon>
+                  </HoverCard.Target>
+                  <HoverCard.Dropdown>
+                    <Text size="sm">
+                      Hover card is revealed when user hovers over target
+                      element, it will be hidden once mouse is not over both
+                      target and dropdown elements
+                    </Text>
+                  </HoverCard.Dropdown>
+                </HoverCard>
+              </ActionIcon.Group>
+            </div>
           </div>
         </div>
 
@@ -116,33 +192,27 @@ const RunCard = ({
 
         {/* Time Information */}
         <div className="flex items-center justify-between w-full gap-2">
-          <div className="flex flex-col items-start justify-end">
+          <div className="flex flex-col items-start">
             <Text size="xs" c="dimmed">
-              Started At
+              Started
             </Text>
-            <Text size="sm">
-              {startTime ? dayjs(startTime).fromNow() : "—"}
+            <Text size="sm" fw={500}>
+              {formatDateTime(startTime)}
             </Text>
           </div>
-          <div className="flex flex-col items-start justify-end">
+          <div className="flex flex-col items-end">
             <Text size="xs" c="dimmed">
-              Ended At
+              Ended
             </Text>
-            <Text size="sm">{endTime ? dayjs(endTime).fromNow() : "—"}</Text>
-          </div>
-          <div className="flex flex-col items-end justify-end">
-            <Text size="xs" c="dimmed">
-              Created At
-            </Text>
-            <Text size="sm">
-              {run.createdAt ? dayjs(run.createdAt).fromNow() : "—"}
+            <Text size="sm" fw={500}>
+              {formatDateTime(endTime)}
             </Text>
           </div>
         </div>
         <Divider />
         {/* Balance Information */}
         <div className="flex items-center justify-between w-full gap-2">
-          <div className="flex flex-col items-start justify-end">
+          <div className="flex flex-col items-start">
             <Text size="xs" c="dimmed">
               Starting Balance
             </Text>
@@ -150,7 +220,7 @@ const RunCard = ({
               ₹{run.startingBalance.toLocaleString()}
             </Text>
           </div>
-          <div className="flex flex-col items-start justify-end">
+          <div className="flex flex-col items-start">
             <Text size="xs" c="dimmed">
               Ending Balance
             </Text>
@@ -160,7 +230,7 @@ const RunCard = ({
                 : "—"}
             </Text>
           </div>
-          <div className="flex flex-col items-end justify-end">
+          <div className="flex flex-col items-end">
             <Text size="xs" c="dimmed">
               P&L
             </Text>
@@ -183,43 +253,6 @@ const RunCard = ({
               </Text>
             </div>
           </div>
-        </div>
-        <Divider />
-        {/* Run Type and Actions */}
-        <div className="flex items-center justify-between w-full gap-2">
-          <Badge color="blue" variant="outline" size="sm">
-            {runType}
-          </Badge>
-          <ActionIcon.Group>
-            <HoverCard width={280} shadow="md" position="right">
-              <HoverCard.Target>
-                <ActionIcon color="dark" variant="outline" size="md">
-                  <Icon icon={icons.timeline} />
-                </ActionIcon>
-              </HoverCard.Target>
-              <HoverCard.Dropdown>
-                <Text size="sm">
-                  Hover card is revealed when user hovers over target element,
-                  it will be hidden once mouse is not over both target and
-                  dropdown elements
-                </Text>
-              </HoverCard.Dropdown>
-            </HoverCard>
-            <HoverCard width={280} shadow="md" position="right">
-              <HoverCard.Target>
-                <ActionIcon color="dark" variant="outline" size="md">
-                  <Icon icon={icons.shortlist} />
-                </ActionIcon>
-              </HoverCard.Target>
-              <HoverCard.Dropdown>
-                <Text size="sm">
-                  Hover card is revealed when user hovers over target element,
-                  it will be hidden once mouse is not over both target and
-                  dropdown elements
-                </Text>
-              </HoverCard.Dropdown>
-            </HoverCard>
-          </ActionIcon.Group>
         </div>
       </div>
     </Paper>
