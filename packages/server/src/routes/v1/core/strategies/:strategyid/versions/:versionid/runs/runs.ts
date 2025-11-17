@@ -68,6 +68,170 @@ async function validateShortlistIds(
   };
 }
 
+// Helper function to populate shortlists in a schedule
+async function populateShortlistsInSchedule(
+  schedule: {
+    startDateTime: string;
+    endDateTime: string;
+    daywise: {
+      monday: { shortlist: string[]; [key: string]: unknown };
+      tuesday: { shortlist: string[]; [key: string]: unknown };
+      wednesday: { shortlist: string[]; [key: string]: unknown };
+      thursday: { shortlist: string[]; [key: string]: unknown };
+      friday: { shortlist: string[]; [key: string]: unknown };
+    };
+  },
+  userId: string
+): Promise<
+  z.infer<typeof v1_core_strategies_versions_runs_schemas.scheduleSchema>
+> {
+  // Extract all shortlist IDs
+  const shortlistIds = extractShortlistIds(
+    schedule as z.infer<
+      typeof v1_core_strategies_versions_runs_schemas.scheduleInputSchema
+    >
+  );
+
+  // Fetch all shortlists with their instruments
+  const shortlistMap = new Map();
+  if (shortlistIds.length > 0) {
+    const shortlists = await prisma.shortlist.findMany({
+      where: {
+        id: {
+          in: shortlistIds,
+        },
+        OR: [
+          { type: ShortlistType.CURATED },
+          {
+            type: ShortlistType.USER,
+            createdById: userId,
+          },
+        ],
+      },
+      include: {
+        instruments: true,
+      },
+    });
+
+    for (const shortlist of shortlists) {
+      shortlistMap.set(shortlist.id, {
+        id: shortlist.id,
+        name: shortlist.name,
+        instruments: shortlist.instruments.map((instrument) => ({
+          id: instrument.id,
+          name: instrument.name,
+          symbol: instrument.tradingSymbol,
+        })),
+      });
+    }
+  }
+
+  // Populate shortlists in schedule
+  const populateDay = (day: {
+    timeslots: Array<{
+      startTime: string;
+      endTime: string;
+      interval: number;
+    }>;
+    shortlist: string[];
+    balance: {
+      startBalance: number;
+      endBalance: number;
+      currentBalance: number;
+    };
+  }) => {
+    return {
+      timeslots: day.timeslots,
+      balance: day.balance,
+      shortlist: (day.shortlist || [])
+        .map((id: string) => shortlistMap.get(id))
+        .filter(Boolean),
+    };
+  };
+
+  return {
+    startDateTime: schedule.startDateTime,
+    endDateTime: schedule.endDateTime,
+    daywise: {
+      monday: populateDay(
+        schedule.daywise.monday as {
+          timeslots: Array<{
+            startTime: string;
+            endTime: string;
+            interval: number;
+          }>;
+          shortlist: string[];
+          balance: {
+            startBalance: number;
+            endBalance: number;
+            currentBalance: number;
+          };
+        }
+      ),
+      tuesday: populateDay(
+        schedule.daywise.tuesday as {
+          timeslots: Array<{
+            startTime: string;
+            endTime: string;
+            interval: number;
+          }>;
+          shortlist: string[];
+          balance: {
+            startBalance: number;
+            endBalance: number;
+            currentBalance: number;
+          };
+        }
+      ),
+      wednesday: populateDay(
+        schedule.daywise.wednesday as {
+          timeslots: Array<{
+            startTime: string;
+            endTime: string;
+            interval: number;
+          }>;
+          shortlist: string[];
+          balance: {
+            startBalance: number;
+            endBalance: number;
+            currentBalance: number;
+          };
+        }
+      ),
+      thursday: populateDay(
+        schedule.daywise.thursday as {
+          timeslots: Array<{
+            startTime: string;
+            endTime: string;
+            interval: number;
+          }>;
+          shortlist: string[];
+          balance: {
+            startBalance: number;
+            endBalance: number;
+            currentBalance: number;
+          };
+        }
+      ),
+      friday: populateDay(
+        schedule.daywise.friday as {
+          timeslots: Array<{
+            startTime: string;
+            endTime: string;
+            interval: number;
+          }>;
+          shortlist: string[];
+          balance: {
+            startBalance: number;
+            endBalance: number;
+            currentBalance: number;
+          };
+        }
+      ),
+    },
+  };
+}
+
 const runsRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/", async (request, reply) => {
     try {
@@ -123,7 +287,44 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
         where: {
           versionId: validatedParams.versionid,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       });
+
+      // populate shortlists in schedules
+      const runsWithPopulatedShortlists = await Promise.all(
+        runs.map(async (run) => {
+          const populatedSchedule = await populateShortlistsInSchedule(
+            run.schedule as {
+              startDateTime: string;
+              endDateTime: string;
+              daywise: {
+                monday: { shortlist: string[]; [key: string]: unknown };
+                tuesday: { shortlist: string[]; [key: string]: unknown };
+                wednesday: { shortlist: string[]; [key: string]: unknown };
+                thursday: { shortlist: string[]; [key: string]: unknown };
+                friday: { shortlist: string[]; [key: string]: unknown };
+              };
+            },
+            user.id
+          );
+
+          return {
+            id: run.id,
+            schedule: populatedSchedule,
+            currentBalance: run.currentBalance,
+            startingBalance: run.startingBalance,
+            endingBalance: run.endingBalance,
+            runType: run.runType,
+            errorLog: run.errorLog,
+            customAttributes: run.customAttributes as Record<string, unknown>,
+            status: run.status,
+            createdAt: run.createdAt.toISOString(),
+            updatedAt: run.updatedAt.toISOString(),
+          };
+        })
+      );
 
       // return
       return reply.send(
@@ -134,21 +335,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
         >({
           statusCode: 200,
           message: "Runs fetched successfully",
-          data: runs.map((run) => ({
-            id: run.id,
-            schedule: run.schedule as z.infer<
-              typeof v1_core_strategies_versions_runs_schemas.scheduleSchema
-            >,
-            currentBalance: run.currentBalance,
-            startingBalance: run.startingBalance,
-            endingBalance: run.endingBalance,
-            runType: run.runType,
-            errorLog: run.errorLog,
-            customAttributes: run.customAttributes as Record<string, unknown>,
-            status: run.status,
-            createdAt: run.createdAt.toISOString(),
-            updatedAt: run.updatedAt.toISOString(),
-          })),
+          data: runsWithPopulatedShortlists,
         })
       );
     } catch (e) {
@@ -219,6 +406,22 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
         );
       }
 
+      // populate shortlists in schedule
+      const populatedSchedule = await populateShortlistsInSchedule(
+        run.schedule as {
+          startDateTime: string;
+          endDateTime: string;
+          daywise: {
+            monday: { shortlist: string[]; [key: string]: unknown };
+            tuesday: { shortlist: string[]; [key: string]: unknown };
+            wednesday: { shortlist: string[]; [key: string]: unknown };
+            thursday: { shortlist: string[]; [key: string]: unknown };
+            friday: { shortlist: string[]; [key: string]: unknown };
+          };
+        },
+        user.id
+      );
+
       // return
       return reply.send(
         sendResponse<
@@ -230,9 +433,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Run fetched successfully",
           data: {
             id: run.id,
-            schedule: run.schedule as z.infer<
-              typeof v1_core_strategies_versions_runs_schemas.scheduleSchema
-            >,
+            schedule: populatedSchedule,
             currentBalance: run.currentBalance,
             startingBalance: run.startingBalance,
             endingBalance: run.endingBalance,
@@ -338,6 +539,22 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
         },
       });
 
+      // populate shortlists in schedule
+      const populatedSchedule = await populateShortlistsInSchedule(
+        validatedBody.schedule as {
+          startDateTime: string;
+          endDateTime: string;
+          daywise: {
+            monday: { shortlist: string[]; [key: string]: unknown };
+            tuesday: { shortlist: string[]; [key: string]: unknown };
+            wednesday: { shortlist: string[]; [key: string]: unknown };
+            thursday: { shortlist: string[]; [key: string]: unknown };
+            friday: { shortlist: string[]; [key: string]: unknown };
+          };
+        },
+        user.id
+      );
+
       // return
       return reply.send(
         sendResponse<
@@ -349,9 +566,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Run created successfully",
           data: {
             id: run.id,
-            schedule: run.schedule as z.infer<
-              typeof v1_core_strategies_versions_runs_schemas.scheduleSchema
-            >,
+            schedule: populatedSchedule,
             currentBalance: run.currentBalance,
             startingBalance: run.startingBalance,
             endingBalance: run.endingBalance,
@@ -566,6 +781,27 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
         },
       });
 
+      // populate shortlists in schedule
+      const scheduleToPopulate =
+        validatedBody.schedule !== undefined
+          ? validatedBody.schedule
+          : (existingRun.schedule as {
+              startDateTime: string;
+              endDateTime: string;
+              daywise: {
+                monday: { shortlist: string[]; [key: string]: unknown };
+                tuesday: { shortlist: string[]; [key: string]: unknown };
+                wednesday: { shortlist: string[]; [key: string]: unknown };
+                thursday: { shortlist: string[]; [key: string]: unknown };
+                friday: { shortlist: string[]; [key: string]: unknown };
+              };
+            });
+
+      const populatedSchedule = await populateShortlistsInSchedule(
+        scheduleToPopulate,
+        user.id
+      );
+
       // return
       return reply.send(
         sendResponse<
@@ -577,9 +813,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Run updated successfully",
           data: {
             id: run.id,
-            schedule: run.schedule as z.infer<
-              typeof v1_core_strategies_versions_runs_schemas.scheduleSchema
-            >,
+            schedule: populatedSchedule,
             currentBalance: run.currentBalance,
             startingBalance: run.startingBalance,
             endingBalance: run.endingBalance,
