@@ -1,4 +1,9 @@
-import { Button, Drawer, LoadingOverlay } from "@mantine/core";
+import {
+  Button,
+  Drawer,
+  LoadingOverlay,
+  type ModalBaseProps,
+} from "@mantine/core";
 import { customZIndexes } from "@/utils/constants";
 
 export const GForm = ({
@@ -9,6 +14,7 @@ export const GForm = ({
   onClose,
   onExitTransitionEnd,
   loading,
+  size = "md",
 }: {
   opened: boolean;
   title: string;
@@ -21,6 +27,7 @@ export const GForm = ({
   onClose: () => void;
   onExitTransitionEnd: () => void;
   loading?: boolean;
+  size?: ModalBaseProps["size"];
 }) => {
   // DRAW
   return (
@@ -29,6 +36,7 @@ export const GForm = ({
       onClose={onClose}
       onExitTransitionEnd={onExitTransitionEnd}
       radius="md"
+      size={size}
       position="right"
       offset={8}
     >

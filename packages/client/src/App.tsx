@@ -3,8 +3,10 @@ import {
   Checkbox,
   Loader,
   MantineProvider,
+  MultiSelect,
   Notification,
   NumberInput,
+  Select,
   Tabs,
   TagsInput,
   Textarea,
@@ -24,6 +26,16 @@ export const App = () => {
       theme={{
         primaryColor: "pink",
         components: {
+          MultiSelect: MultiSelect.extend({
+            defaultProps: {
+              checkIconPosition: "right",
+            },
+          }),
+          Select: Select.extend({
+            defaultProps: {
+              checkIconPosition: "right",
+            },
+          }),
           Loader: Loader.extend({
             defaultProps: {
               type: "bars",

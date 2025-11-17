@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { FastifyPluginAsync } from "fastify";
 import * as csv from "fast-csv";
 import { prisma } from "../../../helpers/prisma";
@@ -153,12 +153,17 @@ async function fetchWithRateLimit(
       await sleep(delay);
       const response = await axios.get(url, { headers, timeout: 10000 });
       return response as AxiosResponse<NSEStockQuoteResponse>;
-    } catch (error: any) {
+    } catch (error) {
       if (attempt === retries) return null;
-
-      if (error.response?.status === 429 || error.response?.status >= 500) {
-        await sleep(delay * Math.pow(2, attempt));
+      if (error instanceof AxiosError) {
+        if (
+          error.response?.status === 429 ||
+          (error.response?.status ?? 0) >= 500
+        ) {
+          await sleep(delay * Math.pow(2, attempt));
+        }
       }
+      return null;
     }
   }
   return null;

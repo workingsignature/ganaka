@@ -134,15 +134,9 @@ async function populateShortlistsInSchedule(
       interval: number;
     }>;
     shortlist: string[];
-    balance: {
-      startBalance: number;
-      endBalance: number;
-      currentBalance: number;
-    };
   }) => {
     return {
       timeslots: day.timeslots,
-      balance: day.balance,
       shortlist: (day.shortlist || [])
         .map((id: string) => shortlistMap.get(id))
         .filter(Boolean),
@@ -161,11 +155,6 @@ async function populateShortlistsInSchedule(
             interval: number;
           }>;
           shortlist: string[];
-          balance: {
-            startBalance: number;
-            endBalance: number;
-            currentBalance: number;
-          };
         }
       ),
       tuesday: populateDay(
@@ -176,11 +165,6 @@ async function populateShortlistsInSchedule(
             interval: number;
           }>;
           shortlist: string[];
-          balance: {
-            startBalance: number;
-            endBalance: number;
-            currentBalance: number;
-          };
         }
       ),
       wednesday: populateDay(
@@ -191,11 +175,6 @@ async function populateShortlistsInSchedule(
             interval: number;
           }>;
           shortlist: string[];
-          balance: {
-            startBalance: number;
-            endBalance: number;
-            currentBalance: number;
-          };
         }
       ),
       thursday: populateDay(
@@ -206,11 +185,6 @@ async function populateShortlistsInSchedule(
             interval: number;
           }>;
           shortlist: string[];
-          balance: {
-            startBalance: number;
-            endBalance: number;
-            currentBalance: number;
-          };
         }
       ),
       friday: populateDay(
@@ -221,11 +195,6 @@ async function populateShortlistsInSchedule(
             interval: number;
           }>;
           shortlist: string[];
-          balance: {
-            startBalance: number;
-            endBalance: number;
-            currentBalance: number;
-          };
         }
       ),
     },
@@ -525,11 +494,11 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       const run = await prisma.strategyVersionRun.create({
         data: {
           schedule: validatedBody.schedule as InputJsonValue,
-          currentBalance: validatedBody.currentBalance,
+          currentBalance: validatedBody.startingBalance, // Initially set to starting balance
           startingBalance: validatedBody.startingBalance,
-          endingBalance: validatedBody.endingBalance,
+          endingBalance: 0, // Set by platform when run completes
           runType: validatedBody.runType,
-          errorLog: validatedBody.errorLog ?? null,
+          errorLog: null,
           customAttributes:
             (validatedBody.customAttributes as InputJsonValue) ?? {},
           status: validatedBody.status ?? "PENDING",
