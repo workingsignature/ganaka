@@ -20,6 +20,8 @@ export const icons = {
   chevronRight: "mdi:chevron-right",
   drag: "si:drag-indicator-fill",
   copy: "mdi:content-copy",
+  eye: "mdi:eye",
+  eyeOff: "mdi:eye-off",
   // ----------------------------------------
   timeline: "mdi:timeline-outline",
   shortlist: "tabler:list-details",

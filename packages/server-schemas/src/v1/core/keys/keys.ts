@@ -8,6 +8,8 @@ import { apiResponseSchema } from "../../../common";
  */
 export const developerKeyItemSchema = z.object({
   id: z.string(),
+  name: z.string(),
+  description: z.string(),
   key: z.string(),
   status: z.enum(["ACTIVE", "INACTIVE", "EXPIRED"]),
   createdAt: z.date(),
@@ -26,7 +28,10 @@ export const getKeys = {
 // ==================== POST /keys ====================
 
 export const createKey = {
-  body: z.object({}).optional(),
+  body: z.object({
+    name: z.string().min(1, "Name is required"),
+    description: z.string(),
+  }),
   response: apiResponseSchema.extend({
     data: developerKeyItemSchema,
   }),
