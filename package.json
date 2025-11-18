@@ -3,12 +3,13 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "dev:bot": "pnpm --filter @ganaka/bot dev",
     "dev:client": "pnpm --filter @ganaka/client dev",
     "dev:server": "pnpm --filter @ganaka/server dev",
     "build:server": "pnpm --filter @ganaka/server build",
     "build:server-schemas": "pnpm --filter @ganaka/server-schemas build",
-    "prisma:migrate:dev": "pnpm --filter @ganaka/server prisma:migrate:dev"
+    "prisma:migrate:dev": "pnpm --filter @ganaka/server prisma:migrate:dev",
+    "build:sdk": "pnpm --filter @ganaka/sdk build",
+    "dev:sdk-test": "pnpm --filter @ganaka/sdk-test dev"
   },
   "author": {
     "name": "Rohit Raj",

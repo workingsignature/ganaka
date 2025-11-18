@@ -1,9 +1,16 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
 import dts from "vite-plugin-dts";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
 
 export default defineConfig({
+  resolve: {
+    // Don't preserve symlinks to ensure we resolve to actual files
+    preserveSymlinks: false,
+  },
   build: {
+    target: "node18",
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "GanakaSDK",
@@ -16,8 +23,15 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      // Make sure to externalize dependencies that shouldn't be bundled
-      external: [],
+      plugins: [
+        nodeResolve({
+          preferBuiltins: true, // Prefer Node.js built-ins
+          exportConditions: ["node", "default"],
+        }),
+        commonjs(),
+      ],
+      // Externalize dotenv - it will be a peer dependency
+      external: ["dotenv"],
       output: {
         // Use named exports to avoid the warning
         exports: "named",

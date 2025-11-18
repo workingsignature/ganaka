@@ -5,6 +5,13 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist",
     "README.md",
@@ -31,6 +38,8 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^11.1.0",
     "@semantic-release/git": "^10.0.1",
@@ -58,5 +67,13 @@
   "homepage": "https://github.com/workingsignature/ganaka#readme",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "peerDependenciesMeta": {
+    "dotenv": {
+      "optional": true
+    }
   }
 }
