@@ -21,3 +21,6 @@ export * as v1_core_strategies_versions_runs_schemas from "./v1/core/strategies/
 export * as v1_core_shortlists_schemas from "./v1/core/shortlists/shortlists";
 export * as v1_core_keys_schemas from "./v1/core/keys/keys";
 export * as v1_core_instruments_schemas from "./v1/core/instruments/instruments";
+
+// Re-export developer endpoint schemas
+export * as v1_developer_runs_schemas from "./v1/developer/runs/runs";

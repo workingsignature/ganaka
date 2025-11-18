@@ -84,7 +84,7 @@ const authPlugin =
             break;
           }
           case "developer": {
-            const developerKey = await prisma.developerKey.findUnique({
+            const developerKeyData = await prisma.developerKey.findUnique({
               where: {
                 key: token,
               },
@@ -93,8 +93,8 @@ const authPlugin =
               },
             });
             if (
-              !developerKey ||
-              developerKey.status !== DeveloperKeyStatus.ACTIVE
+              !developerKeyData ||
+              developerKeyData.status !== DeveloperKeyStatus.ACTIVE
             ) {
               fastify.log.info("Developer not found or inactive");
               return reply.unauthorized(
@@ -104,8 +104,8 @@ const authPlugin =
 
             // Attach developer to request
             request.user = {
-              id: developerKey.id,
-              clerkId: developerKey.user.clerkId,
+              id: developerKeyData.user.id,
+              clerkId: developerKeyData.user.clerkId,
             };
 
             // Authentication successful, continue to the route handler
