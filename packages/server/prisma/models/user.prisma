@@ -19,8 +19,10 @@ model DeveloperKey {
     id   String @id @default(uuid())
     user User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    key    String             @unique
-    status DeveloperKeyStatus @default(ACTIVE)
+    name        String             @default("")
+    description String             @default("")
+    key         String             @unique
+    status      DeveloperKeyStatus @default(ACTIVE)
 
     userId    String
     createdAt DateTime @default(now())

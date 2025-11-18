@@ -2,12 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import appSlice from "./appSlice";
 import strategyFormSlice from "./forms/strategyFormSlice";
 import shortlistFormSlice from "./forms/shortlistFormSlice";
+import keyFormSlice from "./forms/keyFormSlice";
 import { shortlistsAPI } from "./api/shortlists.api";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { versionsAPI } from "./api/versions.api";
 import { strategiesAPI } from "./api/strategies.api";
 import { instrumentsAPI } from "./api/instruments.api";
 import { runsAPI } from "./api/runs.api";
+import { keysApi } from "./api/keys.api";
 import versionFormSlice from "./forms/versionFormSlice";
 import runFormSlice from "./forms/runFormSlice";
 import shortlistsPageSlice from "./pages/shortlistsPageSlice";
@@ -18,6 +20,7 @@ export const store = configureStore({
     shortlistsPage: shortlistsPageSlice,
     strategyForm: strategyFormSlice,
     shortlistForm: shortlistFormSlice,
+    keyForm: keyFormSlice,
     versionForm: versionFormSlice,
     runForm: runFormSlice,
     [shortlistsAPI.reducerPath]: shortlistsAPI.reducer,
@@ -25,6 +28,7 @@ export const store = configureStore({
     [strategiesAPI.reducerPath]: strategiesAPI.reducer,
     [instrumentsAPI.reducerPath]: instrumentsAPI.reducer,
     [runsAPI.reducerPath]: runsAPI.reducer,
+    [keysApi.reducerPath]: keysApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -32,7 +36,8 @@ export const store = configureStore({
       versionsAPI.middleware,
       strategiesAPI.middleware,
       instrumentsAPI.middleware,
-      runsAPI.middleware
+      runsAPI.middleware,
+      keysApi.middleware
     ),
 });
 

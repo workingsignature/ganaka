@@ -7,6 +7,8 @@ import { RunForm } from "@/components/forms/Run.form";
 import { StrategyForm } from "@/components/forms/Strategy.form";
 import { VersionForm } from "@/components/forms/Version.form";
 import { ShortlistForm } from "@/components/forms/Shortlist.form";
+import { KeyForm } from "@/components/forms/Key.form";
+import { KeysPage } from "@/pages/Dashboard/Keys/Keys.page";
 
 export const Dashboard = () => {
   // DRAW
@@ -16,6 +18,7 @@ export const Dashboard = () => {
       <Routes>
         <Route path="overview" element={<OverviewPage />} />
         <Route path="shortlists" element={<ShortlistsPage />} />
+        <Route path="keys" element={<KeysPage />} />
         <Route path="/" element={<Navigate to="overview" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -23,6 +26,7 @@ export const Dashboard = () => {
       <VersionForm />
       <StrategyForm />
       <ShortlistForm />
+      <KeyForm />
     </div>
   );
 };

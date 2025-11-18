@@ -19,6 +19,9 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
             id: user.id,
           },
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       });
 
       // return
@@ -28,6 +31,8 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Developer keys fetched successfully",
           data: developerKeys.map((key) => ({
             id: key.id,
+            name: key.name,
+            description: key.description,
             key: key.key,
             status: key.status,
             createdAt: key.createdAt,
@@ -46,9 +51,21 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
       // get user
       const user = request.user;
 
+      // validate request
+      const validatedBody = validateRequest(
+        request.body,
+        reply,
+        v1_core_keys_schemas.createKey.body
+      );
+      if (!validatedBody) {
+        return;
+      }
+
       // create developer key
       const developerKey = await prisma.developerKey.create({
         data: {
+          name: validatedBody.name,
+          description: validatedBody.description,
           key: crypto.randomUUID(),
           user: {
             connect: {
@@ -65,6 +82,8 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Developer key created successfully",
           data: {
             id: developerKey.id,
+            name: developerKey.name,
+            description: developerKey.description,
             key: developerKey.key,
             status: developerKey.status,
             createdAt: developerKey.createdAt,
@@ -121,6 +140,8 @@ const keysRoutes: FastifyPluginAsync = async (fastify) => {
           message: "Developer key deactivated successfully",
           data: {
             id: developerKey.id,
+            name: developerKey.name,
+            description: developerKey.description,
             key: developerKey.key,
             status: developerKey.status,
             createdAt: developerKey.createdAt,
