@@ -1,5 +1,5 @@
 {
-  "name": "@workingsignature/ganaka",
+  "name": "@ganaka/sdk",
   "version": "1.0.1",
   "description": "Ganaka SDK - TypeScript client library",
   "main": "dist/index.js",
@@ -67,6 +67,11 @@
   "homepage": "https://github.com/workingsignature/ganaka#readme",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@ganaka/server-schemas": "workspace:*",
+    "axios": "^1.12.2",
+    "zod": "^4.1.11"
   },
   "peerDependencies": {
     "dotenv": "^16.4.5"

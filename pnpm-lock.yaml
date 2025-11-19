@@ -15,31 +15,6 @@ importers:
         specifier: ^5.0.9
         version: 5.0.9
 
-  packages/bot:
-    dependencies:
-      dotenv:
-        specifier: ^16.4.5
-        version: 16.6.1
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
-    devDependencies:
-      '@types/lodash':
-        specifier: ^4.14.202
-        version: 4.17.20
-      '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
-      nodemon:
-        specifier: ^3.1.7
-        version: 3.1.10
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@types/node@24.5.2)(typescript@5.9.2)
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.2
-
   packages/client:
     dependencies:
       '@clerk/clerk-react':
@@ -199,9 +174,18 @@ importers:
 
   packages/sdk:
     dependencies:
+      '@ganaka/server-schemas':
+        specifier: workspace:*
+        version: link:../server-schemas
+      axios:
+        specifier: ^1.12.2
+        version: 1.12.2
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1
+      zod:
+        specifier: ^4.1.11
+        version: 4.1.11
     devDependencies:
       '@rollup/plugin-commonjs':
         specifier: ^29.0.0
@@ -245,7 +229,7 @@ importers:
 
   packages/sdk-test:
     dependencies:
-      '@workingsignature/ganaka':
+      '@ganaka/sdk':
         specifier: workspace:*
         version: link:../sdk
       dotenv:

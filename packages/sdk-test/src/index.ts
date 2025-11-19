@@ -1,4 +1,4 @@
-import { ganaka } from "@workingsignature/ganaka";
+import { ganaka } from "@ganaka/sdk";
 
 async function testGanaka() {
   console.log("Testing Ganaka SDK...\n");
@@ -21,4 +21,3 @@ async function testGanaka() {
 }
 
 testGanaka();
-

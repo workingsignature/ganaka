@@ -38,10 +38,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm --filter @workingsignature/ganaka run build
+        run: pnpm --filter @ganaka/sdk run build
 
       - name: Semantic Release
-        run: pnpm --filter @workingsignature/ganaka run semantic-release
+        run: pnpm --filter @ganaka/sdk run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
