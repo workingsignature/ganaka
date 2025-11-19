@@ -1,8 +1,9 @@
-import { defineConfig } from "vite";
+import { defineConfig, Plugin } from "vite";
 import { resolve } from "path";
 import dts from "vite-plugin-dts";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import { build as esbuild } from "esbuild";
 
 export default defineConfig({
   resolve: {
@@ -31,14 +32,7 @@ export default defineConfig({
         commonjs(),
       ],
       // Externalize dependencies that should not be bundled
-      external: ["dotenv"],
-      output: {
-        // Use named exports to avoid the warning
-        exports: "named",
-        // Provide global variables to use in the UMD build
-        // for externalized deps
-        globals: {},
-      },
+      external: ["dotenv", "path", "worker_threads", "url", "module", "fs"],
     },
     // Generate sourcemaps
     sourcemap: true,
@@ -56,5 +50,35 @@ export default defineConfig({
       rollupTypes: true,
       copyDtsFiles: true,
     }),
+    // Custom plugin to build worker file
+    {
+      name: "build-worker",
+      async writeBundle() {
+        const workerEntry = resolve(__dirname, "src/scheduler/worker.ts");
+        const distDir = resolve(__dirname, "dist/scheduler");
+
+        // Build ES module version
+        await esbuild({
+          entryPoints: [workerEntry],
+          bundle: true,
+          platform: "node",
+          format: "esm",
+          outfile: resolve(distDir, "worker.mjs"),
+          sourcemap: true,
+          external: ["worker_threads"],
+        });
+
+        // Build CJS version
+        await esbuild({
+          entryPoints: [workerEntry],
+          bundle: true,
+          platform: "node",
+          format: "cjs",
+          outfile: resolve(distDir, "worker.js"),
+          sourcemap: true,
+          external: ["worker_threads"],
+        });
+      },
+    } as Plugin,
   ],
 });

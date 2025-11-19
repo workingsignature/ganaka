@@ -1,9 +1,143 @@
 import { Cron } from "croner";
+import { Worker } from "worker_threads";
+import { join, dirname } from "path";
+import { existsSync } from "fs";
+import { fileURLToPath } from "url";
+import { createRequire } from "module";
 import { runsApi } from "../apis/runs/runs";
-import { RunItem, RunContext } from "./types";
+import { RunItem, RunContext, ExecutionTime } from "./types";
 import { generateExecutionTimes } from "./utils";
 
 type UserFunction<T> = (context: RunContext) => Promise<T>;
+
+const EXECUTION_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
+// Get the directory of the current module
+// Handle both ES modules and CommonJS
+function getWorkerPath(): string {
+  // Get require function that works in both ESM and CJS
+  let requireFn: NodeRequire;
+  try {
+    if (typeof import.meta !== "undefined" && import.meta.url) {
+      // ES module - use createRequire
+      requireFn = createRequire(import.meta.url);
+    } else if (typeof require !== "undefined") {
+      // CommonJS - use global require (available in CJS context)
+      requireFn = require;
+    } else {
+      // Fallback - try createRequire with a file URL
+      // This shouldn't normally happen, but handle it gracefully
+      throw new Error("Neither require nor import.meta.url is available");
+    }
+  } catch (error) {
+    // If all else fails, throw a more helpful error
+    throw new Error(
+      `Cannot resolve require function: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+  }
+
+  // Try to resolve from the SDK package location first (most reliable)
+  try {
+    // Try to resolve the package.json to find the SDK package root
+    const packagePath = requireFn.resolve("@ganaka/sdk/package.json");
+    const packageDir = dirname(packagePath);
+    const distWorkerPath = join(packageDir, "dist", "scheduler", "worker.js");
+
+    // Check if the built worker file exists
+    if (existsSync(distWorkerPath)) {
+      return distWorkerPath;
+    }
+  } catch (error) {
+    // Log the error for debugging, but continue to try other methods
+    console.warn(
+      `[getWorkerPath] Failed to resolve @ganaka/sdk/package.json: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+  }
+
+  // Try alternative: resolve from the current module location
+  // This works when the SDK is imported as a dependency (built or source)
+  try {
+    if (typeof import.meta !== "undefined" && import.meta.url) {
+      // Get the current file's location
+      const currentFile = fileURLToPath(import.meta.url);
+      const currentDir = dirname(currentFile);
+      
+      // Check if we're in dist (built version)
+      // Structure: packages/sdk/dist/scheduler/scheduler.js (or .mjs)
+      // We want: packages/sdk/dist/scheduler/worker.js
+      if (currentDir.includes("/dist/")) {
+        const distWorkerPath = join(currentDir, "worker.js");
+        if (existsSync(distWorkerPath)) {
+          return distWorkerPath;
+        }
+      }
+      
+      // Check if we're in src (development/source version)
+      // Structure: packages/sdk/src/scheduler/scheduler.ts
+      // We want: packages/sdk/dist/scheduler/worker.js
+      if (currentDir.includes("/src/")) {
+        // Navigate: src/scheduler -> src -> package root -> dist/scheduler
+        const srcDir = dirname(currentDir); // src
+        const packageRoot = dirname(srcDir); // packages/sdk
+        const distWorkerPath = join(packageRoot, "dist", "scheduler", "worker.js");
+        
+        if (existsSync(distWorkerPath)) {
+          return distWorkerPath;
+        }
+      }
+      
+      // Try navigating up to find dist/scheduler/worker.js
+      // This handles cases where the file structure might be different
+      let searchDir = currentDir;
+      for (let i = 0; i < 5; i++) {
+        const candidatePath = join(searchDir, "dist", "scheduler", "worker.js");
+        if (existsSync(candidatePath)) {
+          return candidatePath;
+        }
+        searchDir = dirname(searchDir);
+      }
+    }
+  } catch (error) {
+    // Fall through
+  }
+
+  // Try CommonJS __dirname first (for CJS builds)
+  if (typeof (globalThis as { __dirname?: string }).__dirname !== "undefined") {
+    const dirnameValue = (globalThis as { __dirname: string }).__dirname;
+    const workerPath = join(dirnameValue, "worker.js");
+    if (existsSync(workerPath)) {
+      return workerPath;
+    }
+  }
+
+  // Try ES module import.meta.url (for ES builds)
+  try {
+    if (typeof import.meta !== "undefined" && import.meta.url) {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = dirname(__filename);
+      const workerPath = join(__dirname, "worker.js");
+      if (existsSync(workerPath)) {
+        return workerPath;
+      }
+    }
+  } catch {
+    // Fall through
+  }
+
+  // Final fallback: relative to current working directory
+  const fallbackPath = join(process.cwd(), "dist", "scheduler", "worker.js");
+
+  // Log a warning if we're using the fallback path
+  console.warn(
+    `[getWorkerPath] Could not resolve worker from SDK package, using fallback: ${fallbackPath}`
+  );
+
+  return fallbackPath;
+}
 
 /**
  * Schedule and execute a run based on its type (BACKTEST or LIVE)
@@ -26,19 +160,35 @@ export async function scheduleRun<T>(
     }
 
     if (run.runType === "BACKTEST") {
-      // For BACKTEST: execute all timeslots immediately (sequential)
-      await executeBacktest(run, executionTimes, fn);
+      // For BACKTEST: execute in worker thread (non-blocking)
+      try {
+        executeBacktestInWorker(run, executionTimes, fn);
+      } catch (error) {
+        console.error(
+          `Error spawning backtest worker for run ${run.id}:`,
+          error
+        );
+        runsApi
+          .updateRun(run.id, {
+            status: "FAILED",
+            errorLog: error instanceof Error ? error.message : String(error),
+          })
+          .catch((err) => {
+            console.error(`Error updating run ${run.id} status:`, err);
+          });
+      }
+      // Return immediately - don't wait for completion
+      return;
     } else if (run.runType === "LIVE") {
-      // For LIVE: schedule all timeslots within startDateTime/endDateTime range
-      await scheduleLive(run, executionTimes, fn);
+      // For LIVE: schedule all timeslots (non-blocking)
+      scheduleLive(run, executionTimes, fn);
+      // Return immediately - don't wait for completion
+      return;
     } else {
       console.error(`Unknown run type: ${run.runType}`);
       await runsApi.updateRun(run.id, { status: "FAILED" });
       return;
     }
-
-    // Update run status to COMPLETED
-    await runsApi.updateRun(run.id, { status: "COMPLETED" });
   } catch (error) {
     console.error(`Error scheduling run ${run.id}:`, error);
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -50,67 +200,171 @@ export async function scheduleRun<T>(
 }
 
 /**
- * Execute BACKTEST mode: run all timeslots immediately sequentially
+ * Execute BACKTEST mode: spawn worker thread to coordinate execution
+ * The worker thread can be terminated if it exceeds the timeout
  */
-async function executeBacktest<T>(
+function executeBacktestInWorker<T>(
   run: RunItem,
-  executionTimes: Array<{
-    executionTime: string;
-    timeslot: { startTime: string; endTime: string; interval: number };
-    day: string;
-    shortlist: unknown[];
-  }>,
+  executionTimes: ExecutionTime[],
   fn: UserFunction<T>
-): Promise<void> {
+): void {
   console.log(
-    `Starting BACKTEST for run ${run.id} with ${executionTimes.length} execution times`
+    `Starting BACKTEST worker for run ${run.id} with ${executionTimes.length} execution times`
   );
 
-  for (const execTime of executionTimes) {
-    try {
-      const context: RunContext = {
-        run,
-        timeslot: execTime.timeslot,
-        shortlist: execTime.shortlist as RunContext["shortlist"],
-        executionTime: execTime.executionTime,
-      };
+  // Determine worker file path
+  // In a built package, the worker will be in the dist folder
+  const workerPath = getWorkerPath();
 
-      console.log(
-        `Executing BACKTEST at ${execTime.executionTime} for run ${run.id}`
-      );
-      await fn(context);
-    } catch (error) {
-      // Log error and continue with next timeslot
-      console.error(
-        `Error executing BACKTEST at ${execTime.executionTime} for run ${run.id}:`,
-        error
-      );
-      // Continue to next execution
+  // Spawn worker thread
+  const worker = new Worker(workerPath, {
+    workerData: {
+      run,
+      executionTimes,
+    },
+  });
+
+  // Set up 5-minute timeout to terminate worker if it exceeds limit
+  const timeoutId = setTimeout(() => {
+    console.warn(
+      `Backtest worker for run ${run.id} exceeded ${
+        EXECUTION_TIMEOUT_MS / 1000 / 60
+      } minutes, terminating...`
+    );
+    worker.terminate();
+    runsApi
+      .updateRun(run.id, {
+        status: "FAILED",
+        errorLog: `Execution timeout: exceeded ${
+          EXECUTION_TIMEOUT_MS / 1000 / 60
+        } minutes`,
+      })
+      .catch((err) => {
+        console.error(
+          `Error updating run ${run.id} status after timeout:`,
+          err
+        );
+      });
+  }, EXECUTION_TIMEOUT_MS);
+
+  // Handle messages from worker
+  worker.on(
+    "message",
+    async (message: {
+      type: string;
+      executionTime?: ExecutionTime;
+      error?: string;
+    }) => {
+      if (message.type === "execute" && message.executionTime) {
+        try {
+          const context: RunContext = {
+            run,
+            timeslot: message.executionTime.timeslot,
+            shortlist: message.executionTime.shortlist,
+            executionTime: message.executionTime.executionTime,
+          };
+
+          console.log(
+            `Executing BACKTEST at ${message.executionTime.executionTime} for run ${run.id}`
+          );
+
+          // Execute user function with per-execution timeout
+          await Promise.race([
+            fn(context),
+            new Promise<never>((_, reject) =>
+              setTimeout(
+                () =>
+                  reject(
+                    new Error(
+                      `Execution timeout: exceeded ${
+                        EXECUTION_TIMEOUT_MS / 1000 / 60
+                      } minutes`
+                    )
+                  ),
+                EXECUTION_TIMEOUT_MS
+              )
+            ),
+          ]);
+
+          // Notify worker that execution completed
+          worker.postMessage({ type: "execution-complete" });
+        } catch (error) {
+          console.error(
+            `Error executing BACKTEST at ${message.executionTime.executionTime} for run ${run.id}:`,
+            error
+          );
+          // Notify worker of error but continue
+          worker.postMessage({
+            type: "execution-error",
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      } else if (message.type === "complete") {
+        clearTimeout(timeoutId);
+        console.log(`Completed BACKTEST for run ${run.id}`);
+        runsApi.updateRun(run.id, { status: "COMPLETED" }).catch((err) => {
+          console.error(`Error updating run ${run.id} status:`, err);
+        });
+        worker.terminate();
+      } else if (message.type === "error") {
+        clearTimeout(timeoutId);
+        console.error(
+          `Backtest worker error for run ${run.id}:`,
+          message.error
+        );
+        runsApi
+          .updateRun(run.id, {
+            status: "FAILED",
+            errorLog: message.error,
+          })
+          .catch((err) => {
+            console.error(`Error updating run ${run.id} status:`, err);
+          });
+        worker.terminate();
+      }
     }
-  }
+  );
 
-  console.log(`Completed BACKTEST for run ${run.id}`);
+  // Handle worker errors
+  worker.on("error", (error) => {
+    clearTimeout(timeoutId);
+    console.error(`Worker error for run ${run.id}:`, error);
+    runsApi
+      .updateRun(run.id, {
+        status: "FAILED",
+        errorLog: error.message,
+      })
+      .catch((err) => {
+        console.error(`Error updating run ${run.id} status:`, err);
+      });
+  });
+
+  // Handle worker exit
+  worker.on("exit", (code) => {
+    clearTimeout(timeoutId);
+    if (code !== 0) {
+      console.error(`Worker for run ${run.id} exited with code ${code}`);
+    }
+  });
 }
 
 /**
  * Schedule LIVE mode: use croner to schedule all timeslots
+ * Returns immediately after scheduling (non-blocking)
  */
-async function scheduleLive<T>(
+function scheduleLive<T>(
   run: RunItem,
-  executionTimes: Array<{
-    executionTime: string;
-    timeslot: { startTime: string; endTime: string; interval: number };
-    day: string;
-    shortlist: unknown[];
-  }>,
+  executionTimes: ExecutionTime[],
   fn: UserFunction<T>
-): Promise<void> {
+): void {
   console.log(
     `Scheduling LIVE run ${run.id} with ${executionTimes.length} execution times`
   );
 
   const scheduledJobs: Cron[] = [];
   const now = new Date();
+  let completedExecutions = 0;
+  const totalExecutions = executionTimes.length;
 
   for (const execTime of executionTimes) {
     const executionDate = new Date(execTime.executionTime);
@@ -122,20 +376,46 @@ async function scheduleLive<T>(
           const context: RunContext = {
             run,
             timeslot: execTime.timeslot,
-            shortlist: execTime.shortlist as RunContext["shortlist"],
+            shortlist: execTime.shortlist,
             executionTime: execTime.executionTime,
           };
 
           console.log(
             `Executing LIVE at ${execTime.executionTime} for run ${run.id}`
           );
-          await fn(context);
+
+          // Execute with 5-minute timeout
+          await Promise.race([
+            fn(context),
+            new Promise<never>((_, reject) =>
+              setTimeout(
+                () =>
+                  reject(
+                    new Error(
+                      `Execution timeout: exceeded ${
+                        EXECUTION_TIMEOUT_MS / 1000 / 60
+                      } minutes`
+                    )
+                  ),
+                EXECUTION_TIMEOUT_MS
+              )
+            ),
+          ]);
         } catch (error) {
           // Log error and continue
           console.error(
             `Error executing LIVE at ${execTime.executionTime} for run ${run.id}:`,
             error
           );
+        } finally {
+          completedExecutions++;
+          // Check if all executions are complete
+          if (completedExecutions === totalExecutions) {
+            // Update run status to COMPLETED
+            runsApi.updateRun(run.id, { status: "COMPLETED" }).catch((err) => {
+              console.error(`Error updating run ${run.id} status:`, err);
+            });
+          }
         }
       });
 
@@ -153,28 +433,14 @@ async function scheduleLive<T>(
       console.log(
         `Skipping past execution time ${execTime.executionTime} for run ${run.id}`
       );
+      completedExecutions++;
+      // If all executions are in the past, mark as completed
+      if (completedExecutions === totalExecutions) {
+        runsApi.updateRun(run.id, { status: "COMPLETED" }).catch((err) => {
+          console.error(`Error updating run ${run.id} status:`, err);
+        });
+      }
     }
-  }
-
-  // Wait for all scheduled jobs to complete
-  // Note: In a real implementation, you might want to keep the process alive
-  // and handle job completion differently. For now, we'll wait until the last scheduled time.
-  const lastExecutionTime =
-    executionTimes.length > 0
-      ? new Date(executionTimes[executionTimes.length - 1].executionTime)
-      : now;
-
-  if (lastExecutionTime > now) {
-    const waitTime = lastExecutionTime.getTime() - now.getTime();
-    console.log(
-      `Waiting ${Math.round(
-        waitTime / 1000 / 60
-      )} minutes for all LIVE executions to complete for run ${run.id}`
-    );
-    // Wait for the last execution time plus a buffer
-    await new Promise(
-      (resolve) => setTimeout(resolve, waitTime + 60000) // Add 1 minute buffer
-    );
   }
 
   console.log(`Completed scheduling LIVE run ${run.id}`);

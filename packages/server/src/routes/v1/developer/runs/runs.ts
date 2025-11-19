@@ -11,9 +11,10 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       // get user
       const user = request.user;
 
-      // get runs
+      // get runs - only return PENDING runs
       const runs = await prisma.strategyVersionRun.findMany({
         where: {
+          status: "PENDING",
           version: {
             strategy: {
               owner: {
