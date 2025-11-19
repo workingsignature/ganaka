@@ -1,4 +1,5 @@
 import { ganaka } from "@ganaka/sdk";
+import dayjs from "dayjs";
 
 async function testGanaka() {
   console.log("Testing Ganaka SDK...\n");
@@ -6,8 +7,12 @@ async function testGanaka() {
   try {
     // Test the ganaka function
     const result = await ganaka({
-      fn: async () => {
-        console.log("Executing test function...");
+      fn: async (context) => {
+        console.log(
+          `Executing test function for run ${context.run.id} at ${dayjs(
+            context.executionTime
+          ).format("YYYY-MM-DD HH:mm:ss")}`
+        );
         return { success: true, message: "Test completed successfully" };
       },
     });

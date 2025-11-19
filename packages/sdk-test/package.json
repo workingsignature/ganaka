@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ganaka/sdk": "workspace:*",
+    "dayjs": "^1.11.19",
     "dotenv": "^16.4.5"
   },
   "devDependencies": {

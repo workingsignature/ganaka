@@ -71,6 +71,8 @@
   "dependencies": {
     "@ganaka/server-schemas": "workspace:*",
     "axios": "^1.12.2",
+    "croner": "^8.0.0",
+    "dayjs": "^1.11.10",
     "zod": "^4.1.11"
   },
   "peerDependencies": {

@@ -180,6 +180,12 @@ importers:
       axios:
         specifier: ^1.12.2
         version: 1.12.2
+      croner:
+        specifier: ^8.0.0
+        version: 8.1.2
+      dayjs:
+        specifier: ^1.11.10
+        version: 1.11.19
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1
@@ -232,6 +238,9 @@ importers:
       '@ganaka/sdk':
         specifier: workspace:*
         version: link:../sdk
+      dayjs:
+        specifier: ^1.11.19
+        version: 1.11.19
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1
@@ -2005,6 +2014,10 @@ packages:
   cron-parser@4.9.0:
     resolution: {integrity: sha512-p0SaNjrHOnQeR8/VnfGbmg9te2kfyYSQ7Sc/j/6DtPL3JQvKxmjO9TSjNFpujqV3vEYYBvNNvXSxzyksBWAx1Q==}
     engines: {node: '>=12.0.0'}
+
+  croner@8.1.2:
+    resolution: {integrity: sha512-ypfPFcAXHuAZRCzo3vJL6ltENzniTjwe/qsLleH1V2/7SRDjgvRQyrLmumFTLmjFax4IuSxfGXEn79fozXcJog==}
+    engines: {node: '>=18.0'}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -6200,6 +6213,8 @@ snapshots:
   cron-parser@4.9.0:
     dependencies:
       luxon: 3.7.2
+
+  croner@8.1.2: {}
 
   cross-spawn@7.0.6:
     dependencies:

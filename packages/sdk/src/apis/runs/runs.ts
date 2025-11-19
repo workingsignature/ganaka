@@ -12,4 +12,19 @@ export const runsApi = {
       return null;
     }
   },
+  updateRun: async (
+    runId: string,
+    data: { status?: string; errorLog?: string | null }
+  ) => {
+    try {
+      const response = await api.put(
+        `${API_URL}/developer/runs/${runId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  },
 };

@@ -30,7 +30,7 @@ export default defineConfig({
         }),
         commonjs(),
       ],
-      // Externalize dotenv - it will be a peer dependency
+      // Externalize dependencies that should not be bundled
       external: ["dotenv"],
       output: {
         // Use named exports to avoid the warning
