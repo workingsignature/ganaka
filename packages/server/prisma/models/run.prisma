@@ -1,0 +1,61 @@
+model Run {
+    id String @id @default(uuid())
+
+    schedule         Json
+    currentBalance   Float   @default(0)
+    startingBalance  Float   @default(0)
+    endingBalance    Float   @default(0)
+    runType          RunType
+    errorLog         String?
+    customAttributes Json?   @default("{}")
+
+    status     RunStatus       @default(PENDING)
+    version    StrategyVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+    executions RunExecution[]
+
+    versionId String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([versionId])
+}
+
+enum RunType {
+    BACKTEST
+    LIVE
+}
+
+enum RunStatus {
+    PENDING
+    RUNNING
+    COMPLETED
+    FAILED
+    CANCELLED
+}
+
+model RunExecution {
+    id String @id @default(uuid())
+
+    run           Run             @relation(fields: [runId], references: [id], onDelete: Cascade)
+    executionTime DateTime
+    status        ExecutionStatus @default(PENDING)
+    executedAt    DateTime?
+    errorLog      String?
+    timeslot      Json?
+    day           String?
+
+    runId     String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([runId])
+    @@index([executionTime])
+    @@map("RunExecution")
+}
+
+enum ExecutionStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    SKIPPED
+}

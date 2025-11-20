@@ -13,9 +13,16 @@
       "command": "pnpm run dev:server"
     },
     {
-      "name": "Server: Build",
+      "name": "SDK: Build",
       "focus": true,
-      "command": "pnpm run build:server",
+      "command": "pnpm run build:sdk",
+      "onlySingle": true
+    },
+    {
+      "name": "SDK Test: Dev",
+      "focus": true,
+      "command": "pnpm run dev:sdk-test",
+      "split": "SDK: Build",
       "onlySingle": true
     },
     {
@@ -25,15 +32,15 @@
       "onlySingle": true
     },
     {
-      "name": "Bot: Dev",
-      "focus": true,
-      "command": "pnpm run dev:bot",
-      "onlySingle": true
-    },
-    {
       "name": "Server: Migrate:dev",
       "focus": true,
       "command": "pnpm run prisma:migrate:dev",
+      "onlySingle": true
+    },
+    {
+      "name": "Server: Build",
+      "focus": true,
+      "command": "pnpm run build:server",
       "onlySingle": true
     }
   ]

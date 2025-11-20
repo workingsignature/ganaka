@@ -252,7 +252,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // get runs
-      const runs = await prisma.strategyVersionRun.findMany({
+      const runs = await prisma.run.findMany({
         where: {
           versionId: validatedParams.versionid,
         },
@@ -363,7 +363,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // get run
-      const run = await prisma.strategyVersionRun.findFirst({
+      const run = await prisma.run.findFirst({
         where: {
           id: validatedParams.id,
           versionId: validatedParams.versionid,
@@ -491,7 +491,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // create run
-      const run = await prisma.strategyVersionRun.create({
+      const run = await prisma.run.create({
         data: {
           schedule: validatedBody.schedule as InputJsonValue,
           currentBalance: validatedBody.startingBalance, // Initially set to starting balance
@@ -604,7 +604,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // check if run exists
-      const run = await prisma.strategyVersionRun.findFirst({
+      const run = await prisma.run.findFirst({
         where: {
           id: validatedParams.id,
           versionId: validatedParams.versionid,
@@ -617,7 +617,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // delete run
-      await prisma.strategyVersionRun.delete({
+      await prisma.run.delete({
         where: { id: validatedParams.id },
       });
 
@@ -695,7 +695,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // check if run exists
-      const existingRun = await prisma.strategyVersionRun.findFirst({
+      const existingRun = await prisma.run.findFirst({
         where: {
           id: validatedParams.id,
           versionId: validatedParams.versionid,
@@ -724,7 +724,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // update run
-      const run = await prisma.strategyVersionRun.update({
+      const run = await prisma.run.update({
         where: { id: validatedParams.id },
         data: {
           schedule:
