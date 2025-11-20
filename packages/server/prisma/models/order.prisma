@@ -1,0 +1,48 @@
+model Order {
+    id String @id @default(uuid())
+
+    run        Run        @relation(fields: [runId], references: [id], onDelete: Cascade)
+    instrument Instrument @relation(fields: [instrumentId], references: [id], onDelete: Restrict)
+
+    orderType   OrderType
+    orderStatus OrderStatus @default(PENDING)
+
+    quantity Float
+    price    Float?
+
+    stopLoss Float?
+    target   Float?
+
+    filledPrice    Float?
+    filledQuantity Float?
+    filledAt       DateTime?
+
+    metadata Json? @default("{}")
+
+    runId        String
+    instrumentId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([runId])
+    @@index([instrumentId])
+    @@index([orderStatus])
+}
+
+enum OrderType {
+    BUY
+    SELL
+    BUY_LIMIT
+    SELL_LIMIT
+    BUY_STOP
+    SELL_STOP
+}
+
+enum OrderStatus {
+    PENDING
+    FILLED
+    CANCELLED
+    FAILED
+}
+

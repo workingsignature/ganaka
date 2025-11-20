@@ -78,7 +78,7 @@ export const createExecutions = {
 export const updateExecution = {
   params: z.object({
     id: z.string(),
-    executionId: z.string(),
+    executionid: z.string(),
   }),
   body: z.object({
     status: executionStatusSchema.optional(),

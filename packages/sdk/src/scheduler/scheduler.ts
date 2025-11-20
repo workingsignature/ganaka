@@ -5,6 +5,7 @@ import { existsSync } from "fs";
 import { fileURLToPath } from "url";
 import { createRequire } from "module";
 import { runsApi } from "../apis/runs/runs";
+import { ordersApi } from "../apis/orders/orders";
 import { RunItem, RunContext, ExecutionTime } from "./types";
 import { generateExecutionTimes } from "./utils";
 
@@ -311,6 +312,12 @@ export function executeBacktestInWorker<T>(
             timeslot: message.executionTime.timeslot,
             shortlist: message.executionTime.shortlist,
             executionTime: message.executionTime.executionTime,
+            orders: {
+              placeOrder: (orderData) => ordersApi.placeOrder(run.id, orderData),
+              getOrders: (filters) => ordersApi.getOrders(run.id, filters),
+              getOrder: (orderId) => ordersApi.getOrder(run.id, orderId),
+              cancelOrder: (orderId) => ordersApi.cancelOrder(run.id, orderId),
+            },
           };
 
           console.log(
@@ -476,6 +483,12 @@ export function scheduleLive<T>(
             timeslot: execTime.timeslot,
             shortlist: execTime.shortlist,
             executionTime: execTime.executionTime,
+            orders: {
+              placeOrder: (orderData) => ordersApi.placeOrder(run.id, orderData),
+              getOrders: (filters) => ordersApi.getOrders(run.id, filters),
+              getOrder: (orderId) => ordersApi.getOrder(run.id, orderId),
+              cancelOrder: (orderId) => ordersApi.cancelOrder(run.id, orderId),
+            },
           };
 
           console.log(

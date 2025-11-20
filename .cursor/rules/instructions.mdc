@@ -14,3 +14,5 @@ If the required color isn't available, create a reusable variable in index.css f
 Only use GText when the text needs to be copied. For most normal text, use Text.
 
 Only use "as" typecasting when absolutely necessary, as it is not fully typesafe or strict.
+
+URL params should always be lowercase characters.

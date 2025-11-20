@@ -12,6 +12,7 @@ model Run {
     status     RunStatus       @default(PENDING)
     version    StrategyVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
     executions RunExecution[]
+    orders     Order[]
 
     versionId String
     createdAt DateTime @default(now())

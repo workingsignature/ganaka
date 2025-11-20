@@ -3,6 +3,10 @@ import {
   v1_core_strategies_versions_runs_schemas,
   v1_core_shortlists_schemas,
 } from "@ganaka/server-schemas";
+import {
+  PlaceOrderData,
+  OrderFilters,
+} from "../apis/orders/orders";
 
 export type RunItem = z.infer<
   typeof v1_core_strategies_versions_runs_schemas.runItemSchema
@@ -35,4 +39,10 @@ export type RunContext = {
   timeslot: Timeslot;
   shortlist: ShortlistItem[];
   executionTime: string; // ISO datetime string
+  orders: {
+    placeOrder: (orderData: PlaceOrderData) => Promise<unknown>;
+    getOrders: (filters?: OrderFilters) => Promise<unknown>;
+    getOrder: (orderId: string) => Promise<unknown>;
+    cancelOrder: (orderId: string) => Promise<unknown>;
+  };
 };

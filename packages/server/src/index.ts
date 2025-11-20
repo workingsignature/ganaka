@@ -48,7 +48,7 @@ fastify.register(async function (fastify, opts) {
   fastify.register(autoLoad, {
     dir: path.join(__dirname, "routes/v1/developer"),
     options: { prefix: "/v1/developer/" },
-    maxDepth: 3,
+    maxDepth: 5,
   });
 });
 

@@ -167,7 +167,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // ==================== PUT /runs/:id/executions/:executionId ====================
   // More specific route must come first to avoid routing conflicts
-  fastify.put("/:id/executions/:executionId", async (request, reply) => {
+  fastify.put("/:id/executions/:executionid", async (request, reply) => {
     try {
       // get user
       const user = request.user;
@@ -218,7 +218,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
       // check if execution exists and belongs to run
       const existingExecution = await prisma.runExecution.findFirst({
         where: {
-          id: params.executionId,
+          id: params.executionid,
           runId: params.id,
         },
       });
@@ -230,7 +230,7 @@ const runsRoutes: FastifyPluginAsync = async (fastify) => {
 
       // update execution
       const execution = await prisma.runExecution.update({
-        where: { id: params.executionId },
+        where: { id: params.executionid },
         data: {
           status: body.status ?? existingExecution.status,
           executedAt:
