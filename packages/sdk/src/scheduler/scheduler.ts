@@ -65,7 +65,7 @@ function getWorkerPath(): string {
       // Get the current file's location
       const currentFile = fileURLToPath(import.meta.url);
       const currentDir = dirname(currentFile);
-      
+
       // Check if we're in dist (built version)
       // Structure: packages/sdk/dist/scheduler/scheduler.js (or .mjs)
       // We want: packages/sdk/dist/scheduler/worker.js
@@ -75,7 +75,7 @@ function getWorkerPath(): string {
           return distWorkerPath;
         }
       }
-      
+
       // Check if we're in src (development/source version)
       // Structure: packages/sdk/src/scheduler/scheduler.ts
       // We want: packages/sdk/dist/scheduler/worker.js
@@ -83,13 +83,18 @@ function getWorkerPath(): string {
         // Navigate: src/scheduler -> src -> package root -> dist/scheduler
         const srcDir = dirname(currentDir); // src
         const packageRoot = dirname(srcDir); // packages/sdk
-        const distWorkerPath = join(packageRoot, "dist", "scheduler", "worker.js");
-        
+        const distWorkerPath = join(
+          packageRoot,
+          "dist",
+          "scheduler",
+          "worker.js"
+        );
+
         if (existsSync(distWorkerPath)) {
           return distWorkerPath;
         }
       }
-      
+
       // Try navigating up to find dist/scheduler/worker.js
       // This handles cases where the file structure might be different
       let searchDir = currentDir;
@@ -159,10 +164,34 @@ export async function scheduleRun<T>(
       return;
     }
 
+    // Create execution records in DB
+    const executionRecords = await runsApi.createExecutions(
+      run.id,
+      executionTimes.map((execTime) => ({
+        executionTime: execTime.executionTime,
+        timeslot: execTime.timeslot,
+        day: execTime.day,
+      }))
+    );
+
+    if (!executionRecords || !executionRecords.data) {
+      console.error(
+        `Failed to create execution records for run ${run.id}, continuing anyway`
+      );
+    }
+
+    // Create a map of executionTime -> executionId for later updates
+    const executionMap = new Map<string, string>();
+    if (executionRecords && executionRecords.data) {
+      for (const execRecord of executionRecords.data) {
+        executionMap.set(execRecord.executionTime, execRecord.id);
+      }
+    }
+
     if (run.runType === "BACKTEST") {
       // For BACKTEST: execute in worker thread (non-blocking)
       try {
-        executeBacktestInWorker(run, executionTimes, fn);
+        executeBacktestInWorker(run, executionTimes, fn, executionMap);
       } catch (error) {
         console.error(
           `Error spawning backtest worker for run ${run.id}:`,
@@ -181,7 +210,7 @@ export async function scheduleRun<T>(
       return;
     } else if (run.runType === "LIVE") {
       // For LIVE: schedule all timeslots (non-blocking)
-      scheduleLive(run, executionTimes, fn);
+      scheduleLive(run, executionTimes, fn, executionMap);
       // Return immediately - don't wait for completion
       return;
     } else {
@@ -203,10 +232,11 @@ export async function scheduleRun<T>(
  * Execute BACKTEST mode: spawn worker thread to coordinate execution
  * The worker thread can be terminated if it exceeds the timeout
  */
-function executeBacktestInWorker<T>(
+export function executeBacktestInWorker<T>(
   run: RunItem,
   executionTimes: ExecutionTime[],
-  fn: UserFunction<T>
+  fn: UserFunction<T>,
+  executionMap: Map<string, string>
 ): void {
   console.log(
     `Starting BACKTEST worker for run ${run.id} with ${executionTimes.length} execution times`
@@ -256,6 +286,25 @@ function executeBacktestInWorker<T>(
       error?: string;
     }) => {
       if (message.type === "execute" && message.executionTime) {
+        const executionId = executionMap.get(
+          message.executionTime.executionTime
+        );
+        const executedAt = new Date().toISOString();
+
+        // Update execution status to mark as started
+        if (executionId) {
+          runsApi
+            .updateExecution(run.id, executionId, {
+              executedAt,
+            })
+            .catch((err) => {
+              console.error(
+                `Error updating execution ${executionId} start time:`,
+                err
+              );
+            });
+        }
+
         try {
           const context: RunContext = {
             run,
@@ -286,25 +335,58 @@ function executeBacktestInWorker<T>(
             ),
           ]);
 
+          // Update execution status to COMPLETED
+          if (executionId) {
+            runsApi
+              .updateExecution(run.id, executionId, {
+                status: "COMPLETED",
+                executedAt,
+              })
+              .catch((err) => {
+                console.error(
+                  `Error updating execution ${executionId} status:`,
+                  err
+                );
+              });
+          }
+
           // Notify worker that execution completed
           worker.postMessage({ type: "execution-complete" });
         } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           console.error(
             `Error executing BACKTEST at ${message.executionTime.executionTime} for run ${run.id}:`,
             error
           );
+
+          // Update execution status to FAILED
+          if (executionId) {
+            runsApi
+              .updateExecution(run.id, executionId, {
+                status: "FAILED",
+                executedAt,
+                errorLog: errorMessage,
+              })
+              .catch((err) => {
+                console.error(
+                  `Error updating execution ${executionId} failure status:`,
+                  err
+                );
+              });
+          }
+
           // Notify worker of error but continue
           worker.postMessage({
             type: "execution-error",
-            error: error instanceof Error ? error.message : String(error),
+            error: errorMessage,
           });
         }
       } else if (message.type === "complete") {
         clearTimeout(timeoutId);
         console.log(`Completed BACKTEST for run ${run.id}`);
-        runsApi.updateRun(run.id, { status: "COMPLETED" }).catch((err) => {
-          console.error(`Error updating run ${run.id} status:`, err);
-        });
+        // Check completion status via DB
+        checkAndUpdateRunCompletion(run.id);
         worker.terminate();
       } else if (message.type === "error") {
         clearTimeout(timeoutId);
@@ -352,10 +434,11 @@ function executeBacktestInWorker<T>(
  * Schedule LIVE mode: use croner to schedule all timeslots
  * Returns immediately after scheduling (non-blocking)
  */
-function scheduleLive<T>(
+export function scheduleLive<T>(
   run: RunItem,
   executionTimes: ExecutionTime[],
-  fn: UserFunction<T>
+  fn: UserFunction<T>,
+  executionMap: Map<string, string>
 ): void {
   console.log(
     `Scheduling LIVE run ${run.id} with ${executionTimes.length} execution times`
@@ -363,15 +446,30 @@ function scheduleLive<T>(
 
   const scheduledJobs: Cron[] = [];
   const now = new Date();
-  let completedExecutions = 0;
-  const totalExecutions = executionTimes.length;
 
   for (const execTime of executionTimes) {
     const executionDate = new Date(execTime.executionTime);
 
     // Only schedule future executions
     if (executionDate > now) {
+      const executionId = executionMap.get(execTime.executionTime);
       const job = new Cron(executionDate, async () => {
+        const executedAt = new Date().toISOString();
+
+        // Update execution status to mark as started
+        if (executionId) {
+          runsApi
+            .updateExecution(run.id, executionId, {
+              executedAt,
+            })
+            .catch((err) => {
+              console.error(
+                `Error updating execution ${executionId} start time:`,
+                err
+              );
+            });
+        }
+
         try {
           const context: RunContext = {
             run,
@@ -401,21 +499,51 @@ function scheduleLive<T>(
               )
             ),
           ]);
+
+          // Update execution status to COMPLETED
+          if (executionId) {
+            runsApi
+              .updateExecution(run.id, executionId, {
+                status: "COMPLETED",
+                executedAt,
+              })
+              .catch((err) => {
+                console.error(
+                  `Error updating execution ${executionId} status:`,
+                  err
+                );
+              });
+          }
+
+          // Check if all executions are complete by querying DB
+          checkAndUpdateRunCompletion(run.id);
         } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           // Log error and continue
           console.error(
             `Error executing LIVE at ${execTime.executionTime} for run ${run.id}:`,
             error
           );
-        } finally {
-          completedExecutions++;
-          // Check if all executions are complete
-          if (completedExecutions === totalExecutions) {
-            // Update run status to COMPLETED
-            runsApi.updateRun(run.id, { status: "COMPLETED" }).catch((err) => {
-              console.error(`Error updating run ${run.id} status:`, err);
-            });
+
+          // Update execution status to FAILED
+          if (executionId) {
+            runsApi
+              .updateExecution(run.id, executionId, {
+                status: "FAILED",
+                executedAt,
+                errorLog: errorMessage,
+              })
+              .catch((err) => {
+                console.error(
+                  `Error updating execution ${executionId} failure status:`,
+                  err
+                );
+              });
           }
+
+          // Check if all executions are complete by querying DB
+          checkAndUpdateRunCompletion(run.id);
         }
       });
 
@@ -433,15 +561,46 @@ function scheduleLive<T>(
       console.log(
         `Skipping past execution time ${execTime.executionTime} for run ${run.id}`
       );
-      completedExecutions++;
-      // If all executions are in the past, mark as completed
-      if (completedExecutions === totalExecutions) {
-        runsApi.updateRun(run.id, { status: "COMPLETED" }).catch((err) => {
-          console.error(`Error updating run ${run.id} status:`, err);
-        });
+      // Mark past execution as SKIPPED
+      const executionId = executionMap.get(execTime.executionTime);
+      if (executionId) {
+        runsApi
+          .updateExecution(run.id, executionId, {
+            status: "SKIPPED",
+          })
+          .catch((err) => {
+            console.error(
+              `Error updating execution ${executionId} to SKIPPED:`,
+              err
+            );
+          });
       }
     }
   }
 
+  // Check if all executions are complete (for past executions)
+  checkAndUpdateRunCompletion(run.id);
+
   console.log(`Completed scheduling LIVE run ${run.id}`);
+}
+
+/**
+ * Check if all executions for a run are complete and update run status accordingly
+ */
+async function checkAndUpdateRunCompletion(runId: string): Promise<void> {
+  try {
+    const incompleteResult = await runsApi.getIncompleteExecutions(runId);
+    if (
+      incompleteResult &&
+      incompleteResult.data &&
+      incompleteResult.data.length === 0
+    ) {
+      // All executions are complete
+      runsApi.updateRun(runId, { status: "COMPLETED" }).catch((err) => {
+        console.error(`Error updating run ${runId} status:`, err);
+      });
+    }
+  } catch (error) {
+    console.error(`Error checking completion status for run ${runId}:`, error);
+  }
 }

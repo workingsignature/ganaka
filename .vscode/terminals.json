@@ -22,6 +22,7 @@
       "name": "SDK Test: Dev",
       "focus": true,
       "command": "pnpm run dev:sdk-test",
+      "split": "SDK: Build",
       "onlySingle": true
     },
     {
